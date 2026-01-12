@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULY - Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 50px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .logo-text {
+            text-align: left;
+        }
+        
+        .logo-main {
+            font-size: 32px;
+            font-weight: 800;
+            color: #000000;
+        }
+        
+        .logo-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .auth-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .auth-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .code-input-container {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .code-input {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        
+        .code-input:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .code-input.error {
+            border-color: #ff4444;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .auth-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #0066cc 0%, #004c99 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .auth-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 102, 204, 0.2);
+        }
+        
+        .auth-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            display: block;
+        }
+        
+        .attempts-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .security-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+        }
+        
+        .admin-note {
+            background: #f8f9fa;
+            border-left: 4px solid #ff6600;
+            padding: 15px;
+            margin-top: 30px;
+            text-align: left;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        .admin-note h4 {
+            color: #ff6600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .lock-info {
+            background: #fff3f3;
+            border: 2px solid #ff4444;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
+        }
+        
+        .timer {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff4444;
+            margin: 10px 0;
+        }
+        
+        /* 同步状态样式 */
+        .sync-status {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .sync-status.syncing {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .sync-status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .sync-status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 跳转信息样式 */
+        .redirect-info {
+            background: #e8f4ff;
+            border: 2px solid #0066cc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #0066cc;
+        }
+        
+        .redirect-info i {
+            margin-right: 8px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 576px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+            
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-text {
+                text-align: center;
+            }
+            
+            .auth-title {
+                font-size: 24px;
+            }
+            
+            .code-input {
+                font-size: 16px;
+                padding: 16px;
+            }
+            
+            .logo-icon {
+                width: 70px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <!-- 使用Info/Title.jpg作为图标 -->
+                <img src="Info/Title.jpg" alt="ULY Logo">
+            </div>
+            <div class="logo-text">
+                <div class="logo-main">ULY</div>
+                <div class="logo-subtitle">Mechanical Parts Intelligent Query System</div>
+            </div>
+        </div>
+        
+        <h1 class="auth-title">Access Verification</h1>
+        <p class="auth-subtitle">Please enter the access verification code to enter the system</p>
+        
+        <!-- 跳转信息显示 -->
+        <div class="redirect-info" id="redirect-info" style="display: none;">
+            <i class="fas fa-arrow-right"></i>
+            <span id="redirect-message">After verification, you will be redirected to: <strong id="target-page"></strong></span>
+        </div>
+        
+        <!-- 同步状态显示 -->
+        <div class="sync-status" id="sync-status" style="display: none;">
+            <i class="fas fa-sync-alt"></i>
+            <span id="sync-message">Syncing verification code...</span>
+        </div>
+        
+        <!-- 锁定信息显示区 -->
+        <div class="lock-info" id="lock-info" style="display: none;">
+            <i class="fas fa-lock" style="font-size: 40px; color: #ff4444; margin-bottom: 15px;"></i>
+            <h3 style="color: #ff4444; margin-bottom: 10px;">Account Locked</h3>
+            <p>Your account has been temporarily locked due to multiple failed verification attempts</p>
+            <div class="timer" id="lock-timer"></div>
+            <p>Please try again later</p>
+        </div>
+        
+        <!-- 正常验证表单 -->
+        <div id="auth-form">
+            <div class="code-input-container">
+                <input type="text" 
+                       class="code-input" 
+                       id="auth-code" 
+                       placeholder="Enter verification code" 
+                       maxlength="20"
+                       autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       spellcheck="false">
+            </div>
+            
+            <button class="auth-button" id="submit-auth">
+                <i class="fas fa-lock-open"></i> Verify & Enter System
+            </button>
+            
+            <div class="attempts-info" id="attempts-info">
+                Please enter the correct verification code to access the system
+            </div>
+        </div>
+        
+        <!-- 消息显示区 -->
+        <div class="message" id="auth-message"></div>
+        
+        <!-- 管理员说明 -->
+        <div class="admin-note">
+            <h4><i class="fas fa-info-circle"></i> System Security Notes</h4>
+            <p>• The verification code is updated regularly, please obtain the latest code from the administrator</p>
+            <p>• 3 consecutive failed attempts will lock the account for 5 minutes</p>
+            <p>• No need to verify again within 24 hours after successful verification</p>
+            <p>• HTML injection protection mechanism is enabled</p>
+        </div>
+        
+        <!-- 安全信息 -->
+        <div class="security-info">
+            <i class="fas fa-shield-alt"></i> 
+            ULY Security Verification System | Data Encrypted | Last Sync: <span id="last-sync"></span>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // GitHub Gist配置 - 只使用Gist ID，不需要Token
+        const GIST_CONFIG = {
+            gistId: '52102f8d0c8808a733ce44513a4cedd9'
+        };
+
+        // 全局变量声明
+        let authCodeInput, submitButton, authMessage, attemptsInfo;
+        let lockInfo, lockTimer, authForm, lastSync;
+        let syncStatus, syncMessage, redirectInfo, redirectMessage, targetPageElement;
+
+        // 初始化所有DOM元素引用
+        function initDOMElements() {
+            authCodeInput = document.getElementById('auth-code');
+            submitButton = document.getElementById('submit-auth');
+            authMessage = document.getElementById('auth-message');
+            attemptsInfo = document.getElementById('attempts-info');
+            lockInfo = document.getElementById('lock-info');
+            lockTimer = document.getElementById('lock-timer');
+            authForm = document.getElementById('auth-form');
+            lastSync = document.getElementById('last-sync');
+            syncStatus = document.getElementById('sync-status');
+            syncMessage = document.getElementById('sync-message');
+            redirectInfo = document.getElementById('redirect-info');
+            redirectMessage = document.getElementById('redirect-message');
+            targetPageElement = document.getElementById('target-page');
+        }
+
+        // 获取重定向URL - 改进版
+        function getReturnUrl() {
+            console.log('正在获取重定向URL...');
+            
+            // 1. 首先检查URL参数（最直接的方式）
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnTo = urlParams.get('return');
+            
+            if (returnTo && returnTo !== 'auth.html') {
+                console.log('从URL参数获取到返回页面:', returnTo);
+                // 保存到sessionStorage以备后用
+                sessionStorage.setItem('uly_return_page', returnTo);
+                return returnTo;
+            }
+            
+            // 2. 检查sessionStorage中的返回页面
+            const sessionReturn = sessionStorage.getItem('uly_return_page');
+            if (sessionReturn && sessionReturn !== 'auth.html') {
+                console.log('从sessionStorage获取到返回页面:', sessionReturn);
+                return sessionReturn;
+            }
+            
+            // 3. 检查referrer页面
+            try {
+                const referrer = document.referrer;
+                if (referrer && referrer.includes(window.location.origin)) {
+                    const referrerPage = referrer.split('/').pop();
+                    if (referrerPage && referrerPage !== 'auth.html') {
+                        console.log('从referrer获取到返回页面:', referrerPage);
+                        return referrerPage;
+                    }
+                }
+            } catch (e) {
+                console.log('无法获取referrer:', e);
+            }
+            
+            // 4. 检查历史记录
+            const previousPage = sessionStorage.getItem('uly_previous_page');
+            if (previousPage && previousPage !== 'auth.html') {
+                console.log('从历史记录获取到返回页面:', previousPage);
+                return previousPage;
+            }
+            
+            // 5. 默认页面
+            console.log('使用默认返回页面: index.html');
+            return 'index.html';
+        }
+
+        // 显示重定向信息
+        function showRedirectInfo() {
+            const returnUrl = getReturnUrl();
+            if (returnUrl && returnUrl !== 'index.html') {
+                targetPageElement.textContent = returnUrl;
+                redirectInfo.style.display = 'block';
+            }
+        }
+
+        // 从GitHub Gist获取验证码
+        async function fetchCodeFromGist() {
+            try {
+                // 显示同步状态
+                syncStatus.style.display = 'flex';
+                syncStatus.className = 'sync-status syncing';
+                syncMessage.innerHTML = '<span class="loading"></span> Syncing verification code from GitHub Gist...';
+                
+                // 构建Gist URL - 使用公开的raw URL（不需要token）
+                const gistUrl = `https://gist.githubusercontent.com/raw/${GIST_CONFIG.gistId}/uly_config.json`;
+                
+                console.log('从Gist获取验证码:', gistUrl);
+                
+                // 添加随机参数防止缓存
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${gistUrl}?t=${timestamp}`, {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch Gist: HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data || !data.code) {
+                    throw new Error('No verification code found in Gist');
+                }
+                
+                // 更新本地验证码（仅更新authManager的配置，不自动验证）
+                if (window.authManager && window.authManager.updateCode) {
+                    const result = window.authManager.updateCode(data.code);
+                    
+                    if (result.success) {
+                        // 保存同步时间
+                        localStorage.setItem('uly_last_sync_time', Date.now().toString());
+                        localStorage.setItem('uly_gist_cache', data.code);
+                        localStorage.setItem('uly_gist_cache_time', Date.now().toString());
+                        
+                        // 更新显示
+                        syncStatus.className = 'sync-status success';
+                        syncMessage.innerHTML = '<i class="fas fa-check-circle"></i> Verification code synced successfully';
+                        lastSync.textContent = 'Just now';
+                        
+                        // 延迟隐藏同步状态
+                        setTimeout(() => {
+                            syncStatus.style.display = 'none';
+                        }, 3000);
+                        
+                        return {
+                            success: true,
+                            code: data.code,
+                            updated_at: data.updated_at || new Date().toISOString()
+                        };
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } else {
+                    throw new Error('authManager not initialized');
+                }
+            } catch (error) {
+                console.error('Failed to sync from Gist:', error);
+                
+                // 显示错误状态
+                syncStatus.className = 'sync-status error';
+                syncMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Sync failed: ${error.message}`;
+                
+                // 使用缓存的验证码时间戳
+                const lastSyncTime = localStorage.getItem('uly_last_sync_time');
+                if (lastSyncTime) {
+                    const time = new Date(parseInt(lastSyncTime));
+                    lastSync.textContent = time.toLocaleString();
+                } else {
+                    lastSync.textContent = 'Never';
+                }
+                
+                // 延迟隐藏同步状态
+                setTimeout(() => {
+                    syncStatus.style.display = 'none';
+                }, 5000);
+                
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        // 检查是否已被锁定
+        function checkLockStatus() {
+            if (window.authManager && window.authManager.isLocked()) {
+                authForm.style.display = 'none';
+                lockInfo.style.display = 'block';
+                updateLockTimer();
+                return true;
+            }
+            return false;
+        }
+        
+        // 更新锁定计时器
+        function updateLockTimer() {
+            if (!window.authManager) return;
+            
+            const lockUntil = localStorage.getItem(window.authManager.config.lockKey);
+            if (lockUntil) {
+                const remaining = parseInt(lockUntil) - Date.now();
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                
+                lockTimer.textContent = `${minutes}min${seconds.toString().padStart(2, '0')}sec`;
+                
+                if (remaining > 0) {
+                    setTimeout(updateLockTimer, 1000);
+                } else {
+                    // 锁定已过期
+                    location.reload();
+                }
+            }
+        }
+        
+        // 显示消息
+        function showMessage(text, type) {
+            authMessage.textContent = text;
+            authMessage.className = 'message ' + type;
+            authMessage.style.display = 'block';
+            
+            // 如果是错误消息，自动隐藏
+            if (type === 'error') {
+                setTimeout(() => {
+                    authMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // 提交验证
+        function submitAuth() {
+            console.log('submitAuth函数被调用');
+            
+            if (!authCodeInput || !submitButton) {
+                console.error('DOM元素未初始化');
+                return;
+            }
+            
+            const code = authCodeInput.value.trim();
+            
+            if (!code) {
+                showMessage('Please enter verification code', 'error');
+                authCodeInput.classList.add('error');
+                authCodeInput.focus();
+                return;
+            }
+            
+            // 确保authManager可用
+            if (!window.authManager) {
+                console.error('authManager未找到');
+                showMessage('System not initialized, please refresh page', 'error');
+                return;
+            }
+            
+            // 禁用提交按钮
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            
+            // 验证
+            const result = window.authManager.validate(code);
+            
+            // 显示结果
+            if (result.success) {
+                showMessage(result.message, 'success');
+                
+                // 获取重定向URL
+                const redirectUrl = getReturnUrl();
+                console.log('验证成功，跳转到:', redirectUrl);
+                
+                // 清除存储的页面信息，避免下次错误使用
+                sessionStorage.removeItem('uly_return_page');
+                sessionStorage.removeItem('uly_previous_page');
+                
+                // 延迟跳转到目标页面
+                setTimeout(() => {
+                    // 确保URL是有效的
+                    if (redirectUrl && redirectUrl !== 'auth.html') {
+                        window.location.href = redirectUrl;
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 1500);
+            } else {
+                showMessage(result.message, result.locked ? 'warning' : 'error');
+                authCodeInput.classList.add('error');
+                
+                if (result.locked) {
+                    checkLockStatus();
+                } else {
+                    // 更新尝试次数信息
+                    attemptsInfo.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Verification failed, <strong>${result.remainingAttempts}</strong> attempts remaining
+                    `;
+                    attemptsInfo.style.color = '#ff4444';
+                    
+                    // 清空输入框并聚焦
+                    authCodeInput.value = '';
+                    setTimeout(() => {
+                        authCodeInput.focus();
+                    }, 100);
+                }
+                
+                // 重新启用提交按钮
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-lock-open"></i> Verify & Enter System';
+            }
+        }
+        
+        // 设置事件监听器
+        function setupEventListeners() {
+            console.log('设置事件监听器');
+            
+            // 绑定提交按钮 - 使用事件委托确保可靠
+            if (submitButton) {
+                submitButton.addEventListener('click', submitAuth);
+                // 同时设置onclick作为备用
+                submitButton.onclick = submitAuth;
+            }
+            
+            // 输入框事件监听
+            if (authCodeInput) {
+                authCodeInput.addEventListener('input', function() {
+                    this.classList.remove('error');
+                    authMessage.style.display = 'none';
+                    
+                    // 清理输入
+                    if (window.authManager) {
+                        this.value = window.authManager.sanitizeInput(this.value);
+                    }
+                });
+                
+                authCodeInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        submitAuth();
+                    }
+                });
+            }
+            
+            // 添加键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+R 刷新验证码输入
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    if (authCodeInput) {
+                        authCodeInput.value = '';
+                        authCodeInput.focus();
+                        showMessage('Input cleared', 'warning');
+                    }
+                }
+                
+                // ESC 清空输入框
+                if (e.key === 'Escape' && authCodeInput) {
+                    authCodeInput.value = '';
+                    authMessage.style.display = 'none';
+                }
+            });
+        }
+        
+        // 主初始化函数
+        async function initAuthPage() {
+            console.log('初始化验证页面');
+            
+            // 初始化DOM元素
+            initDOMElements();
+            
+            // 显示最后同步时间
+            if (lastSync) {
+                const lastSyncTime = localStorage.getItem('uly_last_sync_time');
+                if (lastSyncTime) {
+                    const time = new Date(parseInt(lastSyncTime));
+                    lastSync.textContent = time.toLocaleString();
+                } else {
+                    lastSync.textContent = 'Not synced';
+                }
+            }
+            
+            // 检查是否已通过验证
+            if (window.authManager && window.authManager.isAuthenticated()) {
+                // 已认证，跳转到目标页面
+                const redirectUrl = getReturnUrl();
+                console.log('已认证，跳转到:', redirectUrl);
+                window.location.href = redirectUrl;
+                return;
+            }
+            
+            // 显示重定向信息
+            showRedirectInfo();
+            
+            // 检查是否被锁定
+            if (window.authManager) {
+                checkLockStatus();
+            }
+            
+            // 如果未锁定，自动从Gist获取验证码
+            if (window.authManager && !window.authManager.isLocked()) {
+                // 从Gist获取最新验证码
+                await fetchCodeFromGist();
+            }
+            
+            // 设置事件监听器
+            setupEventListeners();
+            
+            // 页面加载后自动聚焦输入框
+            if (authCodeInput && window.authManager && !window.authManager.isLocked()) {
+                setTimeout(() => {
+                    authCodeInput.focus();
+                }, 500);
+            }
+            
+            // 如果authManager未加载，等待一下再试
+            if (!window.authManager) {
+                console.warn('authManager未加载，等待后重试');
+                setTimeout(() => {
+                    if (window.authManager) {
+                        console.log('authManager已加载，重新初始化');
+                        initAuthPage();
+                    } else {
+                        console.error('authManager仍未加载，请检查auth.js文件');
+                        showMessage('System initialization failed, please refresh page', 'error');
+                    }
+                }, 1000);
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM加载完成，开始初始化');
+            console.log('window.authManager:', window.authManager);
+            
+            // 确保authManager全局可用
+            if (typeof authManager !== 'undefined' && !window.authManager) {
+                window.authManager = authManager;
+                console.log('设置window.authManager = authManager');
+            }
+            
+            // 记录来源页面
+            if (document.referrer && document.referrer.includes(window.location.origin)) {
+                const referrerPage = document.referrer.split('/').pop();
+                if (referrerPage && referrerPage !== 'auth.html') {
+                    sessionStorage.setItem('uly_previous_page', referrerPage);
+                    console.log('记录来源页面:', referrerPage);
+                }
+            }
+            
+            // 延迟一点确保所有资源加载完成
+            setTimeout(() => {
+                initAuthPage();
+            }, 100);
+        });
+        
+        // 添加全局错误处理
+        window.addEventListener('error', function(e) {
+            console.error('全局错误:', e.error);
+        });
+    </script>
+</body>
+</html>
