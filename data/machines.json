@@ -7,24 +7,17 @@
     "icon": "fas fa-leaf"
   },
   {
-    "id": "CG500",
-    "name": "CG500",
+    "id": "MS170",
+    "name": "MS170",
     "type": "chainsaw",
-    "description": "化油器系列 - 大功率型号",
+    "description": "油锯M170",
     "icon": "fas fa-tree"
   },
   {
-    "id": "BC430",
-    "name": "BC430",
+    "id": "TL43",
+    "name": "TL43",
     "type": "brush_cutter",
-    "description": "割灌机系列 - 标准型号",
-    "icon": "fas fa-leaf"
-  },
-  {
-    "id": "BC500",
-    "name": "BC500",
-    "type": "brush_cutter",
-    "description": "割灌机系列 - 大功率型号",
+    "description": "割灌机系列",
     "icon": "fas fa-leaf"
   }
 ]
