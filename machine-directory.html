@@ -1616,7 +1616,6 @@
                             { header: translations[state.currentLanguage].excel_specifications, key: 'specs', width: 40 },
                             { header: translations[state.currentLanguage].excel_brand, key: 'brand', width: 15 },
                             { header: translations[state.currentLanguage].excel_quantity, key: 'quantity', width: 10 },
-                            { header: translations[state.currentLanguage].excel_total_price, key: 'totalPrice', width: 15 }
                         ];
                         
                         worksheet.getColumn(2).height = 120;
@@ -1655,7 +1654,6 @@
                                 specs: item.specs || '',
                                 brand: item.selectedBrand || translations[state.currentLanguage].no_brand,
                                 quantity: item.quantity || 0,
-                                totalPrice: ((item.price || 0) * item.quantity).toFixed(2)
                             });
                             
                             row.height = 75;

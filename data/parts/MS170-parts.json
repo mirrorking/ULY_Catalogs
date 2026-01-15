@@ -42,7 +42,7 @@
     { "name": "STIHL 017 MS170 019 MS190 8mm Pin", "category": "CRANKSHAFT", "code": "120024", "oldCode": "STCS1212", "brand": "STIHL", "specs": "8mm" },
     { "name": "STIHL 018 023 025 MS170 MS180 MS210 MS230 MS250 MS191 MS181 MS171 15X25X5MM", "category": "OIL SEAL", "code": "120078", "oldCode": "STCS1201S", "brand": "STIHL", "specs": "15X25X5MM" },
     { "name": "STIHL MS170 MS180 MS210 MS230 MS250 CARBURETOR GASKET", "category": "GASKET", "code": "140012", "oldCode": "STCS1401", "brand": "STIHL", "specs": "" },
-    { "name": "STIHL MS170 MS180 MS210 MS230 MS250 MUFFLER GASKET", "category": "GASKET", "code": "140015", "oldCode": "STCS1404", "brand": "STIHL", "specs": "" },
+    { "name": "STIHL MS170 MS180 MS210 MS230 MS250 MUFFLER GASKET", "category": "MUFFLER GASKET", "code": "140015", "oldCode": "STCS1404", "brand": "STIHL", "specs": "" },
     { "name": "STIHL MS170 MS180 CARBURETOR GASKET", "category": "GASKET", "code": "140017", "oldCode": "STCS1406", "brand": "STIHL", "specs": "" },
     { "name": "STIHL MS170 MS180 017 018", "category": "MUFFLER", "code": "150025", "oldCode": "STCS1501", "brand": "STIHL", "specs": "" },
     { "name": "STIHL 017 018 MS170 MS180", "category": "IGNITION COIL", "code": "160029", "oldCode": "STCS1614", "brand": "STIHL", "specs": "" },
