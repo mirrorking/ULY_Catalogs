@@ -417,6 +417,7 @@
 
         .detail-action-btn.secondary {
             background: #95a5a6;
+            color: white;
         }
 
         .detail-action-btn.secondary:hover {
@@ -467,6 +468,168 @@
             font-size: 11px;
             font-weight: bold;
             margin-left: 5px;
+        }
+
+        /* 机器类型选择器样式 */
+        .machine-type-selector {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .machine-type-card {
+            width: 300px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .machine-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .machine-type-icon {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .machine-type-icon i {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        .machine-type-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .machine-type-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .machine-type-description {
+            color: #7f8c8d;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        .machine-type-stats {
+            display: flex;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: auto;
+        }
+
+        .type-stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .type-stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #3498db;
+        }
+
+        .type-stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        /* 返回类型选择按钮 */
+        .back-to-type-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 10px;
+        }
+
+        .back-to-type-btn:hover {
+            background: #7f8c8d;
+        }
+        
+        /* 新增：返回机型列表按钮 */
+        .back-to-machines-btn {
+            background: #7f8c8d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .back-to-machines-btn:hover {
+            background: #6c7b7d;
+        }
+        
+        .machine-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .machine-info-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .machine-control-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 新增：零件匹配状态样式 */
+        .part-match-status {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 10px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        .part-matched {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .part-not-matched {
+            background-color: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
@@ -562,13 +725,65 @@
         
         <!-- 主内容区域 -->
         <div class="main-area">
+            <!-- 机器类型选择面板 -->
+            <div class="machine-type-selector" id="machine-type-selector">
+                <!-- 油锯类型卡片 -->
+                <div class="machine-type-card" id="chainsaw-type-card">
+                    <div class="machine-type-icon">
+                        <i class="fas fa-tree"></i>
+                        <h3 data-key="chainsaw">油锯</h3>
+                    </div>
+                    <div class="machine-type-info">
+                        <div class="machine-type-description" data-key="chainsaw_description">
+                            用于砍伐树木、修剪树枝的便携式锯类工具，主要用于林业、园艺和建筑行业。
+                        </div>
+                        <div class="machine-type-stats">
+                            <div class="type-stat-item">
+                                <div class="type-stat-value" id="chainsaw-count">0</div>
+                                <div class="type-stat-label" data-key="machine_models">机型数量</div>
+                            </div>
+                            <div class="type-stat-item">
+                                <div class="type-stat-value" id="chainsaw-parts">0</div>
+                                <div class="type-stat-label" data-key="parts_count">配件总数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 割灌机类型卡片 -->
+                <div class="machine-type-card" id="brush-cutter-type-card">
+                    <div class="machine-type-icon" style="background: linear-gradient(135deg, #27ae60 0%, #219653 100%);">
+                        <i class="fas fa-leaf"></i>
+                        <h3 data-key="brush_cutter">割灌机</h3>
+                    </div>
+                    <div class="machine-type-info">
+                        <div class="machine-type-description" data-key="brush_cutter_description">
+                            用于清理灌木、杂草、小树苗的便携式工具，主要用于园林绿化、农业和道路维护。
+                        </div>
+                        <div class="machine-type-stats">
+                            <div class="type-stat-item">
+                                <div class="type-stat-value" id="brush-cutter-count">0</div>
+                                <div class="type-stat-label" data-key="machine_models">机型数量</div>
+                            </div>
+                            <div class="type-stat-item">
+                                <div class="type-stat-value" id="brush-cutter-parts">0</div>
+                                <div class="type-stat-label" data-key="parts_count">配件总数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 整机选择面板 -->
-            <div class="machine-selector" id="machine-selector">
+            <div class="machine-selector" id="machine-selector" style="display: none;">
                 <div class="selector-header">
-                    <div class="selector-title" data-key="select_machine_model">选择整机型号</div>
+                    <div class="selector-title" id="type-selector-title" data-key="select_machine_model">选择整机型号</div>
                     <div class="selector-stats">
                         <i class="fas fa-filter"></i> <span data-key="total">共</span> <span id="machine-count">0</span> <span data-key="models">个型号</span>
                     </div>
+                    <button class="back-to-type-btn" id="back-to-type-from-selector">
+                        <i class="fas fa-arrow-left"></i> <span data-key="back_to_type">返回类型选择</span>
+                    </button>
                 </div>
                 <div class="machine-grid" id="machine-grid">
                     <!-- 整机卡片将通过JavaScript动态生成 -->
@@ -579,26 +794,29 @@
             <div class="machine-parts-container" id="machine-parts-container">
                 <!-- 整机目录控制栏 -->
                 <div class="machine-controls" id="machine-controls">
-                    <div class="current-machine">
-                        <i class="fas fa-tractor"></i>
-                        <div class="machine-info">
-                            <h3 id="current-machine-name">未选择整机</h3>
-                            <p id="current-machine-code">请先选择整机型号</p>
+                    <div class="machine-info-section">
+                        <div class="current-machine">
+                            <i class="fas fa-tractor"></i>
+                            <div class="machine-info">
+                                <h3 id="current-machine-name">未选择整机</h3>
+                                <p id="current-machine-code">请先选择整机型号</p>
+                                <p id="current-machine-type" style="font-size: 12px; color: #7f8c8d; margin-top: 3px;"></p>
+                            </div>
                         </div>
+                        <button class="back-to-machines-btn" id="back-to-machines">
+                            <i class="fas fa-arrow-left"></i> <span>返回机型列表</span>
+                        </button>
                     </div>
                     
-                    <div class="search-box">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="machine-search-input" data-key="search_parts_placeholder" placeholder="搜索配件名称、编码、规格型号...">
+                    <div class="machine-control-buttons">
+                        <div class="search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="machine-search-input" data-key="search_parts_placeholder" placeholder="搜索配件名称、编码、规格型号...">
+                        </div>
+                        <button id="reset-filters" class="action-button">
+                            <i class="fas fa-redo"></i> <span data-key="reset_filters">重置筛选</span>
+                        </button>
                     </div>
-                    
-                    <button id="reset-filters" class="action-button">
-                        <i class="fas fa-redo"></i> <span data-key="reset_filters">重置筛选</span>
-                    </button>
-                    
-                    <button id="back-to-selector" class="action-button">
-                        <i class="fas fa-arrow-left"></i> <span data-key="back_to_selection">返回选择</span>
-                    </button>
                 </div>
                 
                 <!-- 整机目录主内容区 -->
@@ -708,18 +926,28 @@
         // 验证检查脚本
         (function() {
             try {
+                // 尝试从本地存储读取认证状态
                 const token = localStorage.getItem('uly_access_token');
+                
                 if (!token) {
+                    // 未登录，跳转到验证页面
                     window.location.href = 'auth.html';
                     return;
                 }
+                
+                // 验证token有效性
                 const data = JSON.parse(atob(token));
                 const now = Date.now();
+                
                 if (now >= data.expires) {
+                    // token已过期，清除并重定向
                     localStorage.removeItem('uly_access_token');
                     window.location.href = 'auth.html';
                 }
+                
+                // token有效，允许访问
             } catch (error) {
+                // 解析失败，清除无效token并重定向
                 localStorage.removeItem('uly_access_token');
                 window.location.href = 'auth.html';
             }
@@ -749,7 +977,6 @@
                 "please_select_machine_model": "请先选择整机型号",
                 "search_parts_placeholder": "搜索配件名称、编码、规格型号...",
                 "reset_filters": "重置筛选",
-                "back_to_selection": "返回选择",
                 "parts_category_catalog": "配件分类目录",
                 "parts_list": "配件列表",
                 "select_category_to_view_parts": "请选择左侧的分类查看配件",
@@ -760,23 +987,30 @@
                 "instruction_3": "点击配件卡片查看详细信息",
                 "instruction_4": "点击购物车图标添加商品到采购清单",
                 "part_details": "配件详情",
-                "machine_model": "整机型号",
                 "add_to_cart": "添加到购物车",
                 "back_to_parts_list": "返回配件列表",
                 "download_image": "下载图片",
                 "parts_catalog_management_system": "配件目录管理系统",
-                "data_source": "数据来源",
-                "image_path": "图片路径",
                 "usage_hint": "提示: 选择整机型号后，在左侧选择分类查看配件卡片，点击购物车图标添加到采购清单",
                 "select_machine_model": "选择整机型号",
                 "models": "个型号",
+                
+                // 机器类型相关
+                "chainsaw": "油锯",
+                "brush_cutter": "割灌机",
+                "chainsaw_description": "用于砍伐树木、修剪树枝的便携式锯类工具，主要用于林业、园艺和建筑行业。",
+                "brush_cutter_description": "用于清理灌木、杂草、小树苗的便携式工具，主要用于园林绿化、农业和道路维护。",
+                "machine_models": "机型数量",
+                "parts_count": "配件总数",
+                "back_to_type": "返回类型选择",
+                "current_machine_type": "机器类型",
                 
                 // 品牌
                 "no_brand": "无品牌",
                 "kelon": "科龙",
                 "lixiong": "力雄",
                 
-                // 修复bug新增的翻译
+                // 新增翻译
                 "total_parts": "配件总数",
                 "categories_count": "分类数",
                 "no_categories_found": "未找到分类",
@@ -807,7 +1041,6 @@
                 "excel_specifications": "规格型号",
                 "excel_brand": "品牌",
                 "excel_quantity": "数量",
-                "excel_unit_price": "单价",
                 "excel_total_price": "总价",
                 "excel_summary_info": "汇总信息",
                 "excel_product_types_count": "商品种类数",
@@ -837,7 +1070,6 @@
                 "please_select_machine_model": "Please select a machine model first",
                 "search_parts_placeholder": "Search part name, code, specs...",
                 "reset_filters": "Reset Filters",
-                "back_to_selection": "Back to Selection",
                 "parts_category_catalog": "Parts Category Catalog",
                 "parts_list": "Parts List",
                 "select_category_to_view_parts": "Please select a category on the left to view parts",
@@ -848,23 +1080,30 @@
                 "instruction_3": "Click part card to view details",
                 "instruction_4": "Click cart icon to add to shopping list",
                 "part_details": "Part Details",
-                "machine_model": "Machine Model",
                 "add_to_cart": "Add to Cart",
                 "back_to_parts_list": "Back to Parts List",
                 "download_image": "Download Image",
                 "parts_catalog_management_system": "Parts Catalog Management System",
-                "data_source": "Data Source",
-                "image_path": "Image Path",
                 "usage_hint": "Tip: After selecting a machine model, select a category on the left to view part cards, click cart icon to add to shopping list",
                 "select_machine_model": "Select Machine Model",
                 "models": "models",
+                
+                // 机器类型相关
+                "chainsaw": "Chainsaw",
+                "brush_cutter": "Brush Cutter",
+                "chainsaw_description": "Portable saw tool for cutting trees and trimming branches, mainly used in forestry, gardening and construction.",
+                "brush_cutter_description": "Portable tool for clearing bushes, weeds and small trees, mainly used in landscaping, agriculture and road maintenance.",
+                "machine_models": "Machine Models",
+                "parts_count": "Parts Count",
+                "back_to_type": "Back to Type Selection",
+                "current_machine_type": "Machine Type",
                 
                 // 品牌
                 "no_brand": "No Brand",
                 "kelon": "Kelon",
                 "lixiong": "LiXiong",
                 
-                // 修复bug新增的翻译
+                // 新增翻译
                 "total_parts": "Total Parts",
                 "categories_count": "Categories",
                 "no_categories_found": "No Categories Found",
@@ -905,9 +1144,108 @@
             }
         };
 
+        // 标准化配件分类体系
+        const standardizedPartsCatalog = {
+            'chainsaw': [
+                'CARBURETOR', 'CARBURETOR REPAIR KIT', 'CARBURETOR DIAPHRGAM', 'CARBURETOR NEEDLE',
+                'AIR FILTER', 'CYLINDER KIT', 'CYLINDER', 'CYLINDER HEAD ASSY', 'PISTON SET',
+                'PISTON RING', 'PISTION BEARING', 'VLAUE', 'RECOIL STARTER', 'CHAIN GUIDE',
+                'STARTER SPRING', 'STARTER PAW', 'STARTER SPRING COVER', 'BRAKE BAND',
+                'STARTER PULLEY', 'STARTER HANDLE', 'SPINDLE', 'OIL PUMP', 'WORM',
+                'OIL PUMP COVER', 'FUEL FILTER', 'FUEL SWITCH', 'OIL FILTER', 'FUEL PIPE',
+                'OIL PIPE', 'MANIFOLD', 'BUFFER SET', 'CLUTCH', 'CLUTCH DRUM', 'CLUTCH TOOLS',
+                'CLUTCH BEARING', 'SPROCKET RIM', 'CLUTCH WASHER', 'SPARK PLUG', 'FUEL TANK',
+                'FUEL TANK ASSY', 'TANK CAP', 'CRANKSHAFT', 'CRANKSHAFT ROD SET', 'OIL SEAL',
+                'GASKET', 'CYLINDER GASKET', 'CRANKCASE GASKET', 'MUFFLER GASKET', 'MUFFLER',
+                'MUFFLER SUPPORT', 'IGNITION COIL', 'IGNITION SWITCH CABLE', 'COIL CAP',
+                'FLYWHEEL', 'FLYWHEEL PAWL SET', 'THROTTLE CABLE', 'HANDLE', 'SWITCH STOP',
+                'THROTTLE COMMAND', 'BUMPER SPIKE', 'THROTTLE TRIGGER', 'CHAIN SPROCKET COVER',
+                'METAL PLATE', 'FOUNT GUARD', 'CHAIN CATCH', 'SNAP RING', 'CRANKCASE',
+                'ADJUSTING SCREW NIT', 'BRAKE SPRING'
+            ],
+            'brush_cutter': [
+                'CARBURETOR', 'CARBURETOR FUEL SWITCH', 'CARBURETOR PUMP', 'CARBURETOR ADJUST SCREW',
+                'CARBURETOR REPAIR KIT', 'CARBURETOR DIAPHRGAM', 'CARBURETOR NEEDLE', 'AIR FILTER ASSEMBLY',
+                'AIR FILTER COVER', 'AIR FILTER SMALL COVER', 'AIR FILTER SPONGE', 'AIR FILTER PLATE',
+                'AIR FILTER SUPPORT', 'CYLINDER KIT', 'CYLINDER', 'PISTON SET', 'PISTON RING',
+                'PISTION BEARING', 'PISTION PIN', 'RECOIL STARTER', 'STEEL STARTER PARTS',
+                'STARTER PULLEY', 'STARTER SPRING', 'STARTER TOP SPRING', 'STARTER HANDLE WITH ROPE',
+                'STARTER HANDLE', 'STARTER ROPE', 'STARTER PAW', 'STARTER PULLEY PLATE PAWL SET',
+                'ROUND PULLEY PLATE', 'STARTER PLATE', 'GEAR CASE', 'GEAR CASE PARTS SET',
+                'GEAR CASE PLATE SET', 'PROTECTOR COVER', 'THREAD NUT', 'GEAR CASE COVER',
+                'GEAR CASE PLATE', 'GEAR SET', 'CONNETING PIPE', 'CONNETING PIPE RUBBER',
+                'OIL BEARING', 'CONNETING CASE', 'CONNETING PLATE SET', 'FUEL PUMP',
+                'FUEL FILTER PIPE ASSEMBLY', 'FUEL PIPE', 'FUEL FILTER', 'FUEL TANK',
+                'FUEL CAP', 'FUEL TANK SUPPORT', 'FUELTANK RUBBER WASHER', 'FUEL TANK PALTE',
+                'FUEL TANK GROMMENT', 'CLUTCH', 'CLUTCH SHOE', 'CLUTCH SPRING', 'CLUTCH SCREW SET',
+                'CLUTCH WAVY WASHER', 'CLUTCH WASHER', 'CLUTCH SCREW', 'CLUTCH DRUM', 'SPARK PLUG',
+                'MANIFOLD', 'TRIMMER HEAD', 'CRANKSHAFT', 'SEMI KEY', 'CRANKSHAFT ROD',
+                'GASKET KIT', 'CRANKCASE  GASKET', 'CYLINDER GASKET', 'CARBURETOR GASKET',
+                'MANIFOLD GASKET', 'MUFFER GASKET', 'MUFFLER', 'IGNITION COIL', 'FLYWHEEL',
+                'IGNITION CAP', 'IGNITION CAP SPRING', 'IGNITION SWITCH CABLE', 'TROTHLE WIRE',
+                'GRASS GUARD', 'GRASS GUARD PLATE WITH SCREW', 'GRASS GUARD PLATE',
+                'GRASS GUARD SUPPORT', 'GRASS GUARD SUPPORT PLATE', 'GRASS GUARD BLADE SCREW',
+                'GRASS GUARD SCREW NUT SET', 'GRASS GUARD BLADE', 'GRASS GUARD SIDE PARTS',
+                'HANDLE SUPPORT', 'HANDLE SUPPORT WITH RUBBER', 'HANDLE SUPPORT RUBBER',
+                'RIGHT SWITCH HANDLE', 'LEFT HANDLE', 'SWITCH HANDLE PARTS', 'SWTICH HANDLE BIG SPRING',
+                'SWTICH HANDLE SMALL SPRING', 'SWTICH TRIGGER', 'HANGER', 'TRANSIT', 'SHAFT PIPE',
+                'SHAFT PIPE WITH TRANSIT', 'SHAFT PIPE WITH ROTATED PIPE', 'RORATED PIPE',
+                'SHAFT PIPE ASSY', 'SHAFT ASSY', 'BRUSH CUTTER PASS PLATE', 'BRUSH CUTTER GRASS HARVSTER',
+                'MUFFER COVER', 'TOP COVER', 'CRANKCASE  COVER', 'CYLINDER COVER', 'CRANKCASE',
+                'SIDE COVER', 'CONNETING CASE SCREW', 'PIN', 'PRIMER BULB', 'CICRLE',
+                'STOP RING FOR CLUTCH CASE', 'SNAP RING', 'OIL SEAL', 'NEEDLE BEARING'
+            ]
+        };
+
+        // 分类映射
+        const categoryMapping = {
+            'CARBURETOR': 'CARBURETOR',
+            'FUEL HOSE': 'FUEL PIPE',
+            'MANIFOLD': 'MANIFOLD',
+            'BUFFER SET': 'BUFFER SET',
+            'CYLINDER': 'CYLINDER',
+            'PISTON ASSEMBLY': 'PISTON SET',
+            'PISTON RING': 'PISTON RING',
+            'SPIRAL SPRING': 'STARTER SPRING',
+            'CLUTCH RETURN SPRING': 'CLUTCH SPRING',
+            'ROPE PULLEY': 'STARTER PULLEY',
+            'PULLEY DIAL': 'STARTER PULLEY',
+            'STARTER PULLEY': 'STARTER PULLEY',
+            'GEAR BOX': 'GEAR CASE',
+            'CLUTCH HOUSING': 'CLUTCH',
+            'HOLDER': 'HANDLE',
+            'CLUTCH': 'CLUTCH',
+            'CLUTCH DRUM': 'CLUTCH DRUM',
+            'NEEDLE GAGE': 'NEEDLE BEARING',
+            'FUEL TANK': 'FUEL TANK',
+            'LEFT SCREW/GEAR BOX': 'GEAR CASE',
+            'CRANKSHAFT': 'CRANKSHAFT',
+            'OIL SEAL': 'OIL SEAL',
+            'GASKET': 'GASKET',
+            'MUFFLER': 'MUFFLER',
+            'IGNITION COIL': 'IGNITION COIL',
+            'FLYWHEEL': 'FLYWHEEL',
+            'THROTTLE LINE': 'THROTTLE CABLE',
+            'SHUT OFF': 'IGNITION SWITCH CABLE',
+            'AIR FILTER ASSEMBLY': 'AIR FILTER',
+            'FUEL FILTER': 'FUEL FILTER'
+        };
+
+        // 分类图标映射
+        const categoryIcons = {
+            'CARBURETOR': 'fas fa-gas-pump',
+            '全部': 'fas fa-list'
+        };
+
+        const defaultIcon = 'fas fa-cube';
+        const imageExtensions = ['.png', '.jpg', '.jpeg'];
+
         // 全局状态
         const state = {
             machinesData: [],
+            standardizedPartsCatalog: standardizedPartsCatalog,
+            categoryMapping: categoryMapping,
+            currentMachineType: null,
             currentMachine: null,
             treeData: {},
             partsByCategory: {},
@@ -923,13 +1261,11 @@
             imageCache: {},
             loadedImages: {},
             treeCollapsed: false,
-            // 搜索状态
             isSearchingAllCategories: false,
             searchResults: [],
             // 购物车状态
             cart: {
                 items: [],
-                // 从localStorage加载购物车
                 load() {
                     const saved = localStorage.getItem('machine_product_cart');
                     if (saved) {
@@ -937,12 +1273,10 @@
                     }
                     this.updateUI();
                 },
-                // 保存购物车到localStorage
                 save() {
                     localStorage.setItem('machine_product_cart', JSON.stringify(this.items));
                     this.updateUI();
                 },
-                // 添加商品到购物车（包含品牌选择）
                 add(part, quantity = 1, brand = '无品牌') {
                     const existingItem = this.items.find(item => 
                         item.code === part.code && item.selectedBrand === brand
@@ -956,6 +1290,7 @@
                             originalCode: part.oldCode || part.code,
                             name: part.name || part.category || '未命名商品',
                             machineName: state.currentMachine?.name || '',
+                            machineType: state.currentMachineType || '',
                             category: part.category || '',
                             specs: part.specs || '',
                             quantity: quantity,
@@ -968,7 +1303,6 @@
                     this.save();
                     this.showNotification('商品已添加到购物车');
                 },
-                // 更新商品数量
                 update(code, quantity) {
                     const item = this.items.find(item => item.code === code);
                     if (item) {
@@ -980,33 +1314,27 @@
                         }
                     }
                 },
-                // 从购物车移除商品
                 remove(code) {
                     this.items = this.items.filter(item => item.code !== code);
                     this.save();
                     this.showNotification('商品已从购物车移除');
                 },
-                // 清空购物车
                 clear() {
                     this.items = [];
                     this.save();
                     this.showNotification('购物车已清空');
                 },
-                // 获取购物车总数量
                 getTotalItems() {
                     return this.items.reduce((total, item) => total + item.quantity, 0);
                 },
-                // 获取购物车总金额
                 getTotalPrice() {
                     return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
                 },
-                // 更新购物车UI
                 updateUI() {
                     document.getElementById('cart-count').textContent = this.getTotalItems();
                     this.renderCart();
                     updateCartButtonStates();
                 },
-                // 渲染购物车内容
                 renderCart() {
                     const cartContent = document.getElementById('cart-content');
                     
@@ -1038,6 +1366,7 @@
                                     ${item.originalCode ? `<div class="cart-item-original-code">${item.originalCode}</div>` : ''}
                                     ${item.selectedBrand ? `<div class="cart-item-brand" style="font-size: 12px; color: #27ae60; margin-bottom: 5px;">品牌: ${item.selectedBrand}</div>` : ''}
                                     ${item.machineName ? `<div class="cart-item-sheet">整机: ${item.machineName}</div>` : ''}
+                                    ${item.machineType ? `<div class="cart-item-sheet">类型: ${item.machineType}</div>` : ''}
                                     ${item.category ? `<div class="cart-item-sheet">分类: ${item.category}</div>` : ''}
                                     <div class="cart-item-controls">
                                         <div class="quantity-control">
@@ -1061,7 +1390,6 @@
                     cartContent.innerHTML = cartHTML;
                     document.getElementById('cart-total-items').textContent = this.getTotalItems();
                 },
-                // 显示通知
                 showNotification(message) {
                     const existingNotification = document.querySelector('.cart-notification');
                     if (existingNotification) {
@@ -1081,7 +1409,6 @@
                         setTimeout(() => notification.remove(), 300);
                     }, 1000);
                 },
-                // 检查图片URL是否存在
                 checkImageUrlExists(url) {
                     return new Promise((resolve) => {
                         const img = new Image();
@@ -1091,7 +1418,6 @@
                     });
                 },
                 
-                // 加载图片为ArrayBuffer
                 async loadImageToBuffer(productCode) {
                     const imageExtensions = ['.png', '.jpg', '.jpeg'];
                     
@@ -1123,64 +1449,49 @@
                     return null;
                 },
                 
-                // 获取图片扩展名
                 getImageExtensionFromBuffer(buffer, productCode) {
                     const arr = new Uint8Array(buffer);
                     
-                    // 检测PNG
                     if (arr.length > 3 && arr[0] === 0x89 && arr[1] === 0x50 && arr[2] === 0x4E && arr[3] === 0x47) {
                         return 'png';
                     }
                     
-                    // 检测JPEG
                     if (arr.length > 1 && arr[0] === 0xFF && arr[1] === 0xD8) {
                         return 'jpeg';
                     }
                     
-                    // 检测JPG
-                    if (arr.length > 10 && arr[6] === 'J' && arr[7] === 'F' && arr[8] === 'I' && arr[9] === 'F') {
-                        return 'jpeg';
-                    }
-                    
-                    // 根据文件名后缀判断
                     const lowerCode = productCode.toLowerCase();
                     if (lowerCode.endsWith('.png')) return 'png';
                     if (lowerCode.endsWith('.jpg') || lowerCode.endsWith('.jpeg')) return 'jpeg';
                     
-                    // 默认返回png
                     return 'png';
                 },
                 
-                // 导出购物车为Excel（修复版）
                 async exportToExcel() {
                     if (this.items.length === 0) {
                         alert(state.currentLanguage === 'zh' ? '购物车为空，无法导出' : 'Cart is empty, cannot export');
                         return;
                     }
                     
-                    // 显示加载提示
                     const exportBtn = document.getElementById('export-cart');
                     const originalText = exportBtn.innerHTML;
                     exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (state.currentLanguage === 'zh' ? '正在生成Excel...' : 'Generating Excel...');
                     exportBtn.disabled = true;
                     
                     try {
-                        // 创建新的Excel工作簿
                         const workbook = new ExcelJS.Workbook();
                         workbook.creator = state.currentLanguage === 'zh' ? '配件选购系统' : 'Parts Selection System';
                         workbook.lastModifiedBy = state.currentLanguage === 'zh' ? '配件选购系统' : 'Parts Selection System';
                         workbook.created = new Date();
                         workbook.modified = new Date();
                         
-                        // 添加工作表
                         const worksheet = workbook.addWorksheet(
                             state.currentLanguage === 'zh' ? '整机配件订购清单' : 'Machine Parts Order List'
                         );
                         
-                        // 设置列宽 - 增加图片列的宽度
                         worksheet.columns = [
                             { header: translations[state.currentLanguage].excel_serial_number, key: 'serial', width: 8 },
-                            { header: translations[state.currentLanguage].excel_product_code, key: 'image', width: 40 }, // 增加图片列宽度到40
+                            { header: translations[state.currentLanguage].excel_product_code, key: 'image', width: 40 },
                             { header: translations[state.currentLanguage].excel_product_code, key: 'code', width: 20 },
                             { header: translations[state.currentLanguage].excel_original_code, key: 'originalCode', width: 20 },
                             { header: translations[state.currentLanguage].excel_product_name, key: 'name', width: 30 },
@@ -1192,10 +1503,8 @@
                             { header: translations[state.currentLanguage].excel_total_price, key: 'totalPrice', width: 15 }
                         ];
                         
-                        // 增加图片列的行高
-                        worksheet.getColumn(2).height = 120; // B列的高度（像素）
+                        worksheet.getColumn(2).height = 120;
                         
-                        // 添加表头行并设置样式
                         const headerRow = worksheet.getRow(1);
                         headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
                         headerRow.fill = {
@@ -1206,7 +1515,6 @@
                         headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
                         headerRow.height = 25;
                         
-                        // 设置表头边框
                         headerRow.eachCell((cell) => {
                             cell.border = {
                                 top: { style: 'thin', color: { argb: '000000' } },
@@ -1216,15 +1524,13 @@
                             };
                         });
                         
-                        // 先创建所有数据行
                         for (let i = 0; i < this.items.length; i++) {
                             const item = this.items[i];
-                            const rowNumber = i + 2; // 从第2行开始
+                            const rowNumber = i + 2;
                             
-                            // 创建数据行
                             const row = worksheet.addRow({
                                 serial: i + 1,
-                                image: '', // 图片单元格留空
+                                image: '',
                                 code: item.code || '',
                                 originalCode: item.originalCode || '',
                                 name: item.name || '',
@@ -1236,10 +1542,8 @@
                                 totalPrice: ((item.price || 0) * item.quantity).toFixed(2)
                             });
                             
-                            // 增加行高到150像素，为图片提供足够空间
                             row.height = 75;
                             
-                            // 设置所有单元格的边框
                             for (let col = 1; col <= 10; col++) {
                                 const cell = row.getCell(col);
                                 cell.border = {
@@ -1249,64 +1553,53 @@
                                     right: { style: 'thin', color: { argb: 'DDDDDD' } }
                                 };
                                 
-                                // 设置对齐方式
-                                if (col === 1 || col === 9) { // 序号和数量居中
+                                if (col === 1 || col === 9) {
                                     cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                                } else if (col === 2) { // 图片单元格居中对齐
+                                } else if (col === 2) {
                                     cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                                } else if (col === 10) { // 总价右对齐
+                                } else if (col === 10) {
                                     cell.alignment = { vertical: 'middle', horizontal: 'right' };
                                     cell.numFmt = '#,##0.00';
-                                } else { // 其他列左对齐
+                                } else {
                                     cell.alignment = { vertical: 'middle', horizontal: 'left' };
                                 }
                             }
                         }
                         
-                        // 单独处理图片插入
                         for (let i = 0; i < this.items.length; i++) {
                             const item = this.items[i];
-                            const rowNumber = i + 2; // 对应的行号
+                            const rowNumber = i + 2;
                             const row = worksheet.getRow(rowNumber);
                             
                             try {
                                 const imageBuffer = await this.loadImageToBuffer(item.code);
                                 if (imageBuffer) {
-                                    // 获取图片扩展名
                                     const extension = this.getImageExtensionFromBuffer(imageBuffer, item.code);
-                                    
-                                    // 添加图片到工作簿
                                     const imageId = workbook.addImage({
                                         buffer: imageBuffer,
                                         extension: extension
                                     });
                                     
-                                    // 图片插入位置：B列（索引1）
-                                    const colIndex = 1; // B列
-                                    const rowIndex = rowNumber - 1; // 转换为0-based索引
+                                    const colIndex = 1;
+                                    const rowIndex = rowNumber - 1;
                                     
-                                    console.log(`插入图片到第${rowNumber}行，第${colIndex+1}列（${String.fromCharCode(65+colIndex)}列）`);
-                                    
-                                    // 新的图片插入方式：使用单元格锚点，并设置偏移和扩展
                                     worksheet.addImage(imageId, {
                                         tl: { 
                                             col: colIndex, 
                                             row: rowIndex,
-                                            offset: 0 // 从单元格左上角开始
+                                            offset: 0
                                         },
                                         br: { 
-                                            col: colIndex + 1, // 占用到C列
-                                            row: rowIndex + 1, // 占用到下一行
-                                            offset: 0 // 结束位置
+                                            col: colIndex + 1,
+                                            row: rowIndex + 1,
+                                            offset: 0
                                         },
                                         editAs: 'oneCell'
                                     });
                                     
-                                    // 调整B列宽度以适应图片
-                                    worksheet.getColumn(colIndex + 1).width = 14; // 进一步增加图片列宽度
+                                    worksheet.getColumn(colIndex + 1).width = 14;
                                     
                                 } else {
-                                    // 没有图片，在单元格中显示"无图片"
                                     row.getCell(2).value = translations[state.currentLanguage].no_image;
                                     row.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
                                 }
@@ -1317,9 +1610,8 @@
                             }
                         }
                         
-                        // 自动调整列宽（跳过图片列）
                         worksheet.columns.forEach((column, index) => {
-                            if (index !== 1) { // 跳过B列（索引1）
+                            if (index !== 1) {
                                 let maxLength = 0;
                                 column.eachCell({ includeEmpty: true }, (cell) => {
                                     const columnLength = cell.value ? cell.value.toString().length : 10;
@@ -1331,14 +1623,10 @@
                             }
                         });
                         
-                        // 添加汇总信息
                         const summaryStartRow = this.items.length + 3;
-                        
-                        // 添加一个空行分隔
                         const separatorRow = worksheet.getRow(this.items.length + 2);
                         separatorRow.height = 5;
                         
-                        // 汇总标题
                         const summaryTitleCell = worksheet.getCell(`A${summaryStartRow}`);
                         summaryTitleCell.value = translations[state.currentLanguage].excel_summary_info;
                         summaryTitleCell.font = { bold: true, color: { argb: '3498DB' }, size: 12 };
@@ -1349,20 +1637,16 @@
                             right: { style: 'thin', color: { argb: '3498DB' } }
                         };
                         
-                        // 商品种类数
                         worksheet.getCell(`A${summaryStartRow + 1}`).value = translations[state.currentLanguage].excel_product_types_count;
                         worksheet.getCell(`B${summaryStartRow + 1}`).value = this.items.length;
                         
-                        // 商品总数量
                         worksheet.getCell(`A${summaryStartRow + 2}`).value = translations[state.currentLanguage].excel_total_quantity;
                         worksheet.getCell(`B${summaryStartRow + 2}`).value = this.getTotalItems();
                         
-                        // 商品总金额
                         worksheet.getCell(`A${summaryStartRow + 3}`).value = translations[state.currentLanguage].excel_total_amount;
                         worksheet.getCell(`B${summaryStartRow + 3}`).value = this.getTotalPrice().toFixed(2);
                         worksheet.getCell(`B${summaryStartRow + 3}`).numFmt = '#,##0.00';
                         
-                        // 导出日期和时间
                         const currentDate = new Date();
                         const dateFormatter = state.currentLanguage === 'zh' ? 
                             currentDate.toLocaleDateString('zh-CN') : 
@@ -1371,12 +1655,10 @@
                         worksheet.getCell(`A${summaryStartRow + 4}`).value = translations[state.currentLanguage].excel_export_date;
                         worksheet.getCell(`B${summaryStartRow + 4}`).value = dateFormatter;
                         
-                        // 设置汇总信息样式
                         for (let i = summaryStartRow; i <= summaryStartRow + 4; i++) {
                             const row = worksheet.getRow(i);
                             row.height = 20;
                             
-                            // 设置A列的粗体和边框
                             const cellA = row.getCell(1);
                             cellA.font = { bold: true };
                             cellA.border = {
@@ -1386,7 +1668,6 @@
                                 right: { style: 'thin', color: { argb: 'DDDDDD' } }
                             };
                             
-                            // 设置B-J列的边框
                             for (let col = 2; col <= 10; col++) {
                                 const cell = row.getCell(col);
                                 cell.border = {
@@ -1398,12 +1679,10 @@
                             }
                         }
                         
-                        // 生成文件名
                         const fileName = state.currentLanguage === 'zh' ? 
                             `整机配件订购清单_${new Date().toISOString().slice(0,10)}.xlsx` :
                             `Machine_Parts_Order_List_${new Date().toISOString().slice(0,10)}.xlsx`;
                         
-                        // 写入文件并下载
                         const buffer = await workbook.xlsx.writeBuffer();
                         const blob = new Blob([buffer], { 
                             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
@@ -1417,7 +1696,6 @@
                         link.click();
                         document.body.removeChild(link);
                         
-                        // 清理URL
                         setTimeout(() => {
                             window.URL.revokeObjectURL(url);
                         }, 100);
@@ -1428,69 +1706,27 @@
                         console.error('导出Excel失败:', error);
                         alert((state.currentLanguage === 'zh' ? '导出失败: ' : 'Export failed: ') + error.message);
                     } finally {
-                        // 恢复按钮状态
-                        exportBtn.innerHTML = originalText || `<i class="fas fa-file-excel"></i> <span id="export-cart-text">${state.currentLanguage === 'zh' ? '导出Excel' : 'Export Excel'}</span>`;
+                        exportBtn.innerHTML = originalText;
                         exportBtn.disabled = false;
                     }
                 }
             },
-            // 当前选择添加到购物车的商品
             selectedProductForCart: null,
-            // 当前语言
             currentLanguage: 'zh'
         };
-
-        // 分类图标映射
-        const categoryIcons = {
-            'CARBURETOR': 'fas fa-gas-pump',
-            'FUEL HOSE': 'fas fa-oil-can',
-            'MANIFOLD': 'fas fa-pipe',
-            'BUFFER SET': 'fas fa-layer-group',
-            'CYLINDER': 'fas fa-database',
-            'PISTON ASSEMBLY': 'fas fa-cogs',
-            'PISTON RING': 'fas fa-ring',
-            'SPIRAL SPRING': 'fas fa-coil',
-            'CLUTCH RETURN SPRING': 'fas fa-coil',
-            'ROPE PULLEY': 'fas fa-wheel',
-            'PULLEY DIAL': 'fas fa-dial',
-            'STARTER PULLEY': 'fas fa-play-circle',
-            'GEAR BOX': 'fas fa-cog',
-            'CLUTCH HOUSING': 'fas fa-home',
-            'HOLDER': 'fas fa-holder',
-            'CLUTCH': 'fas fa-link',
-            'CLUTCH DRUM': 'fas fa-drum',
-            'NEEDLE GAGE': 'fas fa-ruler',
-            'FUEL TANK': 'fas fa-gas-pump',
-            'LEFT SCREW/GEAR BOX': 'fas fa-screwdriver',
-            'CRANKSHAFT': 'fas fa-cogs',
-            'OIL SEAL': 'fas fa-seal',
-            'GASKET': 'fas fa-layer-group',
-            'MUFFLER': 'fas fa-volume-mute',
-            'IGNITION COIL': 'fas fa-bolt',
-            'FLYWHEEL': 'fas fa-wheel',
-            'THROTTLE LINE': 'fas fa-sliders-h',
-            'SHUT OFF': 'fas fa-power-off',
-            'AIR FILTER ASSEMBLY': 'fas fa-wind',
-            'FUEL FILTER': 'fas fa-filter'
-        };
-
-        const defaultIcon = 'fas fa-cube';
-        const imageExtensions = ['.png', '.jpg', '.jpeg'];
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', async function() {
             showLoading();
             
-            // 加载购物车数据
             state.cart.load();
             
             try {
                 await loadMachinesData();
-                initializeMachineSelector();
+                initializeMachineTypeSelector();
                 setupEventListeners();
                 hideLoading();
                 
-                // 初始化语言切换
                 setupLanguageSwitcher();
             } catch (error) {
                 console.error('加载数据失败:', error);
@@ -1507,18 +1743,19 @@
                 btn.addEventListener('click', function() {
                     const lang = this.dataset.lang;
                     if (state.currentLanguage !== lang) {
-                        // 更新按钮状态
                         langBtns.forEach(b => b.classList.remove('active'));
                         this.classList.add('active');
                         
-                        // 更新当前语言
                         state.currentLanguage = lang;
                         
-                        // 翻译页面
                         translatePage();
                         
-                        // 更新当前整机显示
                         updateCurrentMachineDisplay();
+                        
+                        if (state.currentMachine) {
+                            renderTree();
+                            applyFilters();
+                        }
                     }
                 });
             });
@@ -1529,7 +1766,6 @@
             const lang = state.currentLanguage;
             const translation = translations[lang];
             
-            // 翻译所有带有data-key属性的元素
             document.querySelectorAll('[data-key]').forEach(element => {
                 const key = element.getAttribute('data-key');
                 if (translation[key]) {
@@ -1541,7 +1777,6 @@
                 }
             });
             
-            // 翻译品牌选择下拉框
             const brandSelect = document.getElementById('brand-select');
             if (brandSelect) {
                 Array.from(brandSelect.options).forEach(option => {
@@ -1552,13 +1787,16 @@
                 });
             }
             
-            // 更新机器卡片中的标签
             document.querySelectorAll('.machine-card .stat-label').forEach(element => {
                 const key = element.getAttribute('data-key');
                 if (key && translation[key]) {
                     element.textContent = translation[key];
                 }
             });
+            
+            if (state.machinesData.length > 0) {
+                updateMachineTypeStats();
+            }
         }
 
         function showLoading() {
@@ -1569,15 +1807,101 @@
             document.getElementById('loading-overlay').classList.remove('active');
         }
 
-        // 加载整机数据
+        // 加载整机数据 - 修改为从JSON文件加载
         async function loadMachinesData() {
-            const mockMachinesData = [
+            try {
+                // 加载整机型号列表
+                const machinesResponse = await fetch('data/machines.json');
+                if (!machinesResponse.ok) {
+                    throw new Error('无法加载整机列表数据');
+                }
+                const machinesList = await machinesResponse.json();
+                
+                // 加载所有整机的配件数据
+                const machinesData = [];
+                
+                for (const machine of machinesList) {
+                    const partsFilename = `${machine.id}-parts.json`;
+                    const partsResponse = await fetch(`data/parts/${partsFilename}`);
+                    
+                    if (partsResponse.ok) {
+                        const partsData = await partsResponse.json();
+                        
+                        // 标准化配件分类
+                        const standardizedParts = mapPartsToStandardized(partsData, machine.type);
+                        
+                        machinesData.push({
+                            id: machine.id,
+                            name: machine.name,
+                            type: machine.type,
+                            description: machine.description || '',
+                            icon: machine.icon || (machine.type === 'chainsaw' ? 'fas fa-tree' : 'fas fa-leaf'),
+                            parts: standardizedParts
+                        });
+                    } else {
+                        console.warn(`无法加载配件数据: ${partsFilename}`);
+                        machinesData.push({
+                            id: machine.id,
+                            name: machine.name,
+                            type: machine.type,
+                            description: machine.description || '',
+                            icon: machine.icon || (machine.type === 'chainsaw' ? 'fas fa-tree' : 'fas fa-leaf'),
+                            parts: []
+                        });
+                    }
+                }
+                
+                state.machinesData = machinesData;
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                
+                // 如果无法从文件加载，使用模拟数据
+                console.warn('使用模拟数据作为备用');
+                state.machinesData = getMockMachinesData();
+            }
+        }
+
+        // 标准化配件分类
+        function mapPartsToStandardized(parts, machineType) {
+            return parts.map(part => {
+                const originalCategory = part.category;
+                let standardizedCategory = originalCategory;
+                
+                if (state.categoryMapping[originalCategory]) {
+                    standardizedCategory = state.categoryMapping[originalCategory];
+                }
+                
+                const standardCategories = state.standardizedPartsCatalog[machineType];
+                if (!standardCategories.includes(standardizedCategory)) {
+                    const found = standardCategories.find(cat => 
+                        cat.includes(originalCategory) || originalCategory.includes(cat)
+                    );
+                    if (found) {
+                        standardizedCategory = found;
+                    } else {
+                        standardizedCategory = originalCategory;
+                    }
+                }
+                
+                return {
+                    ...part,
+                    originalCategory: originalCategory,
+                    category: standardizedCategory,
+                    isStandardized: standardCategories.includes(standardizedCategory)
+                };
+            });
+        }
+
+        // 模拟数据（作为备用）
+        function getMockMachinesData() {
+            const mockPartsData = [
                 {
                     id: 'CG430',
                     name: 'CG430',
-                    description: '化油器系列 - 经典型号',
-                    icon: 'fas fa-gas-pump',
-                    parts: [
+                    type: 'brush_cutter',
+                    description: '割灌机系列 - 经典型号',
+                    icon: 'fas fa-leaf',
+                    parts: mapPartsToStandardized([
                         { name: "CG430", category: "CARBURETOR", code: "010890", oldCode: "UKBC0102", brand: "", specs: "" },
                         { name: "", category: "FUEL HOSE", code: "020097", oldCode: "UKFL0202S", brand: "", specs: "" },
                         { name: "", category: "MANIFOLD", code: "020117", oldCode: "UKBC0201M", brand: "", specs: "" },
@@ -1631,35 +1955,113 @@
                         { name: "", category: "AIR FILTER ASSEMBLY", code: "250406", oldCode: "UKAF02S-1", brand: "", specs: "" },
                         { name: "", category: "AIR FILTER ASSEMBLY", code: "250453", oldCode: "", brand: "", specs: "" },
                         { name: "", category: "FUEL FILTER", code: "260067", oldCode: "UKFF02", brand: "", specs: "" }
-                    ]
+                    ], 'brush_cutter')
                 },
                 {
                     id: 'CG500',
                     name: 'CG500',
+                    type: 'chainsaw',
                     description: '化油器系列 - 大功率型号',
-                    icon: 'fas fa-gas-pump',
-                    parts: [
+                    icon: 'fas fa-tree',
+                    parts: mapPartsToStandardized([
                         { name: "CG500", category: "CARBURETOR", code: "010900", oldCode: "UKBC0103", brand: "", specs: "" },
                         { name: "", category: "FUEL HOSE", code: "020100", oldCode: "UKFL0203S", brand: "", specs: "" },
                         { name: "", category: "MANIFOLD", code: "020120", oldCode: "UKBC0202M", brand: "", specs: "" },
                         { name: "", category: "CYLINDER", code: "030020", oldCode: "UKBC0306A", brand: "", specs: "45MM" },
                         { name: "", category: "PISTON ASSEMBLY", code: "030230", oldCode: "UKBC0305P", brand: "", specs: "KC13015AA 45MM" }
-                    ]
+                    ], 'chainsaw')
+                },
+                {
+                    id: 'BC430',
+                    name: 'BC430',
+                    type: 'brush_cutter',
+                    description: '割灌机系列 - 标准型号',
+                    icon: 'fas fa-leaf',
+                    parts: mapPartsToStandardized([
+                        { name: "BC430", category: "CARBURETOR", code: "010895", oldCode: "UKBC0110", brand: "", specs: "" },
+                        { name: "", category: "AIR FILTER", code: "250407", oldCode: "UKAF03S", brand: "", specs: "" },
+                        { name: "", category: "FUEL TANK", code: "090058", oldCode: "UKBC0902C", brand: "", specs: "" },
+                        { name: "", category: "MUFFLER", code: "150002", oldCode: "UKBC1502", brand: "", specs: "" }
+                    ], 'brush_cutter')
+                },
+                {
+                    id: 'BC500',
+                    name: 'BC500',
+                    type: 'brush_cutter',
+                    description: '割灌机系列 - 大功率型号',
+                    icon: 'fas fa-leaf',
+                    parts: mapPartsToStandardized([
+                        { name: "BC500", category: "CARBURETOR", code: "010910", oldCode: "UKBC0112", brand: "", specs: "" },
+                        { name: "", category: "AIR FILTER", code: "250408", oldCode: "UKAF04S", brand: "", specs: "" },
+                        { name: "", category: "FUEL TANK", code: "090059", oldCode: "UKBC0903C", brand: "", specs: "" },
+                        { name: "", category: "MUFFLER", code: "150003", oldCode: "UKBC1503", brand: "", specs: "" }
+                    ], 'brush_cutter')
                 }
             ];
             
-            state.machinesData = mockMachinesData;
-            console.log('整机数据加载完成:', state.machinesData.length, '个整机');
+            return mockPartsData;
         }
 
-        // 初始化整机选择器
-        function initializeMachineSelector() {
+        // 初始化机器类型选择器
+        function initializeMachineTypeSelector() {
+            updateMachineTypeStats();
+            
+            document.getElementById('chainsaw-type-card').addEventListener('click', () => {
+                selectMachineType('chainsaw');
+            });
+            
+            document.getElementById('brush-cutter-type-card').addEventListener('click', () => {
+                selectMachineType('brush_cutter');
+            });
+        }
+
+        // 更新机器类型统计信息
+        function updateMachineTypeStats() {
+            const chainsawMachines = state.machinesData.filter(m => m.type === 'chainsaw');
+            const chainsawPartsCount = chainsawMachines.reduce((total, machine) => total + machine.parts.length, 0);
+            
+            const brushCutterMachines = state.machinesData.filter(m => m.type === 'brush_cutter');
+            const brushCutterPartsCount = brushCutterMachines.reduce((total, machine) => total + machine.parts.length, 0);
+            
+            document.getElementById('chainsaw-count').textContent = chainsawMachines.length;
+            document.getElementById('chainsaw-parts').textContent = chainsawPartsCount;
+            
+            document.getElementById('brush-cutter-count').textContent = brushCutterMachines.length;
+            document.getElementById('brush-cutter-parts').textContent = brushCutterPartsCount;
+        }
+
+        // 选择机器类型
+        function selectMachineType(type) {
+            state.currentMachineType = type;
+            state.currentMachine = null;
+            state.selectedPart = null;
+            
+            const typeName = state.currentLanguage === 'zh' ? 
+                (type === 'chainsaw' ? '油锯' : '割灌机') :
+                (type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter');
+            
+            document.getElementById('type-selector-title').textContent = `${typeName} - ${translations[state.currentLanguage].select_machine_model}`;
+            
+            document.getElementById('machine-type-selector').style.display = 'none';
+            document.getElementById('machine-selector').style.display = 'block';
+            document.getElementById('machine-parts-container').classList.remove('active');
+            document.getElementById('part-detail-container').classList.remove('active');
+            
+            initializeMachineSelectorByType(type);
+        }
+
+        // 根据类型初始化整机选择器
+        function initializeMachineSelectorByType(type) {
             const machineGrid = document.getElementById('machine-grid');
             machineGrid.innerHTML = '';
             
-            state.machinesData.forEach(machine => {
+            const filteredMachines = state.machinesData.filter(machine => machine.type === type);
+            
+            filteredMachines.forEach(machine => {
                 const categories = [...new Set(machine.parts.map(part => part.category))];
                 const totalParts = machine.parts.length;
+                
+                const standardCategories = state.standardizedPartsCatalog[type] || [];
                 
                 const machineCard = document.createElement('div');
                 machineCard.className = 'machine-card fade-in';
@@ -1678,7 +2080,7 @@
                                 <div class="stat-label" data-key="total_parts">配件总数</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">${categories.length}</div>
+                                <div class="stat-value">${categories.length}/${standardCategories.length}</div>
                                 <div class="stat-label" data-key="categories_count">分类数</div>
                             </div>
                         </div>
@@ -1692,30 +2094,54 @@
                 machineGrid.appendChild(machineCard);
             });
             
-            document.getElementById('machine-count').textContent = state.machinesData.length;
+            document.getElementById('machine-count').textContent = filteredMachines.length;
             
-            // 翻译机器卡片
             translatePage();
+            
+            if (filteredMachines.length === 0) {
+                machineGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #7f8c8d; margin-bottom: 20px;"></i>
+                        <h3>暂无${state.currentLanguage === 'zh' ? (type === 'chainsaw' ? '油锯' : '割灌机') : (type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter')}机型</h3>
+                        <p>该类型下暂无整机数据</p>
+                        <button class="action-button" id="back-to-type-btn" style="margin-top: 20px;">
+                            <i class="fas fa-arrow-left"></i> ${state.currentLanguage === 'zh' ? '返回类型选择' : 'Back to Type Selection'}
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('back-to-type-btn').addEventListener('click', backToTypeSelector);
+            }
         }
 
-        // 选择整机 - 修复bug：更新当前整机显示
+        // 选择整机 - 修复了这里，手动设置状态而不是调用 selectCategory
         function selectMachine(machine) {
             state.currentMachine = machine;
-            state.currentCategory = null;
+            state.currentCategory = '全部'; // 默认显示全部配件
             state.filteredParts = [];
             state.selectedPart = null;
             state.expandedCategories.clear();
             state.currentFilter.search = '';
-            state.currentFilter.category = '';
             state.isSearchingAllCategories = false;
             
             initializeTreeData();
-            updateCurrentMachineDisplay(); // 修复bug：添加这一行
+            updateCurrentMachineDisplay();
             showMachineContent();
             renderTree();
             
+            // 修复：手动设置状态并渲染，而不是调用 selectCategory
+            state.filteredParts = [...state.currentMachine.parts];
+            state.expandedCategories.add('全部');
+            
+            // 直接渲染全部配件
+            renderFilteredParts(state.filteredParts, 
+                `${state.currentMachine.name} - ${state.currentLanguage === 'zh' ? '全部配件' : 'All Parts'}`,
+                state.currentLanguage === 'zh' ? 
+                    `共 ${state.filteredParts.length} 个配件` :
+                    `Total ${state.filteredParts.length} parts`
+            );
+            
             document.getElementById('machine-search-input').value = '';
-            showEmptyPartsGrid();
         }
 
         // 初始化树形数据
@@ -1725,48 +2151,68 @@
             
             if (!state.currentMachine) return;
             
-            state.currentMachine.parts.forEach(part => {
-                const category = part.category;
-                if (!state.treeData[category]) {
-                    state.treeData[category] = [];
-                }
-                state.treeData[category].push(part);
-                
-                if (!state.partsByCategory[category]) {
-                    state.partsByCategory[category] = [];
-                }
-                state.partsByCategory[category].push(part);
+            const standardCategories = state.standardizedPartsCatalog[state.currentMachine.type] || [];
+            
+            standardCategories.forEach(category => {
+                state.treeData[category] = [];
+                state.partsByCategory[category] = [];
             });
             
-            // 默认展开前3个分类
-            const categories = Object.keys(state.treeData).sort();
-            for (let i = 0; i < Math.min(3, categories.length); i++) {
-                state.expandedCategories.add(categories[i]);
+            state.currentMachine.parts.forEach(part => {
+                const category = part.category;
+                
+                if (state.treeData[category]) {
+                    state.treeData[category].push(part);
+                    state.partsByCategory[category].push(part);
+                } else {
+                    if (!state.treeData[category]) {
+                        state.treeData[category] = [];
+                        state.partsByCategory[category] = [];
+                    }
+                    state.treeData[category].push(part);
+                    state.partsByCategory[category].push(part);
+                }
+            });
+            
+            state.expandedCategories.add('全部');
+            
+            const categoriesWithParts = Object.keys(state.treeData).filter(category => 
+                state.partsByCategory[category] && state.partsByCategory[category].length > 0
+            ).sort();
+            
+            for (let i = 0; i < Math.min(2, categoriesWithParts.length); i++) {
+                state.expandedCategories.add(categoriesWithParts[i]);
             }
         }
 
-        // 更新当前整机显示 - 修复bug：正确处理双语显示
+        // 更新当前整机显示
         function updateCurrentMachineDisplay() {
             if (!state.currentMachine) {
-                // 没有选择整机时，显示翻译后的文本
                 const currentMachineName = document.getElementById('current-machine-name');
                 const currentMachineCode = document.getElementById('current-machine-code');
+                const currentMachineType = document.getElementById('current-machine-type');
                 
                 currentMachineName.textContent = translations[state.currentLanguage].no_machine_selected;
                 currentMachineCode.textContent = translations[state.currentLanguage].please_select_machine_model;
+                currentMachineType.textContent = '';
                 return;
             }
             
-            // 选择整机后，显示实际数据
             const currentMachineName = document.getElementById('current-machine-name');
             const currentMachineCode = document.getElementById('current-machine-code');
+            const currentMachineType = document.getElementById('current-machine-type');
             const partDetailSubtitle = document.getElementById('part-detail-subtitle');
+            
+            const typeName = state.currentLanguage === 'zh' ? 
+                (state.currentMachine.type === 'chainsaw' ? '油锯' : '割灌机') :
+                (state.currentMachine.type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter');
             
             currentMachineName.textContent = state.currentMachine.name;
             currentMachineCode.textContent = state.currentMachine.description;
+            currentMachineType.textContent = `${translations[state.currentLanguage].current_machine_type}: ${typeName}`;
             
             document.getElementById('parts-grid-title').textContent = `${state.currentMachine.name} ${state.currentLanguage === 'zh' ? '配件目录' : 'Parts Catalog'}`;
-            partDetailSubtitle.textContent = `${state.currentLanguage === 'zh' ? '整机型号' : 'Machine Model'}: ${state.currentMachine.name}`;
+            partDetailSubtitle.textContent = `${state.currentLanguage === 'zh' ? '整机型号' : 'Machine Model'}: ${state.currentMachine.name} (${typeName})`;
         }
 
         // 显示整机内容
@@ -1776,38 +2222,100 @@
             document.getElementById('part-detail-container').classList.remove('active');
         }
 
-        // 返回选择器
-        function backToSelector() {
-            document.getElementById('machine-selector').style.display = 'block';
-            document.getElementById('machine-parts-container').classList.remove('active');
-            document.getElementById('part-detail-container').classList.remove('active');
-            
+        // 返回类型选择器
+        function backToTypeSelector() {
+            state.currentMachineType = null;
             state.currentMachine = null;
             state.selectedPart = null;
             
-            // 修复bug：返回选择器后更新显示
+            document.getElementById('machine-type-selector').style.display = 'flex';
+            document.getElementById('machine-selector').style.display = 'none';
+            document.getElementById('machine-parts-container').classList.remove('active');
+            document.getElementById('part-detail-container').classList.remove('active');
+            
             updateCurrentMachineDisplay();
         }
 
-        // 渲染树形目录
+        // 返回选择器
+        function backToSelector() {
+            if (state.currentMachineType) {
+                document.getElementById('machine-selector').style.display = 'block';
+                document.getElementById('machine-parts-container').classList.remove('active');
+                document.getElementById('part-detail-container').classList.remove('active');
+                
+                initializeMachineSelectorByType(state.currentMachineType);
+                
+                state.currentMachine = null;
+                state.selectedPart = null;
+                
+                updateCurrentMachineDisplay();
+            } else {
+                backToTypeSelector();
+            }
+        }
+
+        // 渲染树形目录 - 移除了状态标签
         function renderTree() {
             const treeContainer = document.getElementById('machine-parts-tree');
             treeContainer.innerHTML = '';
             
-            if (!state.currentMachine) return;
+            if (!state.currentMachine || !state.currentMachineType) return;
             
-            const categories = Object.keys(state.treeData).sort();
+            const standardCategories = state.standardizedPartsCatalog[state.currentMachine.type] || [];
             
-            categories.forEach(category => {
+            // 添加"全部"分类到最前面
+            const allCategoryNode = createTreeNode('全部', state.currentMachine.parts.length, 
+                state.expandedCategories.has('全部'), state.currentCategory === '全部', true);
+            treeContainer.appendChild(allCategoryNode);
+            
+            // 将分类分为两组：有配件的和没配件的
+            const categoriesWithParts = [];
+            const categoriesWithoutParts = [];
+            
+            standardCategories.forEach(category => {
                 const categoryParts = state.partsByCategory[category] || [];
+                const hasParts = categoryParts.length > 0;
+                
+                if (hasParts) {
+                    categoriesWithParts.push(category);
+                } else {
+                    categoriesWithoutParts.push(category);
+                }
+            });
+            
+            // 有配件的分类按照配件数量降序排列
+            categoriesWithParts.sort((a, b) => {
+                const countA = state.partsByCategory[a]?.length || 0;
+                const countB = state.partsByCategory[b]?.length || 0;
+                return countB - countA;
+            });
+            
+            // 无配件的分类按字母顺序排列
+            categoriesWithoutParts.sort();
+            
+            // 先显示有配件的分类
+            categoriesWithParts.forEach(category => {
+                const categoryParts = state.partsByCategory[category] || [];
+                const hasParts = categoryParts.length > 0;
                 const isExpanded = state.expandedCategories.has(category);
                 const isActive = state.currentCategory === category;
                 
-                const treeNode = createTreeNode(category, categoryParts.length, isExpanded, isActive);
+                const treeNode = createTreeNode(category, categoryParts.length, isExpanded, isActive, hasParts);
                 treeContainer.appendChild(treeNode);
             });
             
-            if (treeContainer.children.length === 0) {
+            // 显示无配件的分类
+            categoriesWithoutParts.forEach(category => {
+                const categoryParts = state.partsByCategory[category] || [];
+                const hasParts = false;
+                const isExpanded = state.expandedCategories.has(category);
+                const isActive = state.currentCategory === category;
+                
+                const treeNode = createTreeNode(category, 0, isExpanded, isActive, hasParts);
+                treeContainer.appendChild(treeNode);
+            });
+            
+            if (standardCategories.length === 0 && !state.currentMachine.parts.length) {
                 const emptyNode = document.createElement('li');
                 emptyNode.className = 'machine-tree-node';
                 emptyNode.innerHTML = `
@@ -1821,14 +2329,22 @@
             }
         }
 
-        // 创建树节点
-        function createTreeNode(category, count, isExpanded, isActive) {
+        // 创建树节点 - 移除了状态标签
+        function createTreeNode(category, count, isExpanded, isActive, hasParts) {
             const li = document.createElement('li');
             li.className = 'machine-tree-node';
+            
+            if (category === '全部') {
+                li.classList.add('all-category');
+            }
             
             const header = document.createElement('div');
             header.className = 'machine-tree-item-header';
             if (isActive) header.classList.add('active');
+            
+            if (!hasParts && category !== '全部') {
+                header.classList.add('no-parts');
+            }
             
             const toggle = document.createElement('div');
             toggle.className = 'machine-tree-toggle';
@@ -1837,11 +2353,18 @@
             
             const icon = document.createElement('div');
             icon.className = 'machine-tree-icon';
-            icon.innerHTML = `<i class="${categoryIcons[category] || defaultIcon}"></i>`;
+            if (category === '全部') {
+                icon.innerHTML = '<i class="fas fa-list"></i>';
+            } else {
+                icon.innerHTML = `<i class="${categoryIcons[category] || defaultIcon}"></i>`;
+            }
             
             const label = document.createElement('div');
             label.className = 'machine-tree-label';
-            label.textContent = category;
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = category;
+            label.appendChild(nameSpan);
             
             const countSpan = document.createElement('div');
             countSpan.className = 'machine-tree-count';
@@ -1854,8 +2377,6 @@
             
             header.addEventListener('click', function(e) {
                 e.stopPropagation();
-                
-                // 选择该分类
                 selectCategory(category);
             });
             
@@ -1866,21 +2387,36 @@
 
         // 选择分类
         function selectCategory(category) {
+            if (category === '全部') {
+                state.currentCategory = '全部';
+                state.selectedPart = null;
+                state.isSearchingAllCategories = false;
+                
+                state.filteredParts = [...state.currentMachine.parts];
+                
+                renderTree();
+                
+                renderFilteredParts(state.filteredParts, 
+                    `${state.currentMachine.name} - ${state.currentLanguage === 'zh' ? '全部配件' : 'All Parts'}`,
+                    state.currentLanguage === 'zh' ? 
+                        `共 ${state.filteredParts.length} 个配件` :
+                        `Total ${state.filteredParts.length} parts`
+                );
+                return;
+            }
+            
             state.currentCategory = category;
             state.selectedPart = null;
             state.isSearchingAllCategories = false;
             
-            // 如果分类已展开，则收起；否则展开
             if (state.expandedCategories.has(category)) {
                 state.expandedCategories.delete(category);
             } else {
                 state.expandedCategories.add(category);
             }
             
-            // 重新渲染树形目录，更新选中状态
             renderTree();
             
-            // 应用筛选（会自动处理搜索和分类）
             applyFilters();
         }
 
@@ -1907,7 +2443,6 @@
             document.getElementById('visible-parts-count').textContent = '0';
             document.getElementById('total-parts-count').textContent = state.currentMachine ? state.currentMachine.parts.length : '0';
             
-            // 修复bug：根据当前语言设置标题
             const title = state.currentMachine ? 
                 `${state.currentMachine.name} ${state.currentLanguage === 'zh' ? '配件目录' : 'Parts Catalog'}` : 
                 (state.currentLanguage === 'zh' ? '配件目录' : 'Parts Catalog');
@@ -1915,7 +2450,6 @@
             document.getElementById('parts-grid-title').textContent = title;
             document.getElementById('parts-grid-subtitle').textContent = state.currentLanguage === 'zh' ? '请选择左侧的分类查看配件' : 'Please select a category on the left to view parts';
             
-            // 翻译空状态
             translatePage();
         }
 
@@ -1923,18 +2457,51 @@
         function applyFilters() {
             if (!state.currentMachine) return;
             
+            if (state.currentCategory === '全部') {
+                const searchTerm = state.currentFilter.search.toLowerCase().trim();
+                const hasSearch = searchTerm !== '';
+                
+                let filtered = [];
+                let titleText = '';
+                let subtitleText = '';
+                
+                if (hasSearch) {
+                    filtered = state.currentMachine.parts.filter(item => 
+                        (item.name && item.name.toLowerCase().includes(searchTerm)) ||
+                        (item.category && item.category.toLowerCase().includes(searchTerm)) ||
+                        (item.code && item.code.toLowerCase().includes(searchTerm)) ||
+                        (item.oldCode && item.oldCode.toLowerCase().includes(searchTerm)) ||
+                        (item.specs && item.specs.toLowerCase().includes(searchTerm))
+                    );
+                    titleText = `${state.currentMachine.name} - ${state.currentLanguage === 'zh' ? '全部配件搜索结果' : 'All Parts Search Results'}`;
+                    subtitleText = state.currentLanguage === 'zh' ? 
+                        `搜索 "${state.currentFilter.search}" 找到 ${filtered.length} 个配件` :
+                        `Search "${state.currentFilter.search}" found ${filtered.length} parts`;
+                    state.isSearchingAllCategories = true;
+                    state.searchResults = filtered;
+                } else {
+                    filtered = [...state.currentMachine.parts];
+                    titleText = `${state.currentMachine.name} - ${state.currentLanguage === 'zh' ? '全部配件' : 'All Parts'}`;
+                    subtitleText = state.currentLanguage === 'zh' ? 
+                        `共 ${filtered.length} 个配件` :
+                        `Total ${filtered.length} parts`;
+                    state.isSearchingAllCategories = false;
+                }
+                
+                state.filteredParts = filtered;
+                renderFilteredParts(filtered, titleText, subtitleText);
+                return;
+            }
+            
             let filtered = [];
             let titleText = '';
             let subtitleText = '';
             
-            // 获取搜索关键词
             const searchTerm = state.currentFilter.search.toLowerCase().trim();
             const hasSearch = searchTerm !== '';
             
             if (hasSearch) {
-                // 有搜索关键词
                 if (state.currentCategory) {
-                    // 在当前分类内搜索
                     const categoryParts = state.partsByCategory[state.currentCategory] || [];
                     filtered = categoryParts.filter(item => 
                         (item.name && item.name.toLowerCase().includes(searchTerm)) ||
@@ -1949,7 +2516,6 @@
                         `Search "${state.currentFilter.search}" found ${filtered.length} parts`;
                     state.isSearchingAllCategories = false;
                 } else {
-                    // 在所有分类中搜索
                     filtered = state.currentMachine.parts.filter(item => 
                         (item.name && item.name.toLowerCase().includes(searchTerm)) ||
                         (item.category && item.category.toLowerCase().includes(searchTerm)) ||
@@ -1965,17 +2531,21 @@
                     state.searchResults = filtered;
                 }
             } else {
-                // 没有搜索关键词
                 if (state.currentCategory) {
-                    // 显示当前分类的所有配件
                     filtered = [...state.partsByCategory[state.currentCategory] || []];
                     titleText = `${state.currentMachine.name} - ${state.currentCategory}`;
-                    subtitleText = state.currentLanguage === 'zh' ? 
-                        `共 ${filtered.length} 个配件` :
-                        `Total ${filtered.length} parts`;
+                    
+                    if (filtered.length === 0) {
+                        subtitleText = state.currentLanguage === 'zh' ? 
+                            `该分类暂无配件` :
+                            `No parts in this category`;
+                    } else {
+                        subtitleText = state.currentLanguage === 'zh' ? 
+                            `共 ${filtered.length} 个配件` :
+                            `Total ${filtered.length} parts`;
+                    }
                     state.isSearchingAllCategories = false;
                 } else {
-                    // 既没有分类也没有搜索，显示空状态
                     state.isSearchingAllCategories = false;
                     showEmptyPartsGrid();
                     return;
@@ -1984,7 +2554,6 @@
             
             state.filteredParts = filtered;
             
-            // 渲染过滤后的配件
             renderFilteredParts(filtered, titleText, subtitleText);
             
             if (state.selectedPart && !filtered.some(item => item.code === state.selectedPart.code)) {
@@ -1995,12 +2564,12 @@
             }
         }
 
-        // 渲染过滤后配件的函数
+        // 渲染过滤后配件
         function renderFilteredParts(parts, titleText, subtitleText) {
             const partsGrid = document.getElementById('parts-grid');
             partsGrid.innerHTML = '';
             
-            if (parts.length === 0) {
+            if (parts.length === 0 && state.currentCategory) {
                 const emptyMessage = document.createElement('div');
                 emptyMessage.className = 'empty-state';
                 emptyMessage.style.gridColumn = '1 / -1';
@@ -2013,33 +2582,32 @@
                     `;
                 } else {
                     emptyMessage.innerHTML = `
-                        <i class="fas fa-search"></i>
-                        <h3 data-key="no_parts_found">未找到配件</h3>
-                        <p data-key="no_parts_in_category">该分类下暂无配件数据</p>
+                        <i class="fas fa-box-open"></i>
+                        <h3>${state.currentLanguage === 'zh' ? '该分类暂无配件' : 'No parts in this category'}</h3>
+                        <p>${state.currentLanguage === 'zh' ? '该分类下暂无配件数据' : 'No parts data in this category'}</p>
                     `;
                 }
                 
                 partsGrid.appendChild(emptyMessage);
                 translatePage();
                 return;
+            } else if (parts.length === 0) {
+                showEmptyPartsGrid();
+                return;
             }
             
-            // 不显示搜索结果提示信息，直接显示配件卡片
             parts.forEach(part => {
                 const partCard = createPartCard(part);
                 partsGrid.appendChild(partCard);
             });
             
-            // 更新标题和副标题
             document.getElementById('parts-grid-title').textContent = titleText;
             document.getElementById('parts-grid-subtitle').textContent = subtitleText;
             document.getElementById('visible-parts-count').textContent = parts.length;
             document.getElementById('total-parts-count').textContent = state.currentMachine.parts.length;
             
-            // 更新购物车按钮状态
             updateCartButtonStates();
             
-            // 加载配件图片
             loadAllPartsImages();
         }
 
@@ -2051,16 +2619,14 @@
             const card = document.createElement('div');
             card.className = `part-card fade-in ${isSelected ? 'active' : ''}`;
             card.dataset.code = part.code;
+            card.dataset.category = part.category;
             
-            // 检查是否已有缓存的图片URL
             const productCode = part.code;
             let imageHtml = '';
             
             if (state.loadedImages[productCode]) {
-                // 已经有缓存的图片URL，直接显示图片
                 imageHtml = `<img src="${state.loadedImages[productCode]}" alt="${productCode}" class="part-image" loading="lazy">`;
             } else if (state.imageCache[productCode] === false) {
-                // 已知图片不存在，显示占位符
                 imageHtml = `
                     <div class="image-placeholder">
                         <i class="fas fa-image"></i>
@@ -2068,7 +2634,6 @@
                     </div>
                 `;
             } else {
-                // 图片状态未知，显示加载中
                 imageHtml = `
                     <div class="image-loading">
                         <i class="fas fa-spinner"></i>
@@ -2077,8 +2642,11 @@
                 `;
             }
             
-            // 只在搜索所有分类时显示分类标签
             const categoryTag = state.isSearchingAllCategories ? `<span class="search-category-tag">${part.category}</span>` : '';
+            
+            const standardizedStatus = part.isStandardized !== false ? 
+                `<span class="part-match-status part-matched" title="${state.currentLanguage === 'zh' ? '标准化分类' : 'Standardized category'}">STD</span>` : 
+                `<span class="part-match-status part-not-matched" title="${state.currentLanguage === 'zh' ? '非标准化分类' : 'Non-standardized category'}">NON</span>`;
             
             card.innerHTML = `
                 <button class="cart-button ${inCart ? 'added' : ''}" title="${inCart ? (state.currentLanguage === 'zh' ? '已在购物车中' : 'Already in cart') : (state.currentLanguage === 'zh' ? '添加到购物车' : 'Add to cart')}" data-code="${part.code}">
@@ -2089,7 +2657,7 @@
                 </div>
                 <div class="part-content">
                     <div class="part-header">
-                        <div class="part-code">${part.code}</div>
+                        <div class="part-code">${part.code} ${standardizedStatus}</div>
                         <div class="category-badge">${part.category}</div>
                         ${categoryTag}
                     </div>
@@ -2102,22 +2670,18 @@
                 </div>
             `;
             
-            // 添加点击事件
             card.addEventListener('click', function(e) {
-                // 如果点击的是购物车按钮，不触发详情查看
                 if (!e.target.closest('.cart-button')) {
                     selectPart(part);
-                    // 点击配件卡片时关闭购物车
                     closeCart();
                 }
             });
             
-            // 添加购物车按钮事件
             const cartBtn = card.querySelector('.cart-button');
             if (cartBtn) {
                 cartBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // 阻止事件冒泡到卡片
-                    e.preventDefault(); // 阻止默认行为
+                    e.stopPropagation();
+                    e.preventDefault();
                     addToCart(part);
                 });
             }
@@ -2149,7 +2713,7 @@
         // 选择配件
         function selectPart(part) {
             state.selectedPart = part;
-            applyFilters(); // 重新应用筛选以更新UI
+            applyFilters();
             showPartDetail(part);
         }
 
@@ -2165,11 +2729,20 @@
         function renderPartDetailContent(part) {
             document.getElementById('part-detail-title').textContent = `${part.category} - ${part.code}`;
             
-            // 修复bug：更新详情页的整机型号显示
+            const machineType = state.currentLanguage === 'zh' ? 
+                (state.currentMachine.type === 'chainsaw' ? '油锯' : '割灌机') :
+                (state.currentMachine.type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter');
+                
             const machineModelText = state.currentLanguage === 'zh' ? '整机型号' : 'Machine Model';
-            document.getElementById('part-detail-subtitle').textContent = `${machineModelText}: ${state.currentMachine.name}`;
+            const machineTypeText = state.currentLanguage === 'zh' ? '机器类型' : 'Machine Type';
+            document.getElementById('part-detail-subtitle').textContent = `${machineModelText}: ${state.currentMachine.name} (${machineTypeText}: ${machineType})`;
             
             const detailContent = document.getElementById('part-detail-content');
+            
+            const isStandardized = part.isStandardized !== false;
+            const standardizedInfo = isStandardized ? 
+                `<span class="part-matched" style="padding: 2px 6px; border-radius: 3px; font-size: 12px;">${state.currentLanguage === 'zh' ? '标准化分类' : 'Standardized Category'}</span>` :
+                `<span class="part-not-matched" style="padding: 2px 6px; border-radius: 3px; font-size: 12px;">${state.currentLanguage === 'zh' ? '非标准化分类' : 'Non-standardized Category'}</span>`;
             
             detailContent.innerHTML = `
                 <div class="detail-image-section" id="detail-image-section">
@@ -2194,8 +2767,15 @@
                                 <td class="info-label" data-key="category">类别</td>
                                 <td class="info-value">
                                     <span class="category-badge">${part.category}</span>
+                                    ${standardizedInfo}
                                 </td>
                             </tr>
+                            ${part.originalCategory && part.originalCategory !== part.category ? `
+                                <tr>
+                                    <td class="info-label">原始分类</td>
+                                    <td class="info-value" style="color: #666;">${part.originalCategory}</td>
+                                </tr>
+                            ` : ''}
                             <tr>
                                 <td class="info-label" data-key="machine_name">整机名称</td>
                                 <td class="info-value">${part.name || state.currentMachine.name}</td>
@@ -2225,17 +2805,13 @@
                 </div>
             `;
             
-            // 加载配件图片
             loadPartDetailImage(part.code);
             
-            // 绑定导航按钮事件
             document.getElementById('prev-part-btn').addEventListener('click', showPreviousPart);
             document.getElementById('next-part-btn').addEventListener('click', showNextPart);
             
-            // 更新导航按钮状态
             updateNavigationButtons();
             
-            // 翻译详情页
             translatePage();
         }
 
@@ -2243,18 +2819,14 @@
         async function loadPartDetailImage(productCode) {
             const imageSection = document.getElementById('detail-image-section');
             
-            // 先检查是否已有缓存的图片URL
             if (state.loadedImages[productCode]) {
-                // 已经有缓存的图片URL，直接显示
                 const imageUrl = state.loadedImages[productCode];
                 displayPartDetailImage(imageSection, productCode, imageUrl);
                 return;
             }
             
-            // 检查图片是否存在（使用缓存）
             const imageUrl = await checkImage(productCode);
             if (imageUrl) {
-                // 保存到已加载图片缓存
                 state.loadedImages[productCode] = imageUrl;
                 displayPartDetailImage(imageSection, productCode, imageUrl);
             } else {
@@ -2293,14 +2865,12 @@
             const loadPromises = Array.from(partImages).map(async (imageContainer) => {
                 const productCode = imageContainer.dataset.code;
                 
-                // 如果图片已经加载过（有缓存的URL），直接显示
                 if (state.loadedImages[productCode]) {
                     const imageUrl = state.loadedImages[productCode];
                     imageContainer.innerHTML = `<img src="${imageUrl}" alt="${productCode}" class="part-image" loading="lazy">`;
                     return;
                 }
                 
-                // 如果已知图片不存在
                 if (state.imageCache[productCode] === false) {
                     imageContainer.innerHTML = `
                         <div class="image-placeholder">
@@ -2311,11 +2881,9 @@
                     return;
                 }
                 
-                // 检查图片是否存在
                 const imageUrl = await checkImage(productCode);
                 
                 if (imageUrl) {
-                    // 保存到已加载图片缓存
                     state.loadedImages[productCode] = imageUrl;
                     imageContainer.innerHTML = `<img src="${imageUrl}" alt="${productCode}" class="part-image" loading="lazy">`;
                 } else {
@@ -2328,21 +2896,17 @@
                 }
             });
             
-            // 等待所有图片加载完成
             await Promise.all(loadPromises);
             
-            // 翻译图片占位符
             translatePage();
         }
 
         // 检查图片是否存在
         async function checkImage(code) {
-            // 检查缓存
             if (state.imageCache[code] !== undefined) {
                 return state.imageCache[code];
             }
             
-            // 尝试加载图片
             for (const ext of imageExtensions) {
                 const url = `images/${code}${ext}`;
                 try {
@@ -2356,7 +2920,6 @@
                 }
             }
             
-            // 图片不存在
             state.imageCache[code] = false;
             return false;
         }
@@ -2415,13 +2978,11 @@
         function resetFilters() {
             document.getElementById('machine-search-input').value = '';
             state.currentFilter.search = '';
-            state.currentCategory = null;
+            state.currentCategory = '全部';
             state.isSearchingAllCategories = false;
             
-            // 应用筛选（会显示空状态）
             applyFilters();
             
-            // 重置树形目录选中状态
             renderTree();
         }
 
@@ -2445,7 +3006,6 @@
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // 翻译下载按钮
             translatePage();
         }
 
@@ -2479,7 +3039,7 @@
             document.body.removeChild(a);
         }
 
-        // 切换整机树形目录 - 修复bug：确保按钮始终可见
+        // 切换整机树形目录
         function toggleMachineTree() {
             const treeContainer = document.getElementById('machine-tree-container');
             const toggleBtn = document.getElementById('toggle-machine-tree');
@@ -2493,7 +3053,6 @@
                 toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
                 toggleBtn.title = state.currentLanguage === 'zh' ? '展开目录' : 'Expand directory';
                 
-                // 隐藏树内容
                 document.querySelector('.machine-tree-header .machine-tree-title').style.display = 'none';
                 document.getElementById('machine-parts-tree').style.display = 'none';
             } else {
@@ -2503,7 +3062,6 @@
                 toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
                 toggleBtn.title = state.currentLanguage === 'zh' ? '折叠目录' : 'Collapse directory';
                 
-                // 显示树内容
                 document.querySelector('.machine-tree-header .machine-tree-title').style.display = 'block';
                 document.getElementById('machine-parts-tree').style.display = 'block';
             }
@@ -2529,7 +3087,6 @@
             
             modal.classList.add('active');
             
-            // 翻译品牌选择下拉框
             translatePage();
         }
 
@@ -2569,14 +3126,17 @@
             // 整机目录搜索
             document.getElementById('machine-search-input').addEventListener('input', function(e) {
                 state.currentFilter.search = e.target.value;
-                applyFilters(); // 直接调用 applyFilters，它会根据是否有分类选择来决定搜索范围
+                applyFilters();
             });
             
             // 重置筛选按钮
             document.getElementById('reset-filters').addEventListener('click', resetFilters);
             
-            // 返回选择按钮
-            document.getElementById('back-to-selector').addEventListener('click', backToSelector);
+            // 返回类型选择按钮
+            document.getElementById('back-to-type-from-selector').addEventListener('click', backToTypeSelector);
+            
+            // 返回机型列表按钮
+            document.getElementById('back-to-machines').addEventListener('click', backToSelector);
             
             // 返回配件列表按钮
             document.getElementById('back-to-parts-list').addEventListener('click', backToPartsList);
@@ -2588,7 +3148,7 @@
                 }
             });
             
-            // 切换整机树形目录 - 确保按钮被正确绑定
+            // 切换整机树形目录
             document.getElementById('toggle-machine-tree').addEventListener('click', toggleMachineTree);
             
             // 购物车相关事件
@@ -2633,12 +3193,11 @@
                 }
             });
             
-            // 全局点击事件：点击购物车外部区域时关闭购物车
+            // 全局点击事件
             document.addEventListener('click', function(e) {
                 const cartSidebar = document.getElementById('cart-sidebar');
                 const viewCartBtn = document.getElementById('view-cart');
                 
-                // 如果购物车是打开的，且点击的不是购物车本身、购物车按钮、数量模态框或购物车内元素
                 if (cartSidebar.classList.contains('active') &&
                     !cartSidebar.contains(e.target) &&
                     !viewCartBtn.contains(e.target) &&
@@ -2650,7 +3209,6 @@
             
             // 事件委托处理动态生成的购物车内容
             document.addEventListener('click', function(e) {
-                // 减少数量按钮
                 if (e.target.closest('.decrease-quantity')) {
                     const code = e.target.closest('.decrease-quantity').dataset.code;
                     const item = state.cart.items.find(item => item.code === code);
@@ -2666,7 +3224,6 @@
                     e.stopPropagation();
                 }
                 
-                // 增加数量按钮
                 if (e.target.closest('.increase-quantity')) {
                     const code = e.target.closest('.increase-quantity').dataset.code;
                     const item = state.cart.items.find(item => item.code === code);
@@ -2676,7 +3233,6 @@
                     e.stopPropagation();
                 }
                 
-                // 移除商品按钮
                 if (e.target.closest('.remove-item')) {
                     const code = e.target.closest('.remove-item').dataset.code;
                     if (confirm(state.currentLanguage === 'zh' ? '确定要从购物车中移除这个商品吗？' : 'Are you sure you want to remove this item from the cart?')) {
@@ -2704,13 +3260,11 @@
                     closeQuantityModal();
                     closeCart();
                     
-                    // 如果当前在详情页，按ESC返回配件列表
                     if (document.getElementById('part-detail-container').classList.contains('active')) {
                         backToPartsList();
                     }
                 }
                 
-                // 左右箭头切换配件
                 if (state.selectedPart && state.currentMachine && 
                     document.getElementById('part-detail-container').classList.contains('active')) {
                     if (e.key === 'ArrowLeft') {
@@ -2720,19 +3274,16 @@
                     }
                 }
                 
-                // 打开购物车快捷键：Ctrl+B
                 if (e.ctrlKey && e.key === 'b') {
                     e.preventDefault();
                     openCart();
                 }
                 
-                // 语言切换快捷键：Ctrl+L
                 if (e.ctrlKey && e.key === 'l') {
                     e.preventDefault();
                     const currentLang = state.currentLanguage;
                     const newLang = currentLang === 'zh' ? 'en' : 'zh';
                     
-                    // 更新按钮状态
                     document.querySelectorAll('.lang-btn').forEach(btn => {
                         btn.classList.remove('active');
                         if (btn.dataset.lang === newLang) {
@@ -2740,14 +3291,18 @@
                         }
                     });
                     
-                    // 更新当前语言
                     state.currentLanguage = newLang;
                     
-                    // 翻译页面
                     translatePage();
                     
-                    // 更新当前整机显示
                     updateCurrentMachineDisplay();
+                    
+                    updateMachineTypeStats();
+                    
+                    if (state.currentMachine) {
+                        renderTree();
+                        applyFilters();
+                    }
                 }
             });
             
@@ -2760,7 +3315,7 @@
                 }
             });
             
-            // 为配件卡片添加点击事件（使用事件委托）
+            // 为配件卡片添加点击事件
             document.getElementById('parts-grid').addEventListener('click', function(e) {
                 const partCard = e.target.closest('.part-card');
                 if (partCard) {
@@ -2771,7 +3326,6 @@
                     
                     if (part) {
                         selectPart(part);
-                        // 点击配件卡片时关闭购物车
                         closeCart();
                     }
                 }
