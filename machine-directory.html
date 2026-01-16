@@ -496,16 +496,60 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
 
+        /* 修改：图片区域铺满整个卡片顶部区域 */
         .machine-type-icon {
-            padding: 30px;
+            padding: 0;
             text-align: center;
             background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             color: white;
+            height: 180px; /* 增加高度让图片有更大显示空间 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* 防止图片溢出 */
+            position: relative;
         }
 
-        .machine-type-icon i {
-            font-size: 64px;
-            margin-bottom: 15px;
+        /* 修改：让图片铺满整个图标区域 */
+        .machine-type-image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* 修改：图片铺满整个区域 */
+        .machine-type-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 使用cover让图片铺满并裁剪 */
+            object-position: center; /* 确保图片中心对齐 */
+            transition: transform 0.3s ease; /* 添加过渡效果 */
+        }
+
+        /* 鼠标悬停时稍微放大图片 */
+        .machine-type-card:hover .machine-type-image {
+            transform: scale(1.05);
+        }
+
+        /* 在图片上方添加机器名称，使用半透明背景确保文字可读 */
+        .machine-type-icon h3 {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            color: white;
+            margin: 0;
+            padding: 15px;
+            font-size: 22px;
+            text-align: center;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .machine-type-info {
@@ -841,7 +885,10 @@
                 <!-- 油锯类型卡片 -->
                 <div class="machine-type-card" id="chainsaw-type-card">
                     <div class="machine-type-icon">
-                        <i class="fas fa-tree"></i>
+                        <!-- 修改：让图片铺满整个卡片顶部区域 -->
+                        <div class="machine-type-image-container">
+                            <img src="Info/chainsaw.png" alt="油锯" class="machine-type-image">
+                        </div>
                         <h3 data-key="chainsaw">油锯</h3>
                     </div>
                     <div class="machine-type-info">
@@ -864,7 +911,10 @@
                 <!-- 割灌机类型卡片 -->
                 <div class="machine-type-card" id="brush-cutter-type-card">
                     <div class="machine-type-icon" style="background: linear-gradient(135deg, #27ae60 0%, #219653 100%);">
-                        <i class="fas fa-leaf"></i>
+                        <!-- 修改：让图片铺满整个卡片顶部区域 -->
+                        <div class="machine-type-image-container">
+                            <img src="Info/brush_cutter.jpg" alt="割灌机" class="machine-type-image">
+                        </div>
                         <h3 data-key="brush_cutter">割灌机</h3>
                     </div>
                     <div class="machine-type-info">

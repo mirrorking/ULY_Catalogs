@@ -19,5 +19,12 @@
     "type": "brush_cutter",
     "description": "割灌机系列",
     "icon": "fas fa-leaf"
+  },
+  {
+    "id": "MS180",
+    "name": "MS180",
+    "type": "chainsaw",
+    "description": "油锯M180",
+    "icon": "fas fa-tree"
   }
 ]
