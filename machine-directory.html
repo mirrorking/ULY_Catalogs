@@ -427,6 +427,9 @@
         /* 在配件卡片中添加购物车按钮 */
         .part-card {
             position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         /* 响应式调整 */
@@ -720,6 +723,9 @@
         /* 修改配件卡片样式 - 始终显示分类和规格 */
         .part-content {
             padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
         
         .part-header {
@@ -751,7 +757,7 @@
             color: #495057;
             line-height: 1.4;
             margin: 10px 0;
-            min-height: 60px;
+            flex: 1;
             font-weight: 600; /* 添加粗体样式 */
         }
         
@@ -768,23 +774,145 @@
             font-family: 'Courier New', monospace;
         }
         
-        /* 修改配件卡片布局 */
-        .part-card .part-content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .part-card .part-specs {
-            flex: 1;
-            overflow: hidden;
-        }
-        
         /* 在详情页中也将规格描述设置为粗体 */
         .specs-content {
             font-size: 15px;
             line-height: 1.6;
             font-weight: 600; /* 添加粗体样式 */
+        }
+
+        /* 修改：增大图片区域，占卡片2/3高度 */
+        .part-image-section {
+            height: 300px; /* 增大图片区域高度 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* 懒加载图片相关样式 */
+        .lazy-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .lazy-image.loading {
+            background: #e3f2fd;
+        }
+
+        .lazy-image.loaded {
+            background: transparent;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #95a5a6;
+        }
+
+        .image-placeholder i {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .part-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: opacity 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .image-loading {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #3498db;
+        }
+
+        .image-loading i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 详情页图片样式 */
+        .detail-image-wrapper {
+            width: 100%;
+            height: 500px; /* 增大详情页图片区域 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .zoom-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .detail-image-wrapper:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        /* 机器类型图片懒加载 */
+        .machine-type-image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .lazy-machine-image {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .machine-type-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -885,9 +1013,12 @@
                 <!-- 油锯类型卡片 -->
                 <div class="machine-type-card" id="chainsaw-type-card">
                     <div class="machine-type-icon">
-                        <!-- 修改：让图片铺满整个卡片顶部区域 -->
-                        <div class="machine-type-image-container">
-                            <img src="Info/chainsaw.png" alt="油锯" class="machine-type-image">
+                        <!-- 懒加载机器类型图片 -->
+                        <div class="machine-type-image-container lazy-machine-image" data-image="Info/chainsaw.png">
+                            <div class="image-loading">
+                                <i class="fas fa-spinner"></i>
+                                <p data-key="loading_image">加载图片中...</p>
+                            </div>
                         </div>
                         <h3 data-key="chainsaw">油锯</h3>
                     </div>
@@ -911,9 +1042,12 @@
                 <!-- 割灌机类型卡片 -->
                 <div class="machine-type-card" id="brush-cutter-type-card">
                     <div class="machine-type-icon" style="background: linear-gradient(135deg, #27ae60 0%, #219653 100%);">
-                        <!-- 修改：让图片铺满整个卡片顶部区域 -->
-                        <div class="machine-type-image-container">
-                            <img src="Info/brush_cutter.jpg" alt="割灌机" class="machine-type-image">
+                        <!-- 懒加载机器类型图片 -->
+                        <div class="machine-type-image-container lazy-machine-image" data-image="Info/brush_cutter.jpg">
+                            <div class="image-loading">
+                                <i class="fas fa-spinner"></i>
+                                <p data-key="loading_image">加载图片中...</p>
+                            </div>
                         </div>
                         <h3 data-key="brush_cutter">割灌机</h3>
                     </div>
@@ -1429,6 +1563,9 @@
             treeCollapsed: false,
             isSearchingAllCategories: false,
             searchResults: [],
+            // 懒加载相关
+            lazyImageObserver: null,
+            currentVisibleImages: new Set(),
             // 购物车状态
             cart: {
                 items: [],
@@ -1889,6 +2026,8 @@
                 await loadMachinesData();
                 initializeMachineTypeSelector();
                 setupEventListeners();
+                initializeLazyLoading();
+                loadMachineTypeImages();
                 hideLoading();
                 
                 setupLanguageSwitcher();
@@ -1971,7 +2110,173 @@
             document.getElementById('loading-overlay').classList.remove('active');
         }
 
-        // 加载整机数据 - 修改为从JSON文件加载
+        // 加载机器类型图片
+        async function loadMachineTypeImages() {
+            const machineTypeImages = document.querySelectorAll('.lazy-machine-image');
+            
+            machineTypeImages.forEach(async (container) => {
+                const imageUrl = container.dataset.image;
+                if (!imageUrl) return;
+                
+                try {
+                    const exists = await checkImageExists(imageUrl);
+                    if (exists) {
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.className = 'machine-type-image';
+                        img.alt = container.closest('.machine-type-card').querySelector('h3').textContent;
+                        
+                        // 替换加载指示器
+                        container.innerHTML = '';
+                        container.appendChild(img);
+                    } else {
+                        container.innerHTML = `
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                                <p data-key="no_image">无图片</p>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.warn('加载机器类型图片失败:', error);
+                    container.innerHTML = `
+                        <div class="image-placeholder">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p data-key="image_not_found">图片加载失败</p>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // 初始化懒加载
+        function initializeLazyLoading() {
+            if ('IntersectionObserver' in window) {
+                state.lazyImageObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const imageContainer = entry.target;
+                            const productCode = imageContainer.dataset.code;
+                            
+                            if (productCode) {
+                                loadLazyImage(imageContainer, productCode);
+                            }
+                        }
+                    });
+                }, {
+                    rootMargin: '100px 0px', // 增加预加载距离
+                    threshold: 0.1
+                });
+            }
+        }
+
+        // 加载懒加载图片
+        async function loadLazyImage(imageContainer, productCode) {
+            // 如果已经在加载中或已加载完成，跳过
+            if (imageContainer.classList.contains('loading') || imageContainer.classList.contains('loaded')) {
+                return;
+            }
+            
+            // 如果图片已经在缓存中
+            if (state.loadedImages[productCode]) {
+                showLazyImage(imageContainer, state.loadedImages[productCode], productCode);
+                return;
+            }
+            
+            // 标记为加载中
+            imageContainer.classList.add('loading');
+            
+            // 检查图片是否存在
+            const imageUrl = await checkImage(productCode);
+            
+            if (imageUrl) {
+                state.loadedImages[productCode] = imageUrl;
+                showLazyImage(imageContainer, imageUrl, productCode);
+            } else {
+                showNoImage(imageContainer, productCode);
+            }
+        }
+
+        // 显示懒加载图片
+        function showLazyImage(imageContainer, imageUrl, productCode) {
+            // 如果已经显示过了，跳过
+            if (imageContainer.classList.contains('loaded')) {
+                return;
+            }
+            
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = productCode;
+            img.className = 'part-image';
+            img.loading = 'lazy';
+            
+            img.onload = () => {
+                imageContainer.classList.remove('loading');
+                imageContainer.classList.add('loaded');
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(img);
+            };
+            
+            img.onerror = () => {
+                showNoImage(imageContainer, productCode);
+            };
+        }
+
+        // 显示无图片
+        function showNoImage(imageContainer, productCode) {
+            imageContainer.classList.remove('loading');
+            imageContainer.innerHTML = `
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                    <p data-key="no_image">无图片</p>
+                    <p style="font-size: 11px; margin-top: 5px; color: #95a5a6;">${productCode}</p>
+                </div>
+            `;
+            translatePage();
+        }
+
+        // 检查图片是否存在
+        async function checkImage(code) {
+            // 如果已经在缓存中，直接返回
+            if (state.imageCache[code] === true && state.loadedImages[code]) {
+                return state.loadedImages[code];
+            }
+            
+            if (state.imageCache[code] === false) {
+                return false;
+            }
+            
+            // 标记为检查中，防止重复检查
+            state.imageCache[code] = 'checking';
+            
+            for (const ext of imageExtensions) {
+                const url = `images/${code}${ext}`;
+                try {
+                    const exists = await checkImageExists(url);
+                    if (exists) {
+                        state.imageCache[code] = true;
+                        return url;
+                    }
+                } catch (error) {
+                    continue;
+                }
+            }
+            
+            state.imageCache[code] = false;
+            return false;
+        }
+
+        // 检查图片是否存在
+        function checkImageExists(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        // 加载整机数据
         async function loadMachinesData() {
             try {
                 // 加载整机型号列表
@@ -2018,9 +2323,7 @@
                 state.machinesData = machinesData;
             } catch (error) {
                 console.error('加载数据失败:', error);
-                
-                // 如果无法从文件加载，使用模拟数据
-                console.warn('使用模拟数据作为备用');
+                // 使用模拟数据作为备用
                 state.machinesData = getMockMachinesData();
             }
         }
@@ -2056,7 +2359,7 @@
             });
         }
 
-        // 模拟数据（作为备用）
+        // 模拟数据
         function getMockMachinesData() {
             const mockPartsData = [
                 {
@@ -2081,84 +2384,6 @@
                         { name: "拉绳滑轮", category: "ROPE PULLEY", code: "040341", oldCode: "UKBC0401P", brand: "", specs: "" },
                         { name: "滑轮刻度盘", category: "PULLEY DIAL", code: "040342", oldCode: "UKBC0402P", brand: "", specs: "" },
                         { name: "启动滑轮", category: "STARTER PULLEY", code: "040343", oldCode: "UKBC0403P", brand: "", specs: "轻松启动型" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050013", oldCode: "UKBC0501", brand: "", specs: "26T9" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050014", oldCode: "UKBC0502", brand: "", specs: "26T7" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050015", oldCode: "UKBC0503", brand: "", specs: "26T方形5X5MM" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050016", oldCode: "UKBC0504", brand: "", specs: "28T9" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050017", oldCode: "UKBC0505", brand: "", specs: "28T7" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050018", oldCode: "UKBC0506", brand: "", specs: "28T4" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050019", oldCode: "UKBC0507", brand: "", specs: "28T方形5X5MM" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050021", oldCode: "UKBC0509", brand: "", specs: "26T4" },
-                        { name: "齿轮箱", category: "GEAR BOX", code: "050022", oldCode: "UKBC0510", brand: "", specs: "24T7" },
-                        { name: "离合器外壳", category: "CLUTCH HOUSING", code: "050024", oldCode: "UKBC0501H", brand: "", specs: "28T9" },
-                        { name: "离合器外壳", category: "CLUTCH HOUSING", code: "050025", oldCode: "UKBC0502H", brand: "", specs: "28T7" },
-                        { name: "离合器外壳", category: "CLUTCH HOUSING", code: "050026", oldCode: "UKBC0503H", brand: "", specs: "28T方形5*5" },
-                        { name: "离合器外壳", category: "CLUTCH HOUSING", code: "050027", oldCode: "UKBC0504H", brand: "", specs: "26T7" },
-                        { name: "离合器外壳", category: "CLUTCH HOUSING", code: "050028", oldCode: "UKBC0505H", brand: "", specs: "26T9" },
-                        { name: "离合器外壳", category: "CLUTCH HOUSING", code: "050029", oldCode: "UKBC0506H", brand: "", specs: "26T方形5*5" },
-                        { name: "把手", category: "HOLDER", code: "050032", oldCode: "UKBC0501G", brand: "", specs: "26mm" },
-                        { name: "把手", category: "HOLDER", code: "050033", oldCode: "UKBC0502G", brand: "", specs: "28mm" },
-                        { name: "把手", category: "HOLDER", code: "050034", oldCode: "UKBC0503G", brand: "", specs: "26mm" },
-                        { name: "把手", category: "HOLDER", code: "050035", oldCode: "UKBC0504G", brand: "", specs: "28mm" },
-                        { name: "离合器", category: "CLUTCH", code: "080002", oldCode: "UKBC0802", brand: "", specs: "" },
-                        { name: "离合器鼓", category: "CLUTCH DRUM", code: "080071", oldCode: "UKBC0801C", brand: "", specs: "9T" },
-                        { name: "离合器鼓", category: "CLUTCH DRUM", code: "080072", oldCode: "UKBC0802C", brand: "", specs: "9T" },
-                        { name: "离合器鼓", category: "CLUTCH DRUM", code: "080074", oldCode: "UKBC0804C", brand: "", specs: "7T" },
-                        { name: "滚针轴承", category: "NEEDLE GAGE", code: "080183", oldCode: "UKBC0801N", brand: "", specs: "CG430滚针轴承43cc10*13*15" },
-                        { name: "燃油箱", category: "FUEL TANK", code: "090057", oldCode: "UKBC0901C", brand: "", specs: "" },
-                        { name: "左螺丝/齿轮箱", category: "LEFT SCREW/GEAR BOX", code: "110097", oldCode: "UKBC1101N", brand: "", specs: "CG430左螺丝/齿轮箱" },
-                        { name: "曲轴", category: "CRANKSHAFT", code: "120005", oldCode: "UKBC1205", brand: "", specs: "CG430专用" },
-                        { name: "油封", category: "OIL SEAL", code: "120069", oldCode: "UKBC1201S", brand: "", specs: "尺寸: 30X15X7MM/ 22X12X7MM" },
-                        { name: "垫片", category: "GASKET", code: "140123", oldCode: "UKBC1404S", brand: "", specs: "" },
-                        { name: "消声器", category: "MUFFLER", code: "150001", oldCode: "UKBC1501", brand: "", specs: "" },
-                        { name: "点火线圈", category: "IGNITION COIL", code: "160003", oldCode: "UKBC1603", brand: "", specs: "" },
-                        { name: "飞轮", category: "FLYWHEEL", code: "160247", oldCode: "UKBC1601F", brand: "", specs: "" },
-                        { name: "油门线", category: "THROTTLE LINE", code: "200043", oldCode: "STBC2006C", brand: "", specs: "" },
-                        { name: "熄火开关", category: "SHUT OFF", code: "200050", oldCode: "UKBC2001W", brand: "", specs: "" },
-                        { name: "空气滤清器总成", category: "AIR FILTER ASSEMBLY", code: "250405", oldCode: "UKAF02S", brand: "", specs: "" },
-                        { name: "空气滤清器总成", category: "AIR FILTER ASSEMBLY", code: "250406", oldCode: "UKAF02S-1", brand: "", specs: "" },
-                        { name: "空气滤清器总成", category: "AIR FILTER ASSEMBLY", code: "250453", oldCode: "", brand: "", specs: "" },
-                        { name: "燃油滤清器", category: "FUEL FILTER", code: "260067", oldCode: "UKFF02", brand: "", specs: "" }
-                    ], 'brush_cutter')
-                },
-                {
-                    id: 'CG500',
-                    name: 'CG500',
-                    type: 'chainsaw',
-                    description: '化油器系列 - 大功率型号',
-                    icon: 'fas fa-tree',
-                    parts: mapPartsToStandardized([
-                        { name: "CG500化油器", category: "CARBURETOR", code: "010900", oldCode: "UKBC0103", brand: "", specs: "CG500专用化油器" },
-                        { name: "燃油软管", category: "FUEL HOSE", code: "020100", oldCode: "UKFL0203S", brand: "", specs: "耐油橡胶软管" },
-                        { name: "进气歧管", category: "MANIFOLD", code: "020120", oldCode: "UKBC0202M", brand: "", specs: "铝合金材质" },
-                        { name: "汽缸", category: "CYLINDER", code: "030020", oldCode: "UKBC0306A", brand: "", specs: "45MM直径" },
-                        { name: "活塞组件", category: "PISTON ASSEMBLY", code: "030230", oldCode: "UKBC0305P", brand: "", specs: "KC13015AA 45MM" }
-                    ], 'chainsaw')
-                },
-                {
-                    id: 'BC430',
-                    name: 'BC430',
-                    type: 'brush_cutter',
-                    description: '割灌机系列 - 标准型号',
-                    icon: 'fas fa-leaf',
-                    parts: mapPartsToStandardized([
-                        { name: "BC430化油器", category: "CARBURETOR", code: "010895", oldCode: "UKBC0110", brand: "", specs: "BC430专用化油器" },
-                        { name: "空气滤清器", category: "AIR FILTER", code: "250407", oldCode: "UKAF03S", brand: "", specs: "BC430专用" },
-                        { name: "燃油箱", category: "FUEL TANK", code: "090058", oldCode: "UKBC0902C", brand: "", specs: "BC430专用" },
-                        { name: "消声器", category: "MUFFLER", code: "150002", oldCode: "UKBC1502", brand: "", specs: "BC430专用" }
-                    ], 'brush_cutter')
-                },
-                {
-                    id: 'BC500',
-                    name: 'BC500',
-                    type: 'brush_cutter',
-                    description: '割灌机系列 - 大功率型号',
-                    icon: 'fas fa-leaf',
-                    parts: mapPartsToStandardized([
-                        { name: "BC500化油器", category: "CARBURETOR", code: "010910", oldCode: "UKBC0112", brand: "", specs: "BC500专用化油器" },
-                        { name: "空气滤清器", category: "AIR FILTER", code: "250408", oldCode: "UKAF04S", brand: "", specs: "BC500专用" },
-                        { name: "燃油箱", category: "FUEL TANK", code: "090059", oldCode: "UKBC0903C", brand: "", specs: "BC500专用" },
-                        { name: "消声器", category: "MUFFLER", code: "150003", oldCode: "UKBC1503", brand: "", specs: "BC500专用" }
                     ], 'brush_cutter')
                 }
             ];
@@ -2278,10 +2503,10 @@
             }
         }
 
-        // 选择整机 - 修复了这里，手动设置状态而不是调用 selectCategory
+        // 选择整机
         function selectMachine(machine) {
             state.currentMachine = machine;
-            state.currentCategory = '全部'; // 默认显示全部配件
+            state.currentCategory = '全部';
             state.filteredParts = [];
             state.selectedPart = null;
             state.expandedCategories.clear();
@@ -2293,11 +2518,10 @@
             showMachineContent();
             renderTree();
             
-            // 修复：手动设置状态并渲染，而不是调用 selectCategory
+            // 直接渲染全部配件
             state.filteredParts = [...state.currentMachine.parts];
             state.expandedCategories.add('全部');
             
-            // 直接渲染全部配件
             renderFilteredParts(state.filteredParts, 
                 `${state.currentMachine.name} - ${state.currentLanguage === 'zh' ? '全部配件' : 'All Parts'}`,
                 state.currentLanguage === 'zh' ? 
@@ -2306,6 +2530,18 @@
             );
             
             document.getElementById('machine-search-input').value = '';
+            
+            // 开始观察懒加载图片
+            if (state.lazyImageObserver) {
+                // 先停止观察所有图片
+                state.lazyImageObserver.disconnect();
+                // 重新观察新图片
+                setTimeout(() => {
+                    document.querySelectorAll('.lazy-image').forEach(img => {
+                        state.lazyImageObserver.observe(img);
+                    });
+                }, 100);
+            }
         }
 
         // 初始化树形数据
@@ -2418,7 +2654,7 @@
             }
         }
 
-        // 渲染树形目录 - 移除了状态标签
+        // 渲染树形目录
         function renderTree() {
             const treeContainer = document.getElementById('machine-parts-tree');
             treeContainer.innerHTML = '';
@@ -2493,7 +2729,7 @@
             }
         }
 
-        // 创建树节点 - 移除了状态标签
+        // 创建树节点
         function createTreeNode(category, count, isExpanded, isActive, hasParts) {
             const li = document.createElement('li');
             li.className = 'machine-tree-node';
@@ -2728,7 +2964,7 @@
             }
         }
 
-        // 渲染过滤后配件 - 修改了这里，不再显示商品名称
+        // 渲染过滤后配件
         function renderFilteredParts(parts, titleText, subtitleText) {
             const partsGrid = document.getElementById('parts-grid');
             partsGrid.innerHTML = '';
@@ -2772,10 +3008,23 @@
             
             updateCartButtonStates();
             
-            loadAllPartsImages();
+            // 开始观察新添加的懒加载图片
+            if (state.lazyImageObserver) {
+                setTimeout(() => {
+                    document.querySelectorAll('.lazy-image').forEach(img => {
+                        // 如果图片已经在缓存中，直接显示
+                        const productCode = img.dataset.code;
+                        if (state.loadedImages[productCode]) {
+                            showLazyImage(img, state.loadedImages[productCode], productCode);
+                        } else {
+                            state.lazyImageObserver.observe(img);
+                        }
+                    });
+                }, 50);
+            }
         }
 
-        // 创建配件卡片 - 修改此处：始终只显示分类和规格，不显示商品名称
+        // 创建配件卡片
         function createPartCard(part) {
             const isSelected = state.selectedPart && state.selectedPart.code === part.code;
             const inCart = state.cart.items.find(item => item.code === part.code);
@@ -2786,25 +3035,16 @@
             card.dataset.category = part.category;
             
             const productCode = part.code;
-            let imageHtml = '';
             
-            if (state.loadedImages[productCode]) {
-                imageHtml = `<img src="${state.loadedImages[productCode]}" alt="${productCode}" class="part-image" loading="lazy">`;
-            } else if (state.imageCache[productCode] === false) {
-                imageHtml = `
-                    <div class="image-placeholder">
-                        <i class="fas fa-image"></i>
-                        <p data-key="no_image">无图片</p>
-                    </div>
-                `;
-            } else {
-                imageHtml = `
+            // 使用懒加载图片容器
+            const imageHtml = `
+                <div class="lazy-image" data-code="${productCode}">
                     <div class="image-loading">
                         <i class="fas fa-spinner"></i>
                         <p data-key="loading_image">加载图片中...</p>
                     </div>
-                `;
-            }
+                </div>
+            `;
             
             const categoryTag = state.isSearchingAllCategories ? `<span class="search-category-tag">${part.category}</span>` : '';
             
@@ -2812,13 +3052,11 @@
                 `<span class="part-match-status part-matched" title="${state.currentLanguage === 'zh' ? '标准化分类' : 'Standardized category'}">STD</span>` : 
                 `<span class="part-match-status part-not-matched" title="${state.currentLanguage === 'zh' ? '非标准化分类' : 'Non-standardized category'}">NON</span>`;
             
-            // 修改此处：只显示分类和规格，不显示商品名称
-            // 修改重点：规格显示格式为"配件类型 - 规格描述"，如果没有规格描述就只显示配件类型
             card.innerHTML = `
                 <button class="cart-button ${inCart ? 'added' : ''}" title="${inCart ? (state.currentLanguage === 'zh' ? '已在购物车中' : 'Already in cart') : (state.currentLanguage === 'zh' ? '添加到购物车' : 'Add to cart')}" data-code="${part.code}">
                     <i class="fas ${inCart ? 'fa-check' : 'fa-cart-plus'}"></i>
                 </button>
-                <div class="part-image-section" data-code="${part.code}">
+                <div class="part-image-section">
                     ${imageHtml}
                 </div>
                 <div class="part-content">
@@ -2892,9 +3130,8 @@
             renderPartDetailContent(part);
         }
 
-        // 渲染配件详情内容 - 修改此处以显示商品名称
-        function renderPartDetailContent(part) {
-            // 修改：在详情页标题中显示商品名称
+        // 渲染配件详情内容
+        async function renderPartDetailContent(part) {
             const displayTitle = part.name && part.name.trim() !== '' ? 
                 `${part.name} - ${part.code}` : 
                 `${part.category} - ${part.code}`;
@@ -2916,7 +3153,6 @@
                 `<span class="part-matched" style="padding: 2px 6px; border-radius: 3px; font-size: 12px;">${state.currentLanguage === 'zh' ? '标准化分类' : 'Standardized Category'}</span>` :
                 `<span class="part-not-matched" style="padding: 2px 6px; border-radius: 3px; font-size: 12px;">${state.currentLanguage === 'zh' ? '非标准化分类' : 'Non-standardized Category'}</span>`;
             
-            // 修改：在详情页中添加商品名称显示
             const displayName = part.name && part.name.trim() !== '' ? part.name : (state.currentLanguage === 'zh' ? '未命名商品' : 'Unnamed product');
             
             detailContent.innerHTML = `
@@ -2984,7 +3220,8 @@
                 </div>
             `;
             
-            loadPartDetailImage(part.code);
+            // 加载配件详情图片
+            await loadPartDetailImage(part.code);
             
             document.getElementById('prev-part-btn').addEventListener('click', showPreviousPart);
             document.getElementById('next-part-btn').addEventListener('click', showNextPart);
@@ -2998,12 +3235,13 @@
         async function loadPartDetailImage(productCode) {
             const imageSection = document.getElementById('detail-image-section');
             
+            // 如果图片已经在缓存中
             if (state.loadedImages[productCode]) {
-                const imageUrl = state.loadedImages[productCode];
-                displayPartDetailImage(imageSection, productCode, imageUrl);
+                displayPartDetailImage(imageSection, productCode, state.loadedImages[productCode]);
                 return;
             }
             
+            // 检查图片是否存在
             const imageUrl = await checkImage(productCode);
             if (imageUrl) {
                 state.loadedImages[productCode] = imageUrl;
@@ -3035,82 +3273,6 @@
             });
             
             translatePage();
-        }
-
-        // 加载所有配件图片
-        async function loadAllPartsImages() {
-            const partImages = document.querySelectorAll('.part-image-section');
-            
-            const loadPromises = Array.from(partImages).map(async (imageContainer) => {
-                const productCode = imageContainer.dataset.code;
-                
-                if (state.loadedImages[productCode]) {
-                    const imageUrl = state.loadedImages[productCode];
-                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="${productCode}" class="part-image" loading="lazy">`;
-                    return;
-                }
-                
-                if (state.imageCache[productCode] === false) {
-                    imageContainer.innerHTML = `
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <p data-key="no_image">无图片</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const imageUrl = await checkImage(productCode);
-                
-                if (imageUrl) {
-                    state.loadedImages[productCode] = imageUrl;
-                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="${productCode}" class="part-image" loading="lazy">`;
-                } else {
-                    imageContainer.innerHTML = `
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <p data-key="no_image">无图片</p>
-                        </div>
-                    `;
-                }
-            });
-            
-            await Promise.all(loadPromises);
-            
-            translatePage();
-        }
-
-        // 检查图片是否存在
-        async function checkImage(code) {
-            if (state.imageCache[code] !== undefined) {
-                return state.imageCache[code];
-            }
-            
-            for (const ext of imageExtensions) {
-                const url = `images/${code}${ext}`;
-                try {
-                    const exists = await checkImageExists(url);
-                    if (exists) {
-                        state.imageCache[code] = url;
-                        return url;
-                    }
-                } catch (error) {
-                    continue;
-                }
-            }
-            
-            state.imageCache[code] = false;
-            return false;
-        }
-
-        // 检查图片是否存在
-        function checkImageExists(url) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
-                img.src = url;
-            });
         }
 
         // 显示上一个配件
