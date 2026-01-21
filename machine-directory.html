@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>整机配件目录</title>
+    <!-- 图标保持.jpg不变 -->
     <link rel="icon" href="Info/Title.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="Info/Title.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -914,41 +915,9 @@
             height: 100%;
             object-fit: cover;
         }
-        
-        /* Service Worker 状态指示器 */
-        .sw-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: #27ae60;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 10000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .sw-status.active {
-            opacity: 0.8;
-        }
-        
-        .sw-status.offline {
-            background: #e74c3c;
-        }
     </style>
 </head>
 <body>
-    <!-- Service Worker 状态指示器 -->
-    <div class="sw-status" id="sw-status">
-        <i class="fas fa-circle"></i>
-        <span>在线</span>
-    </div>
-
     <!-- 购物车侧边栏 -->
     <div class="cart-sidebar" id="cart-sidebar">
         <div class="cart-header">
@@ -1045,7 +1014,7 @@
                 <!-- 油锯类型卡片 -->
                 <div class="machine-type-card" id="chainsaw-type-card">
                     <div class="machine-type-icon">
-                        <!-- 懒加载机器类型图片 -->
+                        <!-- 懒加载机器类型图片 - 修改为.png -->
                         <div class="machine-type-image-container lazy-machine-image" data-image="Info/chainsaw.png">
                             <div class="image-loading">
                                 <i class="fas fa-spinner"></i>
@@ -1074,8 +1043,8 @@
                 <!-- 割灌机类型卡片 -->
                 <div class="machine-type-card" id="brush-cutter-type-card">
                     <div class="machine-type-icon" style="background: linear-gradient(135deg, #27ae60 0%, #219653 100%);">
-                        <!-- 懒加载机器类型图片 -->
-                        <div class="machine-type-image-container lazy-machine-image" data-image="Info/brush_cutter.jpg">
+                        <!-- 懒加载机器类型图片 - 修改为.png -->
+                        <div class="machine-type-image-container lazy-machine-image" data-image="Info/brush_cutter.png">
                             <div class="image-loading">
                                 <i class="fas fa-spinner"></i>
                                 <p data-key="loading_image">加载图片中...</p>
@@ -1251,41 +1220,6 @@
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     
     <script>
-        // Service Worker 注册
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('Service Worker 注册成功:', registration.scope);
-                        updateSWStatus('active');
-                    })
-                    .catch(function(error) {
-                        console.log('Service Worker 注册失败:', error);
-                        updateSWStatus('inactive');
-                    });
-            });
-        }
-
-        // 更新Service Worker状态显示
-        function updateSWStatus(status) {
-            const statusEl = document.getElementById('sw-status');
-            if (!statusEl) return;
-            
-            switch(status) {
-                case 'active':
-                    statusEl.innerHTML = '<i class="fas fa-circle"></i><span>离线可用</span>';
-                    statusEl.classList.add('active');
-                    break;
-                case 'inactive':
-                    statusEl.innerHTML = '<i class="fas fa-circle"></i><span>离线不可用</span>';
-                    statusEl.classList.add('active');
-                    statusEl.classList.add('offline');
-                    break;
-                default:
-                    statusEl.classList.remove('active');
-            }
-        }
-
         // 验证检查脚本
         (function() {
             try {
@@ -1605,6 +1539,8 @@
         };
 
         const defaultIcon = 'fas fa-cube';
+        // 只使用.png格式
+        const imageExtensions = ['.png'];
 
         // 全局状态
         const state = {
@@ -1632,8 +1568,6 @@
             // 懒加载相关
             lazyImageObserver: null,
             currentVisibleImages: new Set(),
-            // 智能图片缓存
-            smartImageCache: {},
             // 购物车状态
             cart: {
                 items: [],
@@ -1790,46 +1724,31 @@
                 },
                 
                 async loadImageToBuffer(productCode) {
+                    // 直接使用.png格式
                     const url = `images/${productCode}.png`;
                     try {
-                        const exists = await checkImageExists(url);
-                        if (exists) {
-                            const response = await fetch(url);
-                            if (!response.ok) {
-                                throw new Error(`HTTP错误! 状态: ${response.status}`);
-                            }
-                            
-                            const blob = await response.blob();
-                            return new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onloadend = function() {
-                                    resolve(this.result);
-                                };
-                                reader.onerror = reject;
-                                reader.readAsArrayBuffer(blob);
-                            });
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`HTTP错误! 状态: ${response.status}`);
                         }
+                        
+                        const blob = await response.blob();
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = function() {
+                                resolve(this.result);
+                            };
+                            reader.onerror = reject;
+                            reader.readAsArrayBuffer(blob);
+                        });
                     } catch (error) {
                         console.warn(`无法加载图片 ${url}:`, error);
+                        return null;
                     }
-                    return null;
                 },
                 
                 getImageExtensionFromBuffer(buffer, productCode) {
-                    const arr = new Uint8Array(buffer);
-                    
-                    if (arr.length > 3 && arr[0] === 0x89 && arr[1] === 0x50 && arr[2] === 0x4E && arr[3] === 0x47) {
-                        return 'png';
-                    }
-                    
-                    if (arr.length > 1 && arr[0] === 0xFF && arr[1] === 0xD8) {
-                        return 'jpeg';
-                    }
-                    
-                    const lowerCode = productCode.toLowerCase();
-                    if (lowerCode.endsWith('.png')) return 'png';
-                    if (lowerCode.endsWith('.jpg') || lowerCode.endsWith('.jpeg')) return 'jpeg';
-                    
+                    // 现在只返回'png'
                     return 'png';
                 },
                 
@@ -2233,7 +2152,7 @@
             }
         }
 
-        // 加载懒加载图片 - 优化版
+        // 加载懒加载图片
         async function loadLazyImage(imageContainer, productCode) {
             // 如果已经在加载中或已加载完成，跳过
             if (imageContainer.classList.contains('loading') || imageContainer.classList.contains('loaded')) {
@@ -2249,51 +2168,16 @@
             // 标记为加载中
             imageContainer.classList.add('loading');
             
-            // 智能检查图片是否存在（使用优化的方法）
-            const imageUrl = await checkImageWithServiceWorker(productCode);
+            // 直接加载.png图片
+            const imageUrl = `images/${productCode}.png`;
+            const exists = await checkImageExists(imageUrl);
             
-            if (imageUrl) {
+            if (exists) {
                 state.loadedImages[productCode] = imageUrl;
                 showLazyImage(imageContainer, imageUrl, productCode);
             } else {
                 showNoImage(imageContainer, productCode);
             }
-        }
-
-        // 智能图片检查（使用Service Worker优化）
-        async function checkImageWithServiceWorker(code) {
-            // 如果已经在缓存中，直接返回
-            if (state.smartImageCache[code]) {
-                return state.smartImageCache[code];
-            }
-            
-            const url = `images/${code}.png`;
-            
-            try {
-                // 使用fetch，Service Worker会处理缓存
-                const response = await fetch(url, {
-                    headers: {
-                        'X-Image-Code': code,
-                        'Cache-Strategy': 'cache-first'
-                    }
-                });
-                
-                if (response.ok) {
-                    // 获取图片URL
-                    const blob = await response.blob();
-                    const objectUrl = URL.createObjectURL(blob);
-                    
-                    // 缓存结果
-                    state.smartImageCache[code] = objectUrl;
-                    return objectUrl;
-                }
-            } catch (error) {
-                console.warn(`图片 ${code} 加载失败:`, error);
-                // 缓存失败状态
-                state.smartImageCache[code] = false;
-            }
-            
-            return false;
         }
 
         // 显示懒加载图片
@@ -2334,7 +2218,20 @@
             translatePage();
         }
 
-        // 检查图片是否存在 - 基础版
+        // 检查图片是否存在
+        async function checkImage(code) {
+            // 直接使用.png格式
+            const url = `images/${code}.png`;
+            const exists = await checkImageExists(url);
+            
+            if (exists) {
+                return url;
+            }
+            
+            return false;
+        }
+
+        // 检查图片是否存在
         function checkImageExists(url) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -3288,7 +3185,7 @@
                 </div>
             `;
             
-            // 使用Service Worker优化加载配件详情图片
+            // 加载配件详情图片
             await loadPartDetailImage(part.code);
             
             document.getElementById('prev-part-btn').addEventListener('click', showPreviousPart);
@@ -3299,7 +3196,7 @@
             translatePage();
         }
 
-        // 加载配件详情图片 - 优化版
+        // 加载配件详情图片
         async function loadPartDetailImage(productCode) {
             const imageSection = document.getElementById('detail-image-section');
             
@@ -3309,9 +3206,11 @@
                 return;
             }
             
-            // 智能检查图片
-            const imageUrl = await checkImageWithServiceWorker(productCode);
-            if (imageUrl) {
+            // 直接加载.png图片
+            const imageUrl = `images/${productCode}.png`;
+            const exists = await checkImageExists(imageUrl);
+            
+            if (exists) {
                 state.loadedImages[productCode] = imageUrl;
                 displayPartDetailImage(imageSection, productCode, imageUrl);
             } else {
@@ -3407,7 +3306,7 @@
             modalImage.src = imageUrl;
             modalImage.alt = partCode;
             
-            const fileName = partCode + '.png';
+            const fileName = imageUrl.split('/').pop();
             downloadBtn.onclick = function() {
                 downloadImage(imageUrl, fileName);
             };
