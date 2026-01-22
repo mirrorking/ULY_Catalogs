@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
         <!-- 开发者工具检测和防护脚本 -->
-    <script src="devtools-detection.js"></script>
+    <!-- <script src="devtools-detection.js"></script> -->
     <style>
         /* 语言切换器样式 */
         .language-switcher {
@@ -916,6 +916,80 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* 新增：多张图片样式 */
+        .more-images-section {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .more-images-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .more-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .more-image-item {
+            position: relative;
+            cursor: pointer;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+
+        .more-image-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .more-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            padding: 10px;
+        }
+
+        .more-image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: #95a5a6;
+        }
+
+        .more-image-index {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .no-more-images {
+            text-align: center;
+            color: #95a5a6;
+            padding: 20px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -1331,6 +1405,8 @@
                 "click_to_zoom": "点击图片放大查看",
                 "product_name": "商品名称",
                 "part_name": "配件名称",
+                "more_images": "更多图片",
+                "no_more_images": "暂无更多图片",
                 
                 // Excel导出列名
                 "excel_serial_number": "序号",
@@ -1426,6 +1502,8 @@
                 "click_to_zoom": "Click to zoom",
                 "product_name": "Product Name",
                 "part_name": "Part Name",
+                "more_images": "More Images",
+                "no_more_images": "No more images available",
                 
                 // Excel导出列名
                 "excel_serial_number": "Serial Number",
@@ -2086,6 +2164,15 @@
             }
         }
 
+        // 轻量翻译函数，返回单条翻译或 undefined
+        function translate(key) {
+            try {
+                return translations[state.currentLanguage] && translations[state.currentLanguage][key];
+            } catch (e) {
+                return undefined;
+            }
+        }
+
         function showLoading() {
             document.getElementById('loading-overlay').classList.add('active');
         }
@@ -2155,8 +2242,9 @@
         }
 
         // 加载懒加载图片
-        async function loadLazyImage(imageContainer, productCode) {
+    async function loadLazyImage(imageContainer, productCode) {
             // 如果已经在加载中或已加载完成，跳过
+            if (!imageContainer || !imageContainer.isConnected) return; // 已经从DOM移除，直接跳过
             if (imageContainer.classList.contains('loading') || imageContainer.classList.contains('loaded')) {
                 return;
             }
@@ -2173,8 +2261,9 @@
             // 直接加载.png图片
             const imageUrl = `images/${productCode}.png`;
             const exists = await checkImageExists(imageUrl);
-            
+
             if (exists) {
+                // 缓存成功的图片地址，后续直接使用
                 state.loadedImages[productCode] = imageUrl;
                 showLazyImage(imageContainer, imageUrl, productCode);
             } else {
@@ -2190,21 +2279,50 @@
             }
             
             const img = document.createElement('img');
-            img.src = imageUrl;
             img.alt = productCode;
             img.className = 'part-image';
-            img.loading = 'lazy';
-            
-            img.onload = () => {
-                imageContainer.classList.remove('loading');
-                imageContainer.classList.add('loaded');
-                imageContainer.innerHTML = '';
-                imageContainer.appendChild(img);
+
+            const onLoad = () => {
+                try {
+                    // 只在元素仍连接到文档时修改 DOM
+                    if (imageContainer && imageContainer.isConnected) {
+                        imageContainer.classList.remove('loading');
+                        imageContainer.classList.add('loaded');
+                        imageContainer.innerHTML = '';
+                        imageContainer.appendChild(img);
+                    }
+                    // 将成功加载的图片地址写回缓存，供详情页和购物车使用
+                    if (productCode) state.loadedImages[productCode] = imageUrl;
+                } catch (e) {
+                    console.error('showLazyImage onLoad error', e);
+                }
             };
-            
-            img.onerror = () => {
+
+            const onError = () => {
                 showNoImage(imageContainer, productCode);
             };
+
+            img.onload = onLoad;
+            img.onerror = onError;
+            img.src = imageUrl;
+
+            // 如果图片已在缓存并完成，直接调用 onLoad
+            if (img.complete && img.naturalWidth > 0) {
+                onLoad.call(img);
+            }
+
+            // 超时回退，避免浏览器延迟触发 load 导致一直显示 loading
+            const fallback = setTimeout(() => {
+                // 只有当元素仍然挂在DOM且未标记为 loaded 时，才显示占位
+                if (imageContainer && imageContainer.isConnected && !imageContainer.classList.contains('loaded')) {
+                    console.warn('showLazyImage timeout for', imageUrl);
+                    showNoImage(imageContainer, productCode);
+                }
+            }, 5000);
+
+            const wrap = (fn) => function() { clearTimeout(fallback); fn && fn.apply(this, arguments); };
+            img.onload = wrap(onLoad);
+            img.onerror = wrap(onError);
         }
 
         // 显示无图片
@@ -3196,6 +3314,9 @@
             updateNavigationButtons();
             
             translatePage();
+            
+            // 加载更多图片
+            await loadMoreImages(part.code);
         }
 
         // 加载配件详情图片
@@ -3229,19 +3350,193 @@
 
         // 显示配件详情图片
         function displayPartDetailImage(imageSection, productCode, imageUrl) {
-            imageSection.innerHTML = `
-                <div class="detail-image-wrapper" id="detail-image-wrapper" data-image-url="${imageUrl}">
-                    <img src="${imageUrl}" alt="${productCode}" class="detail-image" id="detail-image">
-                    <div class="zoom-hint" data-key="click_to_zoom">点击图片放大查看</div>
+            imageSection.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'detail-image-wrapper';
+            wrapper.dataset.imageUrl = imageUrl;
+
+            const img = document.createElement('img');
+            img.alt = productCode;
+            img.className = 'detail-image';
+
+            const hint = document.createElement('div');
+            hint.className = 'zoom-hint';
+            hint.textContent = translate('clickToZoom') || '点击图片放大查看';
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(hint);
+            imageSection.appendChild(wrapper);
+
+            const onLoad = () => {
+                img.classList.add('loaded');
+            };
+
+            const onError = () => {
+                imageSection.innerHTML = `
+                    <div class="image-placeholder" style="width: 100%; height: 100%;">
+                        <i class="fas fa-image"></i>
+                        <p data-key="image_not_found">图片未找到</p>
+                        <p style="font-size: 12px; margin-top: 8px;">${productCode}</p>
+                    </div>
+                `;
+                translatePage();
+            };
+
+            img.onload = onLoad;
+            img.onerror = onError;
+            img.src = imageUrl;
+
+            if (img.complete && img.naturalWidth > 0) {
+                onLoad.call(img);
+            }
+
+            const fallback = setTimeout(() => {
+                if (!img.classList.contains('loaded')) {
+                    console.warn('displayPartDetailImage timeout', imageUrl);
+                    onError();
+                }
+            }, 5000);
+
+            const wrap = (fn) => function() { clearTimeout(fallback); fn && fn.apply(this, arguments); };
+            img.onload = wrap(onLoad);
+            img.onerror = wrap(onError);
+
+            wrapper.addEventListener('click', function() {
+                openImageModal(productCode, imageUrl);
+            });
+
+            translatePage();
+        }
+
+        // 加载更多图片
+        async function loadMoreImages(productCode) {
+            const detailContent = document.getElementById('part-detail-content');
+            
+            // 创建更多图片区域
+            const moreImagesSection = document.createElement('div');
+            moreImagesSection.className = 'more-images-section';
+            moreImagesSection.innerHTML = `
+                <h3 class="more-images-title" data-key="more_images">更多图片</h3>
+                <div class="more-images-grid" id="more-images-grid">
+                    <div class="image-loading">
+                        <i class="fas fa-spinner"></i>
+                        <p data-key="loading_image">加载图片中...</p>
+                    </div>
                 </div>
             `;
             
-            const imageWrapper = document.getElementById('detail-image-wrapper');
-            imageWrapper.addEventListener('click', function() {
-                openImageModal(productCode, imageUrl);
-            });
-            
+            detailContent.appendChild(moreImagesSection);
             translatePage();
+            
+            const moreImagesGrid = document.getElementById('more-images-grid');
+            moreImagesGrid.innerHTML = '';
+            
+            // 从Moreimages文件夹中读取多张图片
+            const moreImages = await getMoreImages(productCode);
+            
+            if (moreImages.length === 0) {
+                moreImagesGrid.innerHTML = `
+                    <div class="no-more-images" data-key="no_more_images">暂无更多图片</div>
+                `;
+                translatePage();
+                return;
+            }
+            
+            moreImages.forEach((image, index) => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'more-image-item';
+                imageItem.dataset.imageUrl = image.url;
+                imageItem.dataset.index = index;
+                
+                const imgEl = document.createElement('img');
+                imgEl.alt = `图片 ${index + 1}`;
+                imgEl.className = 'more-image';
+
+                const indexEl = document.createElement('div');
+                indexEl.className = 'more-image-index';
+                indexEl.textContent = index + 1;
+
+                // load with handlers
+                const onLoad = () => {
+                    imgEl.classList.add('loaded');
+                };
+
+                const onError = () => {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'more-image-placeholder';
+                    placeholder.innerHTML = `<i class="fas fa-image"></i>`;
+                    imageItem.appendChild(placeholder);
+                };
+
+                imgEl.onload = onLoad;
+                imgEl.onerror = onError;
+                imgEl.src = image.url;
+
+                if (imgEl.complete && imgEl.naturalWidth > 0) {
+                    onLoad.call(imgEl);
+                }
+
+                const fallback = setTimeout(() => {
+                    if (!imgEl.classList.contains('loaded')) {
+                        console.warn('more image timeout', image.url);
+                        onError();
+                    }
+                }, 5000);
+
+                const wrap = (fn) => function() { clearTimeout(fallback); fn && fn.apply(this, arguments); };
+                imgEl.onload = wrap(onLoad);
+                imgEl.onerror = wrap(onError);
+
+                imageItem.appendChild(imgEl);
+                imageItem.appendChild(indexEl);
+
+                imageItem.addEventListener('click', function() {
+                    openImageModal(productCode, this.dataset.imageUrl);
+                });
+
+                moreImagesGrid.appendChild(imageItem);
+            });
+        }
+
+        // 获取更多图片
+        async function getMoreImages(productCode) {
+            const baseCode = productCode;
+            const moreImages = [];
+            
+            // 定义扩展名顺序：jpg, png, jpeg
+            const extensions = ['jpg', 'png', 'jpeg'];
+            let imageIndex = 1;
+            
+            // 尝试读取带括号的图片文件
+            while (true) {
+                let foundImage = false;
+                
+                for (const ext of extensions) {
+                    const imageUrl = `Moreimages/${baseCode}(${imageIndex}).${ext}`;
+                    const exists = await checkImageExists(imageUrl);
+                    
+                    if (exists) {
+                        moreImages.push({
+                            url: imageUrl,
+                            index: imageIndex,
+                            extension: ext
+                        });
+                        foundImage = true;
+                        // 找到一种格式后就不尝试其他格式了
+                        break;
+                    }
+                }
+                
+                if (!foundImage) {
+                    // 如果所有格式都没找到，停止搜索
+                    break;
+                }
+                
+                imageIndex++;
+            }
+            
+            return moreImages;
         }
 
         // 显示上一个配件

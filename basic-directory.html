@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="style.css">
     
     <!-- 开发者工具检测和防护脚本 -->
-    <script src="devtools-detection.js"></script>
+    <!-- <script src="devtools-detection.js"></script> -->
     
     <style>
         /* ========== 新增：防止文本选择和右键菜单的样式 ========== */
@@ -124,6 +124,38 @@
         
         .product-image img {
             will-change: opacity;
+        }
+        
+        /* 图片加载错误状态 */
+        .image-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #e74c3c;
+            font-size: 12px;
+        }
+        
+        .image-error i {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        /* 图片重试按钮 */
+        .retry-btn {
+            margin-top: 10px;
+            padding: 4px 8px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        
+        .retry-btn:hover {
+            background: #2980b9;
         }
         
         /* ========== 修改：优化图片加载样式 ========== */
@@ -1440,7 +1472,13 @@
             'footerText': '© 2026 配件目录管理系统 | 基础配件目录',
             'noBrand': '无品牌',
             'kelon': '科龙',
-            'lixiong': '力雄'
+            'lixiong': '力雄',
+            'loadingFailed': '加载失败',
+            'retry': '重试',
+            'loading': '加载中...',
+            'checkingImages': '检查图片...',
+            'imageLoadError': '图片加载错误',
+            'checkingImage': '检查图片路径...'
         },
         'en-US': {
             'pageTitle': 'Basic Parts Directory - Selection System',
@@ -1507,7 +1545,13 @@
             'footerText': '© 2026 Parts Directory Management System | Basic Parts Directory',
             'noBrand': 'No Brand',
             'kelon': 'Kelon',
-            'lixiong': 'Lixiong'
+            'lixiong': 'Lixiong',
+            'loadingFailed': 'Loading failed',
+            'retry': 'Retry',
+            'loading': 'Loading...',
+            'checkingImages': 'Checking images...',
+            'imageLoadError': 'Image load error',
+            'checkingImage': 'Checking image path...'
         }
     };
 
@@ -1525,235 +1569,276 @@
         }
     };
 
-    // ========== 图片加载优化系统 ==========
+    // ========== 简化的图片加载系统 ==========
     const imageCache = new Map();
-    const imageExistsCache = new Map();
-    const pendingImageChecks = new Map();
+    const imageLoadingPromises = new Map();
     let lazyImageObserver = null;
     
-    // 高性能图片检查
-    async function checkImageExistsOptimized(url, priority = 'medium') {
-        if (imageExistsCache.has(url)) {
-            return imageExistsCache.get(url);
-        }
-        
-        if (pendingImageChecks.has(url)) {
-            return pendingImageChecks.get(url);
-        }
-        
-        const checkPromise = new Promise((resolve) => {
+    // 简单直接的图片检查函数 - 只检查PNG格式的主图
+    async function checkImageExists(url) {
+        return new Promise((resolve) => {
             const img = new Image();
-            let timeoutId;
-            
-            const timeout = priority === 'high' ? 800 : priority === 'medium' ? 1200 : 2000;
-            
-            img.onload = function() {
-                clearTimeout(timeoutId);
-                imageExistsCache.set(url, true);
-                resolve(true);
-            };
-            
-            img.onerror = function() {
-                clearTimeout(timeoutId);
-                imageExistsCache.set(url, false);
-                resolve(false);
-            };
-            
-            timeoutId = setTimeout(() => {
-                img.src = '';
-                imageExistsCache.set(url, false);
-                resolve(false);
-            }, timeout);
-            
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
             img.src = url;
         });
-        
-        pendingImageChecks.set(url, checkPromise);
-        const result = await checkPromise;
-        pendingImageChecks.delete(url);
-        return result;
     }
     
-    // 批量图片检查
-    async function batchCheckImages(urls, priority = 'medium') {
-        const results = new Map();
-        const toCheck = [];
-        
-        urls.forEach(url => {
-            if (imageExistsCache.has(url)) {
-                results.set(url, imageExistsCache.get(url));
-            } else {
-                toCheck.push(url);
-            }
+    // 查找商品主图 - 只检查PNG格式
+    // helper: 从已加载数据中查找商品名称（用于图片文件名回退）
+    function getProductNameByCode(productCode) {
+        if (!productCode) return '';
+        const p = state.allProducts.find(pr => {
+            const code = (pr.CODE || pr.code || '').toString();
+            return code === productCode;
         });
-        
-        if (toCheck.length > 0) {
-            const checkPromises = toCheck.map(url => 
-                checkImageExistsOptimized(url, priority).then(exists => {
-                    results.set(url, exists);
-                })
-            );
-            
-            await Promise.all(checkPromises);
-        }
-        
-        return results;
+        if (p) return (p.MODEL || p.model || p.NAME || p.name || '').toString().trim();
+        return '';
     }
-    
-    // 快速查找商品主图
-    async function findMainImageQuickly(productCode) {
+
+    async function findMainImage(productCode) {
         const cacheKey = `main_${productCode}`;
+        
+        // 检查缓存
         if (imageCache.has(cacheKey)) {
-            return imageCache.get(cacheKey);
+            const cached = imageCache.get(cacheKey);
+            if (cached.url === null) return null;
+            return cached.url;
         }
         
-        const baseName = productCode.replace(/\(\d+\)$/, '');
-        const extensions = ['.png', '.jpg', '.jpeg'];
-        const urlsToCheck = [];
+        // 防止重复检查
+        if (imageLoadingPromises.has(cacheKey)) {
+            return imageLoadingPromises.get(cacheKey);
+        }
         
-        extensions.forEach(ext => {
-            urlsToCheck.push(`images/${baseName}${ext}`);
-            urlsToCheck.push(`Moreimages/${baseName}${ext}`);
-        });
-        
-        const results = await batchCheckImages(urlsToCheck, 'high');
-        
-        for (const [url, exists] of results) {
-            if (exists) {
-                imageCache.set(cacheKey, url);
-                return url;
+        const checkPromise = (async () => {
+            try {
+                // 仅支持 PNG（按要求）。先尝试以商品编码为文件名，再尝试以商品名称为文件名
+                const candidates = [];
+                candidates.push(`images/${productCode}.png`);
+                const nameFallback = getProductNameByCode(productCode);
+                if (nameFallback) {
+                    // 对文件名做简单处理：去除首尾空白并用 encodeURIComponent 以支持中文/空格
+                    const safeName = encodeURIComponent(nameFallback.replace(/^\s+|\s+$/g, ''));
+                    candidates.push(`images/${safeName}.png`);
+                }
+
+                // Moreimages 备用目录
+                candidates.push(`Moreimages/${productCode}.png`);
+                if (nameFallback) {
+                    const safeName = encodeURIComponent(nameFallback.replace(/^\s+|\s+$/g, ''));
+                    candidates.push(`Moreimages/${safeName}.png`);
+                }
+
+                for (const url of candidates) {
+                    try {
+                        const exists = await checkImageExists(url);
+                        if (exists) {
+                            imageCache.set(cacheKey, { url, timestamp: Date.now() });
+                            return url;
+                        }
+                    } catch (e) {
+                        // 单个候选失败，继续下一个
+                    }
+                }
+
+                // 未找到
+                imageCache.set(cacheKey, { url: null, timestamp: Date.now() });
+                return null;
+            } catch (error) {
+                console.warn(`检查主图失败: ${productCode}`, error);
+                imageCache.set(cacheKey, { url: null, timestamp: Date.now() });
+                return null;
+            } finally {
+                imageLoadingPromises.delete(cacheKey);
             }
-        }
+        })();
         
-        imageCache.set(cacheKey, null);
-        return null;
+        imageLoadingPromises.set(cacheKey, checkPromise);
+        return checkPromise;
     }
     
-    // 查找附加图片（优化版）
-    async function findAdditionalImagesOptimized(productCode) {
+    // 查找附加图片 - 检查多种格式
+    async function findAdditionalImages(productCode) {
         const cacheKey = `additional_${productCode}`;
+        
+        // 检查缓存
         if (imageCache.has(cacheKey)) {
-            return imageCache.get(cacheKey);
+            return imageCache.get(cacheKey).images;
         }
         
-        const baseName = productCode.replace(/\(\d+\)$/, '');
-        const urlsToCheck = [];
-        
-        // 主图
-        ['images/', 'Moreimages/'].forEach(path => {
-            ['.png', '.jpg', '.jpeg'].forEach(ext => {
-                urlsToCheck.push(`${path}${baseName}${ext}`);
-            });
-        });
-        
-        // 附加图片（最多3张）
-        for (let i = 1; i <= 3; i++) {
-            ['.png', '.jpg', '.jpeg'].forEach(ext => {
-                urlsToCheck.push(`Moreimages/${baseName}(${i})${ext}`);
-            });
+        // 防止重复检查
+        if (imageLoadingPromises.has(cacheKey)) {
+            return imageLoadingPromises.get(cacheKey);
         }
         
-        const results = await batchCheckImages(urlsToCheck, 'medium');
-        const foundImages = [];
-        
-        // 优先添加主图
-        for (const [url, exists] of results) {
-            if (exists && url.includes(baseName) && !url.includes('(')) {
-                foundImages.push(url);
-                break;
-            }
-        }
-        
-        // 添加附加图片
-        for (let i = 1; i <= 3; i++) {
-            let foundForI = false;
-            for (const [url, exists] of results) {
-                if (exists && url.includes(`(${i})`)) {
-                    foundImages.push(url);
-                    foundForI = true;
-                    break;
+        const checkPromise = (async () => {
+            try {
+                const images = [];
+                const baseName = productCode.replace(/\(\d+\)$/, '');
+                const formats = ['.png', '.jpg', '.jpeg'];
+                
+                // 检查主图（如果需要）
+                const mainImageUrl = `images/${productCode}.png`;
+                const mainExists = await checkImageExists(mainImageUrl);
+                if (mainExists) {
+                    images.push(mainImageUrl);
                 }
+                
+                // 检查附加图片(1)-(3)
+                for (let i = 1; i <= 3; i++) {
+                    let found = false;
+                    
+                    for (const format of formats) {
+                        const url = `Moreimages/${baseName}(${i})${format}`;
+                        const exists = await checkImageExists(url);
+                        if (exists) {
+                            images.push(url);
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    // 如果这个编号的图片没找到，就不再继续查找更高编号的
+                    if (!found) break;
+                }
+                
+                const result = { images, timestamp: Date.now() };
+                imageCache.set(cacheKey, result);
+                return images;
+            } catch (error) {
+                console.warn(`检查附加图片失败: ${productCode}`, error);
+                const result = { images: [], timestamp: Date.now() };
+                imageCache.set(cacheKey, result);
+                return [];
+            } finally {
+                imageLoadingPromises.delete(cacheKey);
             }
-            if (!foundForI) break;
-        }
+        })();
         
-        imageCache.set(cacheKey, foundImages);
-        return foundImages;
+        imageLoadingPromises.set(cacheKey, checkPromise);
+        return checkPromise;
     }
     
     // 初始化懒加载
     function initializeLazyLoading() {
         if ('IntersectionObserver' in window) {
             lazyImageObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+                entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         const imageContainer = entry.target;
                         const productCode = imageContainer.dataset.code;
-                        
-                        if (productCode && !imageContainer.dataset.loaded) {
+
+                        // Ensure we only trigger load when not already loading or loaded
+                        if (productCode && imageContainer.dataset.loading !== 'true' && imageContainer.dataset.loaded !== 'true') {
                             loadProductCardImage(imageContainer, productCode);
-                            imageContainer.dataset.loaded = 'true';
                             lazyImageObserver.unobserve(imageContainer);
                         }
                     }
                 });
             }, {
-                rootMargin: '50px 0px',
-                threshold: 0.1
+                rootMargin: '100px 0px',
+                threshold: 0.01
             });
         }
     }
     
     // 加载商品卡片图片
     async function loadProductCardImage(imageContainer, productCode) {
+        // 标记为正在加载，防止重复加载
+        if (imageContainer.dataset.loading === 'true') return;
+        imageContainer.dataset.loading = 'true';
+        
         imageContainer.classList.add('loading');
         
         try {
-            const mainImageUrl = await findMainImageQuickly(productCode);
+            const mainImageUrl = await findMainImage(productCode);
             
             if (mainImageUrl) {
-                state.loadedImages[productCode] = mainImageUrl;
-                
                 const img = new Image();
-                img.src = mainImageUrl;
                 img.alt = productCode;
-                img.loading = 'lazy';
-                
-                img.onload = function() {
-                    img.classList.add('loaded', 'quick-load');
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
-                    imageContainer.classList.remove('loading');
+                img.decoding = 'async';
+                img.classList.add('lazy-image');
+
+                // 使用命名处理器，便于在设置 src 后直接调用（处理浏览器对 load 事件的延迟策略）
+                const onLoadHandler = function() {
+                    try {
+                        img.classList.add('loaded', 'quick-load');
+                        imageContainer.innerHTML = '';
+                        imageContainer.appendChild(img);
+                        imageContainer.classList.remove('loading');
+                        imageContainer.dataset.loading = 'false';
+                        imageContainer.dataset.loaded = 'true';
+                        // 记录已加载的图片 URL，供购物车使用
+                        try {
+                            state.loadedImages[productCode] = mainImageUrl;
+                            // 如果购物车中已有该商品，更新条目的 image 并刷新 UI
+                            const cartItem = state.cart.items.find(it => it.code === productCode);
+                            if (cartItem && !cartItem.image) {
+                                cartItem.image = mainImageUrl;
+                                state.cart.save();
+                                state.cart.updateUI();
+                            }
+                        } catch (e) {
+                            console.warn('无法写入 state.loadedImages', e);
+                        }
+                    } catch (e) {
+                        console.error('处理图片 onload 时出错', e);
+                    }
                 };
-                
-                img.onerror = function() {
-                    imageContainer.innerHTML = `
-                        <div class="image-placeholder">
-                            <i class="fas fa-image"></i>
-                            <p>${translate('noImage')}</p>
-                        </div>
-                    `;
-                    imageContainer.classList.remove('loading');
+
+                const onErrorHandler = function() {
+                    console.warn(`图片加载失败: ${mainImageUrl}`);
+                    showNoImagePlaceholder(imageContainer);
+                    imageContainer.dataset.loading = 'false';
                 };
+
+                img.onload = onLoadHandler;
+                img.onerror = onErrorHandler;
+
+                // 先绑定处理器再设置 src（避免缓存时丢失事件）
+                img.src = mainImageUrl;
+
+                // 有些浏览器在 lazy-load 优化下会延迟触发 load 事件；如果图片已在缓存中完成，直接调用处理器
+                if (img.complete && img.naturalWidth > 0) {
+                    onLoadHandler.call(img);
+                }
+
+                // 超时回退：若在合理时间内都没有触发 load/error，显示占位避免一直卡着
+                const fallbackTimeout = setTimeout(() => {
+                    if (imageContainer.dataset.loaded !== 'true') {
+                        console.warn(`图片加载超时: ${mainImageUrl}`);
+                        showNoImagePlaceholder(imageContainer);
+                        imageContainer.dataset.loading = 'false';
+                    }
+                }, 5000);
+
+                // 在成功或失败时清理超时
+                const wrappedOnLoad = img.onload;
+                img.onload = function() { clearTimeout(fallbackTimeout); wrappedOnLoad.call(this); };
+                const wrappedOnError = img.onerror;
+                img.onerror = function() { clearTimeout(fallbackTimeout); wrappedOnError.call(this); };
             } else {
-                imageContainer.innerHTML = `
-                    <div class="image-placeholder">
-                        <i class="fas fa-image"></i>
-                        <p>${translate('noImage')}</p>
-                    </div>
-                `;
-                imageContainer.classList.remove('loading');
+                showNoImagePlaceholder(imageContainer);
+                imageContainer.dataset.loading = 'false';
             }
         } catch (error) {
             console.error('加载商品图片失败:', error);
-            imageContainer.innerHTML = `
-                <div class="image-placeholder">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>加载失败</p>
-                </div>
-            `;
-            imageContainer.classList.remove('loading');
+            showNoImagePlaceholder(imageContainer);
+            imageContainer.dataset.loading = 'false';
         }
+    }
+    
+    // 显示无图片占位符
+    function showNoImagePlaceholder(container) {
+        container.innerHTML = `
+            <div class="image-placeholder">
+                <i class="fas fa-image"></i>
+                <p>${translate('noImage')}</p>
+            </div>
+        `;
+        container.classList.remove('loading');
+        container.dataset.loaded = 'true';
     }
     
     // 设置商品卡片图片懒加载
@@ -1782,62 +1867,120 @@
         const mainImageContainer = document.getElementById('carousel-main-image');
         const thumbnailContainer = document.getElementById('thumbnail-container');
         
-        // 第一步：快速显示主图
+        // 显示加载状态
         mainImageContainer.innerHTML = `
             <div class="lazy-placeholder">
                 <i class="fas fa-spinner fa-spin"></i>
-                <span>加载主图...</span>
+                <span>${translate('checkingImages')}...</span>
             </div>
         `;
         
-        // 快速加载主图
-        const mainImageUrl = await findMainImageQuickly(productCode);
-        
-        if (mainImageUrl) {
-            // 显示主图
-            const mainImg = new Image();
-            mainImg.src = mainImageUrl;
-            mainImg.alt = productCode;
-            mainImg.className = 'detail-image';
+        try {
+            // 并行获取主图和附加图片
+            const [mainImageUrl, additionalImages] = await Promise.all([
+                findMainImage(productCode),
+                findAdditionalImages(productCode)
+            ]);
             
-            mainImg.onload = function() {
-                mainImg.classList.add('loaded');
-                mainImageContainer.innerHTML = '';
-                mainImageContainer.appendChild(mainImg);
+            // 合并图片，主图优先
+            const allImages = [];
+            if (mainImageUrl) allImages.push(mainImageUrl);
+            allImages.push(...additionalImages.filter(img => img !== mainImageUrl)); // 去重
+            
+            state.currentCarouselImages = allImages;
+            state.currentProductCode = productCode;
+            
+            if (allImages.length > 0) {
+                // 显示第一张图片
+                const mainImg = new Image();
+                mainImg.alt = productCode;
+                mainImg.className = 'detail-image';
+
+                const onMainLoad = function() {
+                    mainImg.classList.add('loaded');
+                    mainImageContainer.innerHTML = '';
+                    mainImageContainer.appendChild(mainImg);
+
+                    // 记录轮播主图到 state.loadedImages
+                    try {
+                        state.loadedImages[productCode] = allImages[0];
+                        const cartItem = state.cart.items.find(it => it.code === productCode);
+                        if (cartItem && !cartItem.image) {
+                            cartItem.image = allImages[0];
+                            state.cart.save();
+                            state.cart.updateUI();
+                        }
+                    } catch (e) {
+                        console.warn('无法保存 carousel image 到 state', e);
+                    }
+
+                    // 添加点击放大功能
+                    mainImg.addEventListener('click', function() {
+                        openImageModal(productCode, allImages[0], 0);
+                    });
+
+                    // 加载缩略图（如果有多个图片）
+                    if (allImages.length > 1) {
+                        loadThumbnails(allImages, thumbnailContainer, productCode);
+                    }
+                };
+
+                const onMainError = function() {
+                    showCarouselError(mainImageContainer, productCode);
+                };
+
+                mainImg.onload = onMainLoad;
+                mainImg.onerror = onMainError;
+                mainImg.src = allImages[0];
+
+                if (mainImg.complete && mainImg.naturalWidth > 0) {
+                    onMainLoad.call(mainImg);
+                }
+
+                const mainFallback = setTimeout(() => {
+                    if (!mainImageContainer.querySelector('img')) {
+                        console.warn('Carousel main image load timeout', productCode);
+                        showCarouselError(mainImageContainer, productCode);
+                    }
+                }, 5000);
+
+                const _wrapMain = (fn) => function() { clearTimeout(mainFallback); fn && fn.apply(this, arguments); };
+                mainImg.onload = _wrapMain(onMainLoad);
+                mainImg.onerror = _wrapMain(onMainError);
                 
-                // 添加点击放大功能
-                mainImg.addEventListener('click', function() {
-                    openImageModal(productCode, mainImageUrl, 0);
-                });
-            };
-            
-            mainImg.onerror = function() {
+            } else {
                 mainImageContainer.innerHTML = `
                     <div class="image-placeholder">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>主图加载失败</p>
+                        <i class="fas fa-image"></i>
+                        <p>${translate('noImage')}</p>
                     </div>
                 `;
-            };
-            
-            // 第二步：延迟加载其他图片和缩略图
-            setTimeout(async () => {
-                const additionalImages = await findAdditionalImagesOptimized(productCode);
-                state.currentCarouselImages = additionalImages;
-                state.currentProductCode = productCode;
-                
-                if (additionalImages.length > 1) {
-                    loadThumbnails(additionalImages, thumbnailContainer, productCode);
-                }
-            }, 300);
-        } else {
-            mainImageContainer.innerHTML = `
-                <div class="image-placeholder">
-                    <i class="fas fa-image"></i>
-                    <p>${translate('imageNotFound')}</p>
-                </div>
-            `;
+            }
+        } catch (error) {
+            console.error('加载商品轮播图失败:', error);
+            showCarouselError(mainImageContainer, productCode);
         }
+    }
+    
+    function showCarouselError(container, productCode) {
+        container.innerHTML = `
+            <div class="image-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${translate('loadingFailed')}</p>
+                <button class="retry-btn" onclick="retryLoadCarousel('${productCode}')">
+                    <i class="fas fa-redo"></i> ${translate('retry')}
+                </button>
+            </div>
+        `;
+    }
+    
+    async function retryLoadCarousel(productCode) {
+        // 清除缓存
+        imageCache.delete(`main_${productCode}`);
+        imageCache.delete(`additional_${productCode}`);
+        
+        // 重新加载
+        loadProductCarousel(productCode);
     }
     
     function loadThumbnails(images, container, productCode) {
@@ -1850,10 +1993,14 @@
             
             const img = new Image();
             img.src = url;
-            img.alt = `缩略图 ${index + 1}`;
+            img.alt = `${translate('thumbnail')} ${index + 1}`;
             
             img.onload = function() {
                 img.classList.add('loaded');
+            };
+            
+            img.onerror = function() {
+                thumbnail.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>`;
             };
             
             thumbnail.appendChild(img);
@@ -1871,24 +2018,54 @@
         
         if (url) {
             const newImg = new Image();
-            newImg.src = url;
             newImg.alt = productCode;
             newImg.className = 'detail-image';
-            
-            newImg.onload = function() {
+
+            const onNewLoad = function() {
                 newImg.classList.add('loaded');
                 mainContainer.innerHTML = '';
                 mainContainer.appendChild(newImg);
-                
+
                 newImg.addEventListener('click', function() {
                     openImageModal(productCode, url, index);
                 });
-                
+
                 // 更新缩略图选中状态
                 document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
                     thumb.classList.toggle('active', i === index);
                 });
             };
+
+            const onNewError = function() {
+                mainContainer.innerHTML = `
+                    <div class="image-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>${translate('imageLoadError')}</p>
+                        <button class="retry-btn" onclick="switchToImage(${index}, ${JSON.stringify(images)}, '${productCode}')">
+                            <i class="fas fa-redo"></i> ${translate('retry')}
+                        </button>
+                    </div>
+                `;
+            };
+
+            newImg.onload = onNewLoad;
+            newImg.onerror = onNewError;
+            newImg.src = url;
+
+            if (newImg.complete && newImg.naturalWidth > 0) {
+                onNewLoad.call(newImg);
+            }
+
+            const newFallback = setTimeout(() => {
+                if (!mainContainer.querySelector('img')) {
+                    console.warn('switchToImage timeout', url);
+                    onNewError();
+                }
+            }, 5000);
+
+            const _wrapNew = (fn) => function() { clearTimeout(newFallback); fn && fn.apply(this, arguments); };
+            newImg.onload = _wrapNew(onNewLoad);
+            newImg.onerror = _wrapNew(onNewError);
         }
     }
     
@@ -1898,20 +2075,10 @@
         const modalImage = document.getElementById('modal-image');
         const modalImageInfo = document.getElementById('modal-image-info');
         
-        // 如果图片URL无效，尝试从缓存获取
-        if (!imageUrl || imageUrl.includes('undefined')) {
-            if (state.currentCarouselImages && state.currentCarouselImages.length > imageIndex) {
-                imageUrl = state.currentCarouselImages[imageIndex];
-            } else if (state.loadedImages[partCode]) {
-                imageUrl = state.loadedImages[partCode];
-            }
-        }
-        
-        // 显示加载状态
         modalImage.style.opacity = '0';
         modalImage.src = imageUrl;
         modalImage.alt = partCode;
-        modalImageInfo.textContent = `${partCode} - 图片 ${imageIndex + 1}`;
+        modalImageInfo.textContent = `${partCode} - ${translate('image')} ${imageIndex + 1}`;
         
         modalImage.onload = function() {
             modalImage.style.opacity = '1';
@@ -1919,6 +2086,7 @@
         
         modalImage.onerror = function() {
             modalImageInfo.textContent = `${translate('imageNotFound')}: ${partCode}`;
+            modalImage.src = '';
         };
         
         modal.classList.add('active');
@@ -1992,6 +2160,24 @@
                     });
                 }
                 this.save();
+                // 若当前没有图片，异步尝试查找并更新（只查png）
+                (async () => {
+                    try {
+                        const imgUrl = await findMainImage(productCode);
+                        if (imgUrl) {
+                            // 更新已存在的购物车条目
+                            const it = this.items.find(item => item.code === productCode && item.selectedBrandKey === brandKey);
+                            if (it && !it.image) {
+                                it.image = imgUrl;
+                                state.loadedImages[productCode] = imgUrl;
+                                this.save();
+                                this.updateUI();
+                            }
+                        }
+                    } catch (e) {
+                        // 忽略查找错误
+                    }
+                })();
                 this.showNotification(translate('cartNotification'));
             },
             update(code, quantity) {
@@ -2151,65 +2337,28 @@
                 }, 1000);
             },
             async loadImageToBuffer(productCode) {
-                const imageExtensions = ['.png', '.jpg', '.jpeg'];
+                const mainImageUrl = await findMainImage(productCode);
+                if (!mainImageUrl) return null;
                 
-                for (const ext of imageExtensions) {
-                    const url = `images/${productCode}${ext}`;
-                    try {
-                        const exists = await this.checkImageUrlExists(url);
-                        if (exists) {
-                            const response = await fetch(url);
-                            if (!response.ok) {
-                                throw new Error(`HTTP错误! 状态: ${response.status}`);
-                            }
-                            
-                            const blob = await response.blob();
-                            return new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onloadend = function() {
-                                    resolve(this.result);
-                                };
-                                reader.onerror = reject;
-                                reader.readAsArrayBuffer(blob);
-                            });
-                        }
-                    } catch (error) {
-                        console.warn(`无法加载图片 ${url}:`, error);
-                        continue;
+                try {
+                    const response = await fetch(mainImageUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误! 状态: ${response.status}`);
                     }
+                    
+                    const blob = await response.blob();
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = function() {
+                            resolve(this.result);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsArrayBuffer(blob);
+                    });
+                } catch (error) {
+                    console.warn(`无法加载图片: ${productCode}`, error);
+                    return null;
                 }
-                return null;
-            },
-            
-            checkImageUrlExists(url) {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = () => resolve(true);
-                    img.onerror = () => resolve(false);
-                    img.src = url;
-                });
-            },
-            
-            getImageExtensionFromBuffer(buffer, productCode) {
-                const arr = new Uint8Array(buffer);
-                
-                if (arr.length > 3 && arr[0] === 0x89 && arr[1] === 0x50 && arr[2] === 0x4E && arr[3] === 0x47) {
-                    return 'png';
-                }
-                
-                if (arr.length > 1 && arr[0] === 0xFF && arr[1] === 0xD8) {
-                    return 'jpeg';
-                }
-                
-                if (arr.length > 10 && arr[6] === 'J' && arr[7] === 'F' && arr[8] === 'I' && arr[9] === 'F') {
-                    return 'jpeg';
-                }
-                
-                const lowerCode = productCode.toLowerCase();
-                if (lowerCode.endsWith('.png')) return 'png';
-                if (lowerCode.endsWith('.jpg') || lowerCode.endsWith('.jpeg')) return 'jpeg';
-                
-                return 'png';
             },
             
             async exportToExcel() {
@@ -2235,14 +2384,14 @@
                     );
                     
                     worksheet.columns = [
-                        { header: translate('excelSerial'), key: 'serial', width: 8 },
-                        { header: translate('excelImage'), key: 'image', width: 40 },
-                        { header: translate('excelProductCode'), key: 'code', width: 20 },
-                        { header: translate('excelOriginalCode'), key: 'originalCode', width: 20 },
-                        { header: translate('excelProductName'), key: 'name', width: 30 },
-                        { header: translate('excelSpecs'), key: 'specs', width: 40 },
-                        { header: translate('excelBrand'), key: 'brand', width: 15 },
-                        { header: translate('excelQuantity'), key: 'quantity', width: 10 }
+                        { header: '序号', key: 'serial', width: 8 },
+                        { header: '图片', key: 'image', width: 40 },
+                        { header: '商品编码', key: 'code', width: 20 },
+                        { header: '原始编码', key: 'originalCode', width: 20 },
+                        { header: '商品名称', key: 'name', width: 30 },
+                        { header: '规格说明', key: 'specs', width: 40 },
+                        { header: '品牌', key: 'brand', width: 15 },
+                        { header: '数量', key: 'quantity', width: 10 }
                     ];
                     
                     worksheet.getColumn(2).height = 120;
@@ -2310,10 +2459,9 @@
                         try {
                             const imageBuffer = await this.loadImageToBuffer(item.code);
                             if (imageBuffer) {
-                                const extension = this.getImageExtensionFromBuffer(imageBuffer, item.code);
                                 const imageId = workbook.addImage({
                                     buffer: imageBuffer,
-                                    extension: extension
+                                    extension: 'png'
                                 });
                                 
                                 const colIndex = 1;
@@ -2346,23 +2494,10 @@
                         }
                     }
                     
-                    worksheet.columns.forEach((column, index) => {
-                        if (index !== 1) {
-                            let maxLength = 0;
-                            column.eachCell({ includeEmpty: true }, (cell) => {
-                                const columnLength = cell.value ? cell.value.toString().length : 10;
-                                if (columnLength > maxLength) {
-                                    maxLength = columnLength;
-                                }
-                            });
-                            column.width = Math.min(maxLength + 2, 50);
-                        }
-                    });
-                    
                     const summaryStartRow = this.items.length + 3;
                     
                     const summaryTitleCell = worksheet.getCell(`A${summaryStartRow}`);
-                    summaryTitleCell.value = translate('excelSummary');
+                    summaryTitleCell.value = '汇总信息';
                     summaryTitleCell.font = { bold: true, color: { argb: '3498DB' }, size: 12 };
                     summaryTitleCell.border = {
                         top: { style: 'thin', color: { argb: '3498DB' } },
@@ -2371,10 +2506,10 @@
                         right: { style: 'thin', color: { argb: '3498DB' } }
                     };
                     
-                    worksheet.getCell(`A${summaryStartRow + 1}`).value = translate('excelCategoryCount');
+                    worksheet.getCell(`A${summaryStartRow + 1}`).value = '商品种类';
                     worksheet.getCell(`B${summaryStartRow + 1}`).value = this.items.length;
                     
-                    worksheet.getCell(`A${summaryStartRow + 2}`).value = translate('excelTotalQuantity');
+                    worksheet.getCell(`A${summaryStartRow + 2}`).value = '总数量';
                     worksheet.getCell(`B${summaryStartRow + 2}`).value = this.getTotalItems();
                     
                     const currentDate = new Date();
@@ -2385,10 +2520,10 @@
                         currentDate.toLocaleTimeString('zh-CN') :
                         currentDate.toLocaleTimeString('en-US');
                     
-                    worksheet.getCell(`A${summaryStartRow + 3}`).value = translate('excelExportDate');
+                    worksheet.getCell(`A${summaryStartRow + 3}`).value = '导出日期';
                     worksheet.getCell(`B${summaryStartRow + 3}`).value = dateFormatter;
                     
-                    worksheet.getCell(`A${summaryStartRow + 4}`).value = translate('excelExportTime');
+                    worksheet.getCell(`A${summaryStartRow + 4}`).value = '导出时间';
                     worksheet.getCell(`B${summaryStartRow + 4}`).value = timeFormatter;
                     
                     for (let i = summaryStartRow; i <= summaryStartRow + 4; i++) {
@@ -2957,18 +3092,17 @@
         document.querySelectorAll('.product-card').forEach(card => {
             const productCode = card.dataset.code;
             const cartBtn = card.querySelector('.cart-button');
-            const inCart = state.cart.items.find(item => item.code === productCode);
-            
-            if (cartBtn) {
-                if (inCart) {
-                    cartBtn.classList.add('added');
-                    cartBtn.innerHTML = '<i class="fas fa-check"></i>';
-                    cartBtn.title = translate('removeFromCart');
-                } else {
-                    cartBtn.classList.remove('added');
-                    cartBtn.innerHTML = '<i class="fas fa-cart-plus"></i>';
-                    cartBtn.title = translate('addToCart');
-                }
+            if (!cartBtn) return;
+
+            const inCart = state.cart.items.some(item => item.code === productCode);
+            if (inCart) {
+                cartBtn.classList.add('added');
+                cartBtn.innerHTML = '<i class="fas fa-check"></i>';
+                cartBtn.title = translate('removeFromCart');
+            } else {
+                cartBtn.classList.remove('added');
+                cartBtn.innerHTML = '<i class="fas fa-cart-plus"></i>';
+                cartBtn.title = translate('addToCart');
             }
         });
     }
@@ -2990,7 +3124,7 @@
                 <div class="product-image" data-code="${productCode}">
                     <div class="lazy-placeholder">
                         <i class="fas fa-spinner fa-spin"></i>
-                        <span>加载中...</span>
+                        <span>${translate('loading')}</span>
                     </div>
                 </div>
                 <div class="product-info">
@@ -3294,7 +3428,7 @@
                             <div class="carousel-main-image" id="carousel-main-image">
                                 <div class="lazy-placeholder">
                                     <i class="fas fa-spinner fa-spin"></i>
-                                    <span>加载主图...</span>
+                                    <span>${translate('checkingImages')}...</span>
                                 </div>
                             </div>
                             
@@ -3451,7 +3585,7 @@
     // 关闭购物车
     function closeCartSidebar() {
         document.getElementById('cart-sidebar').classList.remove('active');
-        document.getElementById('cart-overlay').classList.remove('active');
+    document.getElementById('cart-overlay').classList.remove('active');
     }
     
     function refreshCurrentView() {
@@ -3600,6 +3734,18 @@
         
         // 刷新数据按钮
         document.getElementById('refresh-data').addEventListener('click', async () => {
+            // 清理图片缓存与未完成的加载承诺，防止多次刷新导致的状态不一致
+            try {
+                imageLoadingPromises.clear();
+                imageCache.clear();
+                if (lazyImageObserver) {
+                    try { lazyImageObserver.disconnect(); } catch (e) { /* ignore */ }
+                    lazyImageObserver = null;
+                }
+            } catch (e) {
+                console.warn('刷新时清理图片缓存失败', e);
+            }
+
             await loadJSONData();
             initializeTreeView();
             if (state.sheetNames.length > 0) {
