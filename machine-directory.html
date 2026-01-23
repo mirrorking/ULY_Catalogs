@@ -860,6 +860,17 @@
         }
 
         /* 详情页图片样式 */
+        .detail-image-section {
+            width: 100%;
+            height: 500px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .detail-image-wrapper {
             width: 100%;
             height: 500px; /* 增大详情页图片区域 */
@@ -871,6 +882,80 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+        }
+
+        /* 详情页：左侧图片，右侧信息 */
+        .detail-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .detail-thumbnails {
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-left: 15px;
+        }
+
+        .thumb-item {
+            width: 100%;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .thumb-item.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .thumb-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .detail-main-and-info {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .detail-info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .detail-main-wrapper {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            min-width: 0;
+        }
+
+        .part-detail-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px 0;
         }
 
         .detail-image {
@@ -917,79 +1002,7 @@
             object-fit: cover;
         }
 
-        /* 新增：多张图片样式 */
-        .more-images-section {
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-
-        .more-images-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        .more-images-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-        }
-
-        .more-image-item {
-            position: relative;
-            cursor: pointer;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8f9fa;
-        }
-
-        .more-image-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-        }
-
-        .more-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            padding: 10px;
-        }
-
-        .more-image-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            color: #95a5a6;
-        }
-
-        .more-image-index {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-
-        .no-more-images {
-            text-align: center;
-            color: #95a5a6;
-            padding: 20px;
-            font-style: italic;
-        }
+    /* 右侧更多图片已移除，使用左侧缩略图列展示主图及其缩略 */
     </style>
 </head>
 <body>
@@ -3241,13 +3254,21 @@
             const displayName = part.name && part.name.trim() !== '' ? part.name : (state.currentLanguage === 'zh' ? '未命名商品' : 'Unnamed product');
             
             detailContent.innerHTML = `
-                <div class="detail-image-section" id="detail-image-section">
-                    <div class="image-loading">
-                        <i class="fas fa-spinner"></i>
-                        <p data-key="loading_image">加载图片中...</p>
+                <div class="detail-layout">
+                    <div class="detail-main-wrapper">
+                        <div class="detail-thumbnails" id="detail-thumbnails" style="width:120px; flex-shrink:0;">
+                            <!-- 缩略图列（在主图框内左侧） -->
+                        </div>
+                        <div style="flex:1;">
+                            <div class="detail-image-section" id="detail-image-section">
+                                <div class="image-loading">
+                                    <i class="fas fa-spinner"></i>
+                                    <p data-key="loading_image">加载图片中...</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="detail-info-section">
+                    <div class="detail-info-section">
                     <div class="info-card">
                         <h3 data-key="basic_info">基本信息</h3>
                         <table class="info-table">
@@ -3305,7 +3326,7 @@
                 </div>
             `;
             
-            // 加载配件详情图片
+            // 加载配件详情主图（同步等待），副图在后台加载
             await loadPartDetailImage(part.code);
             
             document.getElementById('prev-part-btn').addEventListener('click', showPreviousPart);
@@ -3315,8 +3336,8 @@
             
             translatePage();
             
-            // 加载更多图片
-            await loadMoreImages(part.code);
+            // 后台加载更多图片（异步，不阻塞）
+            loadMoreImages(part.code);
         }
 
         // 加载配件详情图片
@@ -3350,7 +3371,10 @@
 
         // 显示配件详情图片
         function displayPartDetailImage(imageSection, productCode, imageUrl) {
-            imageSection.innerHTML = '';
+            // 主图容器只包含当前主图
+            const mainSection = document.getElementById('detail-image-section');
+            if (!mainSection) return;
+            mainSection.innerHTML = '';
 
             const wrapper = document.createElement('div');
             wrapper.className = 'detail-image-wrapper';
@@ -3362,18 +3386,18 @@
 
             const hint = document.createElement('div');
             hint.className = 'zoom-hint';
-            hint.textContent = translate('clickToZoom') || '点击图片放大查看';
+            hint.textContent = translate('click_to_zoom') || translate('clickToZoom') || '点击图片放大查看';
 
             wrapper.appendChild(img);
             wrapper.appendChild(hint);
-            imageSection.appendChild(wrapper);
+            mainSection.appendChild(wrapper);
 
             const onLoad = () => {
                 img.classList.add('loaded');
             };
 
             const onError = () => {
-                imageSection.innerHTML = `
+                mainSection.innerHTML = `
                     <div class="image-placeholder" style="width: 100%; height: 100%;">
                         <i class="fas fa-image"></i>
                         <p data-key="image_not_found">图片未找到</p>
@@ -3406,97 +3430,86 @@
                 openImageModal(productCode, imageUrl);
             });
 
+            // 如果缩略图列存在，尝试高亮对应缩略图
+            const thumbs = document.querySelectorAll('#detail-thumbnails .thumb-item');
+            thumbs.forEach(t => t.classList.remove('active'));
+            const related = document.querySelector(`#detail-thumbnails .thumb-item[data-url="${imageUrl}"]`);
+            if (related) related.classList.add('active');
+
             translatePage();
         }
 
         // 加载更多图片
         async function loadMoreImages(productCode) {
-            const detailContent = document.getElementById('part-detail-content');
+            const thumbsContainer = document.getElementById('detail-thumbnails');
+            if (!thumbsContainer) return;
             
-            // 创建更多图片区域
-            const moreImagesSection = document.createElement('div');
-            moreImagesSection.className = 'more-images-section';
-            moreImagesSection.innerHTML = `
-                <h3 class="more-images-title" data-key="more_images">更多图片</h3>
-                <div class="more-images-grid" id="more-images-grid">
-                    <div class="image-loading">
-                        <i class="fas fa-spinner"></i>
-                        <p data-key="loading_image">加载图片中...</p>
-                    </div>
-                </div>
-            `;
-            
-            detailContent.appendChild(moreImagesSection);
-            translatePage();
-            
-            const moreImagesGrid = document.getElementById('more-images-grid');
-            moreImagesGrid.innerHTML = '';
-            
-            // 从Moreimages文件夹中读取多张图片
+            // 清空缩略图容器（不再创建"更多图片"区域）
+            thumbsContainer.innerHTML = '';
+
+            // 首先添加主图到缩略图列表
+            const mainImageUrl = `images/${productCode}.png`;
+            const mainThumb = document.createElement('div');
+            mainThumb.className = 'thumb-item active';
+            mainThumb.dataset.url = mainImageUrl;
+            mainThumb.title = '主图';
+
+            const mainImgEl = document.createElement('img');
+            mainImgEl.alt = '主图';
+            mainImgEl.className = 'thumb-img';
+            mainImgEl.src = mainImageUrl;
+
+            mainImgEl.onload = () => mainImgEl.classList.add('loaded');
+            mainImgEl.onerror = () => mainImgEl.classList.add('error');
+
+            mainThumb.appendChild(mainImgEl);
+
+            mainThumb.addEventListener('click', function() {
+                // 切换主图
+                displayPartDetailImage(document.getElementById('detail-image-section'), productCode, this.dataset.url);
+                // 高亮当前缩略
+                document.querySelectorAll('#detail-thumbnails .thumb-item').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+
+            thumbsContainer.appendChild(mainThumb);
+
+            // 从Moreimages文件夹中读取更多图片
             const moreImages = await getMoreImages(productCode);
-            
-            if (moreImages.length === 0) {
-                moreImagesGrid.innerHTML = `
-                    <div class="no-more-images" data-key="no_more_images">暂无更多图片</div>
-                `;
-                translatePage();
-                return;
-            }
-            
-            moreImages.forEach((image, index) => {
-                const imageItem = document.createElement('div');
-                imageItem.className = 'more-image-item';
-                imageItem.dataset.imageUrl = image.url;
-                imageItem.dataset.index = index;
-                
+
+            // 异步加载缩略图（分批/延迟）以减少阻塞
+            for (let i = 0; i < moreImages.length; i++) {
+                const image = moreImages[i];
+
+                // 小延时，避免一次性发起大量请求
+                await new Promise(res => setTimeout(res, 50));
+
+                const thumb = document.createElement('div');
+                thumb.className = 'thumb-item';
+                thumb.dataset.url = image.url;
+
                 const imgEl = document.createElement('img');
-                imgEl.alt = `图片 ${index + 1}`;
-                imgEl.className = 'more-image';
-
-                const indexEl = document.createElement('div');
-                indexEl.className = 'more-image-index';
-                indexEl.textContent = index + 1;
-
-                // load with handlers
-                const onLoad = () => {
-                    imgEl.classList.add('loaded');
-                };
-
-                const onError = () => {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'more-image-placeholder';
-                    placeholder.innerHTML = `<i class="fas fa-image"></i>`;
-                    imageItem.appendChild(placeholder);
-                };
-
-                imgEl.onload = onLoad;
-                imgEl.onerror = onError;
+                imgEl.alt = `图片 ${i + 1}`;
+                imgEl.className = 'thumb-img';
                 imgEl.src = image.url;
 
-                if (imgEl.complete && imgEl.naturalWidth > 0) {
-                    onLoad.call(imgEl);
-                }
+                imgEl.onload = () => imgEl.classList.add('loaded');
+                imgEl.onerror = () => imgEl.classList.add('error');
 
-                const fallback = setTimeout(() => {
-                    if (!imgEl.classList.contains('loaded')) {
-                        console.warn('more image timeout', image.url);
-                        onError();
-                    }
-                }, 5000);
+                thumb.appendChild(imgEl);
 
-                const wrap = (fn) => function() { clearTimeout(fallback); fn && fn.apply(this, arguments); };
-                imgEl.onload = wrap(onLoad);
-                imgEl.onerror = wrap(onError);
-
-                imageItem.appendChild(imgEl);
-                imageItem.appendChild(indexEl);
-
-                imageItem.addEventListener('click', function() {
-                    openImageModal(productCode, this.dataset.imageUrl);
+                thumb.addEventListener('click', function() {
+                    // 切换主图
+                    displayPartDetailImage(document.getElementById('detail-image-section'), productCode, this.dataset.url);
+                    // 高亮当前缩略
+                    document.querySelectorAll('#detail-thumbnails .thumb-item').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
                 });
 
-                moreImagesGrid.appendChild(imageItem);
-            });
+                thumbsContainer.appendChild(thumb);
+            }
+
+            // 如果没有更多图片，不显示额外提示，仅保持主图缩略图
         }
 
         // 获取更多图片
