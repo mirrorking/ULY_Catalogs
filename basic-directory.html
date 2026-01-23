@@ -1413,7 +1413,7 @@
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script>
     // === 图片加载优化核心代码 ===
-    
+
     // 多语言文本定义
     const translations = {
         'zh-CN': {
@@ -1582,9 +1582,9 @@
     const imageCache = new Map();
     const imageLoadingPromises = new Map();
     let lazyImageObserver = null;
-    
-    // 优化的图片检查函数 - 设置超时
-    function checkImageExists(url, timeout = 1500) {
+
+    // ========== 关键修复：优化的图片检查函数 ==========
+    function checkImageExists(url, timeout = 2000) {
         return new Promise((resolve) => {
             const img = new Image();
             let timer;
@@ -1599,6 +1599,7 @@
                 resolve(false);
             };
             
+            // 关键修复：设置更短的超时时间
             timer = setTimeout(() => {
                 img.onload = img.onerror = null;
                 img.src = '';
@@ -1608,19 +1609,68 @@
             img.src = url;
         });
     }
-    
-    // helper: 从已加载数据中查找商品名称（用于图片文件名回退）
-    function getProductNameByCode(productCode) {
-        if (!productCode) return '';
-        const p = state.allProducts.find(pr => {
-            const code = (pr.CODE || pr.code || '').toString();
-            return code === productCode;
+
+    // ========== 关键修复：检查图片是否已缓存 ==========
+    function checkIfImageIsCached(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            
+            img.onload = () => {
+                resolve({ cached: true, width: img.naturalWidth, height: img.naturalHeight });
+            };
+            
+            img.onerror = () => {
+                resolve({ cached: false });
+            };
+            
+            // 如果图片已经在缓存中，onload会立即触发
+            img.src = url;
+            
+            // 设置一个很小的超时来检测缓存
+            setTimeout(() => {
+                if (img.complete && img.naturalWidth > 0) {
+                    resolve({ cached: true, width: img.naturalWidth, height: img.naturalHeight });
+                }
+            }, 50);
         });
-        if (p) return (p.MODEL || p.model || p.NAME || p.name || '').toString().trim();
-        return '';
     }
 
-    // 优化的主图查找函数 - 并行检查
+    // ========== 关键修复：显示已缓存的图片 ==========
+    function displayCachedImage(imageContainer, imageUrl, productCode, loadId, controller) {
+        // 检查加载是否被取消
+        if (controller.signal.aborted || imageContainer.dataset.loadId !== loadId) {
+            return;
+        }
+        
+        const img = new Image();
+        img.src = imageUrl;
+        img.alt = productCode;
+        img.className = 'lazy-image';
+        img.decoding = 'async';
+        
+        // 清空容器并添加图片
+        imageContainer.innerHTML = '';
+        imageContainer.appendChild(img);
+        
+        // 立即添加loaded类，因为图片已经在缓存中
+        requestAnimationFrame(() => {
+            img.classList.add('loaded', 'quick-load');
+            imageContainer.dataset.loaded = 'true';
+            imageContainer.dataset.loading = 'false';
+            
+            // 清理abortController
+            delete imageContainer.abortController;
+            
+            console.log(`商品 ${productCode} 缓存的图片成功显示`);
+        });
+        
+        // 缓存到 loadedImages
+        if (!state.loadedImages[productCode]) {
+            state.loadedImages[productCode] = imageUrl;
+        }
+    }
+
+    // ========== 关键修改：主图片只查找png格式，只从images目录 ==========
     async function findMainImage(productCode) {
         const cacheKey = `main_${productCode}`;
         
@@ -1641,34 +1691,19 @@
         
         const checkPromise = (async () => {
             try {
-                const candidates = [];
-                candidates.push(`images/${productCode}.png`);
+                // 主图片：只有png格式，只在images目录
+                const mainImageUrl = `images/${productCode}.png`;
+                const exists = await checkImageExists(mainImageUrl);
                 
-                const nameFallback = getProductNameByCode(productCode);
-                if (nameFallback) {
-                    const safeName = encodeURIComponent(nameFallback.trim());
-                    candidates.push(`images/${safeName}.png`);
-                    candidates.push(`Moreimages/${safeName}.png`);
+                if (exists) {
+                    imageCache.set(cacheKey, { 
+                        url: mainImageUrl, 
+                        timestamp: Date.now() 
+                    });
+                    return mainImageUrl;
                 }
                 
-                candidates.push(`Moreimages/${productCode}.png`);
-                
-                // 并行检查所有候选图片
-                const checkPromises = candidates.map(url => checkImageExists(url));
-                const results = await Promise.allSettled(checkPromises);
-                
-                // 找到第一个存在的图片
-                for (let i = 0; i < results.length; i++) {
-                    if (results[i].status === 'fulfilled' && results[i].value === true) {
-                        imageCache.set(cacheKey, { 
-                            url: candidates[i], 
-                            timestamp: Date.now() 
-                        });
-                        return candidates[i];
-                    }
-                }
-                
-                // 未找到
+                // 未找到主图片
                 imageCache.set(cacheKey, { 
                     url: null, 
                     timestamp: Date.now() 
@@ -1690,15 +1725,15 @@
         imageLoadingPromises.set(cacheKey, checkPromise);
         return checkPromise;
     }
-    
-    // 优化的附加图片查找
+
+    // ========== 关键修复：附加图片检查 - 一轮失败就停止 ==========
     async function findAdditionalImages(productCode) {
         const cacheKey = `additional_${productCode}`;
         
         // 检查缓存
         if (imageCache.has(cacheKey)) {
             const cached = imageCache.get(cacheKey);
-            if (Date.now() - cached.timestamp < 10000) {
+            if (Date.now() - cached.timestamp < 30000) { // 附加图片缓存30秒
                 return cached.images;
             }
         }
@@ -1711,32 +1746,53 @@
         const checkPromise = (async () => {
             try {
                 const images = [];
-                const baseName = productCode.replace(/\(\d+\)$/, '');
-                const formats = ['.png', '.jpg', '.jpeg'];
                 
-                // 检查附加图片(1)-(3)
-                const allPromises = [];
+                // 附加图片格式检查顺序：jpg → png → jpeg
+                const formats = ['.jpg', '.png', '.jpeg'];
                 
-                for (let i = 1; i <= 3; i++) {
+                // 关键修复：智能停止检查逻辑
+                let consecutiveFailures = 0;
+                const maxConsecutiveFailures = 1; // 关键修改：连续1个变体没找到就停止（一轮失败就结束）
+                const maxVariants = 8;  // 最多检查到 (8)
+                
+                // 只检查带括号的变体图片 (1)-(8)
+                for (let i = 1; i <= maxVariants; i++) {
+                    // 如果连续1个变体都没找到任何格式的图片，立即停止检查
+                    if (consecutiveFailures >= maxConsecutiveFailures) {
+                        console.log(`商品 ${productCode}: 变体(${i})未找到任何格式图片，停止检查后续变体`);
+                        break;
+                    }
+                    
+                    let foundVariant = false;
+                    
+                    // 检查当前变体的所有格式（按优先级顺序）
                     for (const format of formats) {
-                        const url = `Moreimages/${baseName}(${i})${format}`;
-                        allPromises.push(checkImageExists(url).then(exists => {
-                            if (exists) return url;
-                            return null;
-                        }));
+                        const url = `Moreimages/${productCode}(${i})${format}`;
+                        
+                        try {
+                            const exists = await checkImageExists(url);
+                            if (exists) {
+                                images.push(url);
+                                foundVariant = true;
+                                consecutiveFailures = 0; // 重置连续失败计数
+                                break; // 找到一种格式就够了，跳过其他格式检查
+                            }
+                        } catch (error) {
+                            console.warn(`检查变体图片失败: ${url}`, error);
+                        }
+                    }
+                    
+                    // 如果这个变体没找到任何格式的图片，增加连续失败计数
+                    if (!foundVariant) {
+                        consecutiveFailures++;
                     }
                 }
                 
-                const results = await Promise.allSettled(allPromises);
-                results.forEach(result => {
-                    if (result.status === 'fulfilled' && result.value) {
-                        images.push(result.value);
-                    }
-                });
-                
                 const result = { images, timestamp: Date.now() };
                 imageCache.set(cacheKey, result);
+                
                 return images;
+                
             } catch (error) {
                 console.warn(`检查附加图片失败: ${productCode}`, error);
                 const result = { images: [], timestamp: Date.now() };
@@ -1750,37 +1806,165 @@
         imageLoadingPromises.set(cacheKey, checkPromise);
         return checkPromise;
     }
-    
-    // 优化的商品卡片图片加载
+
+    // ========== 为商品详情页优化的图片查找函数 ==========
+    async function findImagesForDetailPage(productCode) {
+        const cacheKey = `detail_${productCode}`;
+        
+        // 检查缓存
+        if (imageCache.has(cacheKey)) {
+            const cached = imageCache.get(cacheKey);
+            if (Date.now() - cached.timestamp < 60000) { // 详情页缓存1分钟
+                return cached.images;
+            }
+        }
+        
+        const checkPromise = (async () => {
+            try {
+                const allImages = [];
+                
+                // 1. 先获取主图片（主图只有png格式，在images目录）
+                const mainImageUrl = await findMainImage(productCode);
+                if (mainImageUrl) {
+                    allImages.push(mainImageUrl);
+                }
+                
+                // 2. 获取附加图片
+                const additionalImages = await findAdditionalImages(productCode);
+                
+                // 合并图片，确保不重复
+                additionalImages.forEach(img => {
+                    if (!allImages.includes(img)) {
+                        allImages.push(img);
+                    }
+                });
+                
+                const result = { images: allImages, timestamp: Date.now() };
+                imageCache.set(cacheKey, result);
+                
+                return allImages;
+                
+            } catch (error) {
+                console.warn(`查找详情页图片失败: ${productCode}`, error);
+                const result = { images: [], timestamp: Date.now() };
+                imageCache.set(cacheKey, result);
+                return [];
+            } finally {
+                imageLoadingPromises.delete(cacheKey);
+            }
+        })();
+        
+        imageLoadingPromises.set(cacheKey, checkPromise);
+        return checkPromise;
+    }
+
+    // ========== 关键修复：优化的商品卡片图片加载（解决超时问题）==========
     async function loadProductCardImage(imageContainer, productCode) {
-        if (imageContainer.dataset.loading === 'true') return;
+        // 关键修复：添加唯一的加载标识符
+        const loadId = `card_${productCode}_${Date.now()}`;
+        imageContainer.dataset.loadId = loadId;
+        imageContainer.dataset.cardCode = productCode;
+        
+        // 检查是否正在加载或已加载
+        if (imageContainer.dataset.loading === 'true') {
+            return;
+        }
+        
+        if (imageContainer.dataset.loaded === 'true') {
+            // 如果已加载，确保显示图片
+            const existingImg = imageContainer.querySelector('img.lazy-image');
+            if (existingImg && existingImg.complete && existingImg.naturalWidth > 0) {
+                existingImg.classList.add('loaded');
+                return;
+            }
+            // 如果标记为已加载但实际没有图片，重置状态
+            imageContainer.dataset.loaded = 'false';
+        }
+        
+        // 设置加载状态
         imageContainer.dataset.loading = 'true';
+        imageContainer.dataset.code = productCode;
         
         // 立即显示骨架屏
         imageContainer.innerHTML = '<div class="skeleton-placeholder"></div>';
         
+        // 使用AbortController来支持取消
+        const controller = new AbortController();
+        imageContainer.abortController = controller;
+        
+        // 定义超时ID
+        let timeoutId = null;
+        
         try {
-            // 使用 Promise.race 设置超时
-            const imagePromise = findMainImage(productCode);
-            const timeoutPromise = new Promise(resolve => 
-                setTimeout(() => resolve(null), 3000)
-            );
+            // 商品卡片只查找主图片
+            const mainImageUrl = await findMainImage(productCode);
             
-            const mainImageUrl = await Promise.race([imagePromise, timeoutPromise]);
+            // 检查是否被取消
+            if (controller.signal.aborted) {
+                return;
+            }
             
             if (mainImageUrl) {
+                // 关键修复：先检查图片是否已缓存
+                const cachedCheck = await checkIfImageIsCached(mainImageUrl);
+                if (cachedCheck.cached) {
+                    // 图片已缓存，直接显示
+                    displayCachedImage(imageContainer, mainImageUrl, productCode, loadId, controller);
+                    return;
+                }
+                
                 const img = new Image();
                 img.alt = productCode;
                 img.decoding = 'async';
                 img.loading = 'lazy';
                 img.className = 'lazy-image';
                 
+                // 关键修复：设置更合理的超时时间（4秒）
+                timeoutId = setTimeout(() => {
+                    // 检查图片是否已经加载完成
+                    if (img.complete && img.naturalWidth > 0) {
+                        // 图片已经加载完成，忽略超时
+                        return;
+                    }
+                    
+                    if (imageContainer.dataset.loading === 'true' && !controller.signal.aborted) {
+                        // 关键修复：不显示错误，只是不设置loaded状态
+                        // 图片可能还在加载中，让浏览器继续加载
+                        console.log(`商品 ${productCode} 图片加载较慢，继续等待...`);
+                    }
+                }, 4000);
+                
                 img.onload = () => {
-                    img.classList.add('loaded');
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
-                    imageContainer.dataset.loaded = 'true';
-                    imageContainer.dataset.loading = 'false';
+                    // 关键修复：立即清除超时定时器
+                    clearTimeout(timeoutId);
+                    
+                    // 检查加载是否被取消
+                    if (controller.signal.aborted || imageContainer.dataset.loadId !== loadId) {
+                        return;
+                    }
+                    
+                    // 直接显示图片
+                    requestAnimationFrame(() => {
+                        if (!imageContainer || !imageContainer.parentNode) {
+                            return;
+                        }
+                        
+                        // 清空容器并添加图片
+                        imageContainer.innerHTML = '';
+                        imageContainer.appendChild(img);
+                        
+                        // 添加加载完成类
+                        setTimeout(() => {
+                            img.classList.add('loaded', 'quick-load');
+                        }, 10);
+                        
+                        // 更新状态
+                        imageContainer.dataset.loaded = 'true';
+                        imageContainer.dataset.loading = 'false';
+                        
+                        // 清理abortController
+                        delete imageContainer.abortController;
+                    });
                     
                     // 缓存到 loadedImages
                     if (!state.loadedImages[productCode]) {
@@ -1797,29 +1981,77 @@
                 };
                 
                 img.onerror = () => {
+                    // 清除超时定时器
+                    clearTimeout(timeoutId);
+                    
+                    // 检查加载是否被取消
+                    if (controller.signal.aborted || imageContainer.dataset.loadId !== loadId) {
+                        return;
+                    }
+                    
                     showNoImagePlaceholder(imageContainer);
                     imageContainer.dataset.loading = 'false';
+                    delete imageContainer.abortController;
                 };
                 
                 img.src = mainImageUrl;
                 
                 // 如果图片已经在缓存中
                 if (img.complete) {
-                    img.onload();
+                    if (img.naturalWidth > 0) {
+                        img.onload();
+                    } else {
+                        img.onerror();
+                    }
                 }
             } else {
+                // 检查是否被取消
+                if (controller.signal.aborted) return;
+                
+                // 清除可能存在的超时
+                if (timeoutId) clearTimeout(timeoutId);
+                
                 showNoImagePlaceholder(imageContainer);
                 imageContainer.dataset.loading = 'false';
+                delete imageContainer.abortController;
             }
         } catch (error) {
-            console.error('加载商品图片失败:', error);
+            console.error(`加载商品图片失败: ${productCode}`, error);
+            
+            // 清除超时定时器
+            if (timeoutId) clearTimeout(timeoutId);
+            
+            // 检查是否被取消
+            if (controller.signal.aborted) return;
+            
             showNoImagePlaceholder(imageContainer);
             imageContainer.dataset.loading = 'false';
+            delete imageContainer.abortController;
         }
     }
-    
+
+    // ========== 关键修复：清理图片加载状态 ==========
+    function cleanupImageLoadingStates() {
+        // 清理所有图片容器的加载状态
+        document.querySelectorAll('.product-image[data-loading="true"]').forEach(container => {
+            // 取消正在进行的加载
+            if (container.abortController) {
+                container.abortController.abort();
+                delete container.abortController;
+            }
+            
+            // 重置状态
+            container.dataset.loading = 'false';
+            container.dataset.loaded = 'false';
+            delete container.dataset.loadId;
+            delete container.dataset.cardCode;
+        });
+    }
+
     // 显示无图片占位符
     function showNoImagePlaceholder(container) {
+        if (container.dataset.loaded === 'true') return;
+        
         container.innerHTML = `
             <div class="image-placeholder">
                 <i class="fas fa-image"></i>
@@ -1827,111 +2059,54 @@
             </div>
         `;
         container.dataset.loaded = 'true';
+        container.dataset.loading = 'false';
     }
-    
-    // 初始化懒加载
-    function initializeLazyLoading() {
-        if ('IntersectionObserver' in window) {
-            lazyImageObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        const imageContainer = entry.target;
-                        const productCode = imageContainer.dataset.code;
 
-                        if (productCode && imageContainer.dataset.loading !== 'true' && imageContainer.dataset.loaded !== 'true') {
-                            loadProductCardImage(imageContainer, productCode);
-                            lazyImageObserver.unobserve(imageContainer);
-                        }
-                    }
-                });
-            }, {
-                rootMargin: '200px 0px',
-                threshold: 0.01
-            });
-        }
-    }
-    
-    // 批量图片预加载
-    function preloadVisibleImages() {
-        const viewportHeight = window.innerHeight;
-        const scrollPosition = window.scrollY;
-        
-        const imageContainers = document.querySelectorAll('.product-image:not([data-loaded]):not([data-loading])');
-        
-        imageContainers.forEach(container => {
-            const rect = container.getBoundingClientRect();
-            const productCode = container.dataset.code;
-            
-            // 预加载可见区域附近的图片（上下200px）
-            if (rect.top < viewportHeight + 200 && rect.bottom > -200) {
-                loadProductCardImage(container, productCode);
-            }
-        });
-    }
-    
-    // 设置商品卡片图片懒加载
-    function setupProductCardLazyLoading() {
-        if (lazyImageObserver) {
-            lazyImageObserver.disconnect();
-        }
-        
-        initializeLazyLoading();
-        
-        const imageContainers = document.querySelectorAll('.product-image:not([data-loaded])');
-        imageContainers.forEach(container => {
-            if (lazyImageObserver) {
-                lazyImageObserver.observe(container);
-            } else {
-                const productCode = container.dataset.code;
-                if (productCode) {
-                    loadProductCardImage(container, productCode);
-                }
-            }
-        });
-    }
-    
-    // ========== 优化商品详情页图片加载 ==========
+    // ========== 优化的商品详情页图片加载 ==========
+    // 添加一个状态跟踪器
+    let currentCarouselLoadId = 0;
+
     async function loadProductCarousel(productCode) {
         const mainImageContainer = document.getElementById('carousel-main-image');
         const thumbnailContainer = document.getElementById('thumbnail-container');
+        
+        // 生成当前加载的唯一ID
+        const loadId = ++currentCarouselLoadId;
+        
+        // 清理旧的加载状态
+        mainImageContainer.innerHTML = '';
+        thumbnailContainer.innerHTML = '';
         
         // 显示骨架屏
         mainImageContainer.innerHTML = '<div class="skeleton-placeholder"></div>';
         
         try {
-            // 并行获取主图和附加图片
-            const [mainImageUrl, additionalImages] = await Promise.all([
-                findMainImage(productCode),
-                findAdditionalImages(productCode)
-            ]);
+            // 使用优化的详情页图片查找函数
+            const allImages = await findImagesForDetailPage(productCode);
             
-            // 合并图片，主图优先
-            const allImages = [];
-            if (mainImageUrl) allImages.push(mainImageUrl);
-            allImages.push(...additionalImages.filter(img => img !== mainImageUrl));
+            // 检查是否是最新的加载请求
+            if (loadId !== currentCarouselLoadId) {
+                return;
+            }
             
             state.currentCarouselImages = allImages;
             state.currentProductCode = productCode;
             
             if (allImages.length > 0) {
-                // 预加载所有图片
-                const preloadPromises = allImages.map(url => {
-                    return new Promise((resolve) => {
-                        const img = new Image();
-                        img.onload = resolve;
-                        img.onerror = resolve;
-                        img.src = url;
-                    });
-                });
-                
-                // 先显示第一张图片
+                // 显示第一张图片
                 const mainImg = new Image();
                 mainImg.src = allImages[0];
                 mainImg.className = 'detail-image';
                 mainImg.alt = productCode;
+                mainImg.decoding = 'async';
                 
                 mainImg.onload = () => {
-                    mainImg.classList.add('loaded');
+                    // 再次检查是否是最新的加载请求
+                    if (loadId !== currentCarouselLoadId) {
+                        return;
+                    }
+                    
+                    mainImg.classList.add('loaded', 'quick-load');
                     mainImageContainer.innerHTML = '';
                     mainImageContainer.appendChild(mainImg);
                     
@@ -1945,17 +2120,23 @@
                         openImageModal(productCode, allImages[0], 0);
                     });
                     
-                    // 预加载其他图片
+                    // 如果有更多图片，加载缩略图
                     if (allImages.length > 1) {
-                        Promise.allSettled(preloadPromises.slice(1)).then(() => {
-                            loadThumbnails(allImages, thumbnailContainer, productCode);
-                        });
+                        loadThumbnails(allImages, thumbnailContainer, productCode);
                     }
                 };
                 
                 mainImg.onerror = () => {
+                    // 检查是否是最新的加载请求
+                    if (loadId !== currentCarouselLoadId) return;
+                    
                     showCarouselError(mainImageContainer, productCode);
                 };
+                
+                // 如果图片已经在缓存中
+                if (mainImg.complete) {
+                    mainImg.onload();
+                }
             } else {
                 mainImageContainer.innerHTML = `
                     <div class="image-placeholder">
@@ -1966,10 +2147,12 @@
             }
         } catch (error) {
             console.error('加载商品轮播图失败:', error);
+            // 检查是否是最新的加载请求
+            if (loadId !== currentCarouselLoadId) return;
             showCarouselError(mainImageContainer, productCode);
         }
     }
-    
+
     function showCarouselError(container, productCode) {
         container.innerHTML = `
             <div class="image-error">
@@ -1981,16 +2164,18 @@
             </div>
         `;
     }
-    
+
     async function retryLoadCarousel(productCode) {
         // 清除缓存
-        imageCache.delete(`main_${productCode}`);
+        imageCache.delete(`detail_${productCode}`);
         imageCache.delete(`additional_${productCode}`);
+        imageCache.delete(`main_${productCode}`);
         
         // 重新加载
         loadProductCarousel(productCode);
     }
-    
+
+    // ========== 优化 loadThumbnails 函数 ==========
     function loadThumbnails(images, container, productCode) {
         container.innerHTML = '';
         
@@ -2002,16 +2187,30 @@
             const img = new Image();
             img.src = url;
             img.alt = `${translate('thumbnail')} ${index + 1}`;
+            img.decoding = 'async';
+            
+            // 添加图片加载状态管理
+            thumbnail.innerHTML = '<div class="skeleton-placeholder" style="width: 100%; height: 100%;"></div>';
             
             img.onload = function() {
-                img.classList.add('loaded');
+                if (thumbnail.contains(thumbnail.querySelector('.skeleton-placeholder'))) {
+                    thumbnail.innerHTML = '';
+                }
+                thumbnail.appendChild(img);
+                img.classList.add('loaded', 'quick-load');
             };
             
             img.onerror = function() {
-                thumbnail.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>`;
+                if (thumbnail.contains(thumbnail.querySelector('.skeleton-placeholder'))) {
+                    thumbnail.innerHTML = '';
+                }
+                thumbnail.innerHTML = `
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+                    </div>
+                `;
             };
             
-            thumbnail.appendChild(img);
             thumbnail.addEventListener('click', function() {
                 switchToImage(index, images, productCode);
             });
@@ -2019,7 +2218,7 @@
             container.appendChild(thumbnail);
         });
     }
-    
+
     function switchToImage(index, images, productCode) {
         const mainContainer = document.getElementById('carousel-main-image');
         const url = images[index];
@@ -2028,9 +2227,10 @@
             const newImg = new Image();
             newImg.alt = productCode;
             newImg.className = 'detail-image';
+            newImg.decoding = 'async';
             
             newImg.onload = function() {
-                newImg.classList.add('loaded');
+                newImg.classList.add('loaded', 'quick-load');
                 mainContainer.innerHTML = '';
                 mainContainer.appendChild(newImg);
                 
@@ -2063,7 +2263,81 @@
             }
         }
     }
-    
+
+    // 初始化懒加载
+    function initializeLazyLoading() {
+        if ('IntersectionObserver' in window) {
+            lazyImageObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const imageContainer = entry.target;
+                        const productCode = imageContainer.dataset.code;
+
+                        if (productCode && imageContainer.dataset.loading !== 'true' && imageContainer.dataset.loaded !== 'true') {
+                            loadProductCardImage(imageContainer, productCode);
+                            lazyImageObserver.unobserve(imageContainer);
+                        }
+                    }
+                });
+            }, {
+                rootMargin: '200px 0px',
+                threshold: 0.01
+            });
+        }
+    }
+
+    // 批量图片预加载
+    function preloadVisibleImages() {
+        const viewportHeight = window.innerHeight;
+        const scrollPosition = window.scrollY;
+        
+        const imageContainers = document.querySelectorAll('.product-image:not([data-loaded]):not([data-loading])');
+        
+        imageContainers.forEach(container => {
+            const rect = container.getBoundingClientRect();
+            const productCode = container.dataset.code;
+            
+            // 预加载可见区域附近的图片（上下200px）
+            if (rect.top < viewportHeight + 200 && rect.bottom > -200) {
+                loadProductCardImage(container, productCode);
+            }
+        });
+    }
+
+    // 设置商品卡片图片懒加载
+    function setupProductCardLazyLoading() {
+        // 关键修复：在重新设置懒加载前，清理旧的加载状态
+        cleanupImageLoadingStates();
+        
+        if (lazyImageObserver) {
+            lazyImageObserver.disconnect();
+        }
+        
+        initializeLazyLoading();
+        
+        const imageContainers = document.querySelectorAll('.product-image:not([data-loaded])');
+        imageContainers.forEach(container => {
+            // 关键修复：确保容器有正确的productCode
+            const productCode = container.dataset.code;
+            if (!productCode) {
+                // 尝试从父元素获取productCode
+                const productCard = container.closest('.product-card');
+                if (productCard && productCard.dataset.code) {
+                    container.dataset.code = productCard.dataset.code;
+                }
+            }
+            
+            if (lazyImageObserver) {
+                lazyImageObserver.observe(container);
+            } else {
+                const productCode = container.dataset.code;
+                if (productCode) {
+                    loadProductCardImage(container, productCode);
+                }
+            }
+        });
+    }
+
     // ========== 图片模态框 ==========
     function openImageModal(partCode, imageUrl, imageIndex = 0) {
         const modal = document.getElementById('image-modal');
@@ -2087,13 +2361,13 @@
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
-    
+
     function closeImageModal() {
         const modal = document.getElementById('image-modal');
         modal.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
-    
+
     // ========== 全局状态和核心功能 ==========
     const state = {
         currentLanguage: localStorage.getItem('product_language') || 'en-US',
@@ -2158,7 +2432,7 @@
                 // 若当前没有图片，异步尝试查找并更新
                 (async () => {
                     try {
-                        const imgUrl = await findMainImage(productCode);
+                        const imgUrl = await findMainImage(productCode);  // 只查找主图片
                         if (imgUrl) {
                             const it = this.items.find(item => item.code === productCode && item.selectedBrandKey === brandKey);
                             if (it && !it.image) {
@@ -2227,9 +2501,9 @@
                     cartHTML += `
                         <div class="cart-item" data-index="${index}" data-code="${item.code}">
                             ${item.image ? `<img src="${item.image}" alt="${item.code}" class="cart-item-image">` : 
-                              `<div class="cart-item-image" style="display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
+                            `<div class="cart-item-image" style="display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
                                 <i class="fas fa-box" style="color: #95a5a6;"></i>
-                              </div>`}
+                            </div>`}
                             <div class="cart-item-info">
                                 <div class="cart-item-name">${item.name}</div>
                                 <div class="cart-item-code">${item.code}</div>
@@ -2331,7 +2605,7 @@
                 }, 1000);
             },
             async loadImageToBuffer(productCode) {
-                const mainImageUrl = await findMainImage(productCode);
+                const mainImageUrl = await findMainImage(productCode);  // 只查找主图片
                 if (!mainImageUrl) return null;
                 
                 try {
@@ -2580,13 +2854,13 @@
         currentCarouselImages: [],
         currentProductCode: ''
     };
-    
+
     // ========== 辅助函数 ==========
     function safeToLower(value) {
         if (value === null || value === undefined) return '';
         return String(value).toLowerCase();
     }
-    
+
     function safeGetValue(obj, keys, defaultValue = '') {
         if (!obj) return defaultValue;
         
@@ -2597,11 +2871,11 @@
         }
         return defaultValue;
     }
-    
+
     function translate(key) {
         return translations[state.currentLanguage][key] || key;
     }
-    
+
     function switchLanguage(lang) {
         if (state.currentLanguage === lang) return;
         
@@ -2612,7 +2886,7 @@
         updateBrandSelect();
         refreshCurrentView();
     }
-    
+
     function updatePageText() {
         // 更新页面文本
         document.getElementById('page-title').textContent = translate('pageTitle');
@@ -2638,7 +2912,7 @@
         document.getElementById('confirm-quantity-text').textContent = translate('confirm');
         document.getElementById('footer-text').textContent = translate('footerText');
     }
-    
+
     function updateFlagIcon() {
         const languageBtn = document.getElementById('language-btn');
         const flagElement = languageBtn.querySelector('.language-flag');
@@ -2651,7 +2925,7 @@
             flagElement.textContent = 'US';
         }
     }
-    
+
     function updateBrandSelect() {
         const brandSelect = document.getElementById('brand-select');
         if (!brandSelect) return;
@@ -2674,7 +2948,7 @@
         
         brandSelect.value = currentValue || 'no_brand';
     }
-    
+
     // 图标映射
     const sheetIcons = {
         '01': 'fas fa-gas-pump',
@@ -2715,7 +2989,7 @@
     const defaultIcon = 'fas fa-table';
     let searchDebounceTimer = null;
     let scrollTimer = null;
-    
+
     // ========== 页面初始化 ==========
     document.addEventListener('DOMContentLoaded', async function() {
         updatePageText();
@@ -2754,7 +3028,7 @@
             preloadVisibleImages();
         }, 500);
     });
-    
+
     // ========== 数据加载和显示函数 ==========
     async function loadJSONData() {
         try {
@@ -2798,7 +3072,7 @@
             });
         }
     }
-    
+
     function processJSONData() {
         state.productsBySheet = {};
         state.allProducts = [];
@@ -2830,7 +3104,7 @@
             }
         });
     }
-    
+
     function updateDataStatus(success, message) {
         const statusElement = document.getElementById('data-status');
         if (statusElement) {
@@ -2848,7 +3122,7 @@
             }
         }
     }
-    
+
     // 初始化树形视图
     function initializeTreeView() {
         const treeList = document.getElementById('category-tree');
@@ -2901,7 +3175,7 @@
             treeList.appendChild(treeItem);
         });
     }
-    
+
     // 退出搜索模式
     function exitSearchMode() {
         state.isSearchMode = false;
@@ -2918,7 +3192,7 @@
             searchDebounceTimer = null;
         }
     }
-    
+
     // 清空搜索
     function clearSearch() {
         exitSearchMode();
@@ -2930,21 +3204,21 @@
             showSheetsList();
         }
     }
-    
+
     // 重置分页状态
     function resetPagination() {
         state.pagination.currentPage = 1;
         state.pagination.loadedItems = 0;
         state.pagination.isLoading = false;
     }
-    
+
     // 更新分页信息
     function updatePaginationInfo(totalItems) {
         state.pagination.totalItems = totalItems;
         state.pagination.totalPages = Math.ceil(totalItems / state.pagination.itemsPerPage);
         state.pagination.currentPage = Math.min(state.pagination.currentPage, state.pagination.totalPages);
     }
-    
+
     // 显示工作表列表页面
     function showSheetsList() {
         const mainContent = document.getElementById('main-content');
@@ -2982,7 +3256,7 @@
             header.classList.remove('active');
         });
     }
-    
+
     // 在所有商品中搜索
     function searchAllProducts(searchTerm) {
         if (!searchTerm || searchTerm.trim().length < 1) {
@@ -3025,13 +3299,16 @@
             });
         });
     }
-    
-    // 按工作表显示商品
+
+    // ========== 关键修复：按工作表显示商品（清理加载状态）==========
     function showProductsBySheet(sheetName) {
         if (state.isSearchMode) {
             showSearchResults();
             return;
         }
+        
+        // 关键修复：在显示新商品列表前清理旧的加载状态
+        cleanupImageLoadingStates();
         
         const products = state.productsBySheet[sheetName] || [];
         updatePaginationInfo(products.length);
@@ -3094,7 +3371,7 @@
             setupProductCardLazyLoading();
         }, 100);
     }
-    
+
     // 更新购物车按钮状态
     function updateCartButtonStates() {
         document.querySelectorAll('.product-card').forEach(card => {
@@ -3114,7 +3391,7 @@
             }
         });
     }
-    
+
     // 创建商品卡片HTML
     function createProductCard(product, index) {
         const productCode = safeGetValue(product, ['CODE', 'code'], `ITEM_${index}`);
@@ -3153,7 +3430,7 @@
             </div>
         `;
     }
-    
+
     // 显示搜索结果
     function showSearchResults() {
         const results = state.filteredProducts;
@@ -3216,7 +3493,7 @@
             setupProductCardLazyLoading();
         }, 100);
     }
-    
+
     // 创建分页控件
     function createPaginationControls() {
         const pagination = state.pagination;
@@ -3267,8 +3544,8 @@
                     <div class="pagination-input-group">
                         <span>${translate('goToPage')}</span>
                         <input type="number" class="pagination-input" id="page-input" 
-                               min="1" max="${pagination.totalPages}" 
-                               value="${pagination.currentPage}">
+                            min="1" max="${pagination.totalPages}" 
+                            value="${pagination.currentPage}">
                         <span>${translate('page')}</span>
                         <button class="pagination-button" id="go-to-page">${translate('jump')}</button>
                     </div>
@@ -3276,7 +3553,7 @@
             </div>
         `;
     }
-    
+
     // 设置分页事件
     function setupPaginationEvents(sheetName) {
         document.getElementById('first-page')?.addEventListener('click', () => {
@@ -3319,7 +3596,7 @@
             }
         });
     }
-    
+
     // 跳转到指定页
     function goToPage(page, sheetName) {
         if (page < 1 || page > state.pagination.totalPages || page === state.pagination.currentPage) {
@@ -3330,7 +3607,7 @@
         showProductsBySheet(sheetName);
         document.querySelector('.products-grid').scrollTop = 0;
     }
-    
+
     // 设置搜索分页事件
     function setupSearchPaginationEvents() {
         document.getElementById('first-page')?.addEventListener('click', () => {
@@ -3373,7 +3650,7 @@
             }
         });
     }
-    
+
     // 跳转到搜索结果的指定页
     function goToPageSearch(page) {
         if (page < 1 || page > state.pagination.totalPages || page === state.pagination.currentPage) {
@@ -3384,9 +3661,12 @@
         showSearchResults();
         document.querySelector('.products-grid').scrollTop = 0;
     }
-    
-    // 显示商品详情页面
+
+    // ========== 关键修复：显示商品详情页面（重置轮播加载状态）==========
     function showProductDetail(product, sheetName) {
+        // 关键修复：重置轮播加载ID
+        currentCarouselLoadId = 0;
+        
         const productCode = safeGetValue(product, ['CODE', 'code'], '未知编码');
         const productName = safeGetValue(product, ['MODEL', 'model', 'NAME', 'name'], '未命名商品');
         const originalCode = safeGetValue(product, ['Original CODE', 'originalCode'], '');
@@ -3493,7 +3773,10 @@
             </div>
         `;
         
-        loadProductCarousel(productCode);
+        // 关键修复：确保在DOM更新后加载轮播图
+        setTimeout(() => {
+            loadProductCarousel(productCode);
+        }, 50);
         
         document.getElementById('back-to-list').addEventListener('click', () => {
             if (state.isSearchMode) {
@@ -3512,7 +3795,7 @@
         state.currentView = 'detail';
         state.selectedProduct = product;
     }
-    
+
     // 添加商品到购物车
     function addToCart(product) {
         state.selectedProductForCart = product;
@@ -3531,7 +3814,7 @@
         
         modal.classList.add('active');
     }
-    
+
     // 确认添加到购物车
     function confirmAddToCart() {
         const quantityInput = document.getElementById('quantity-input');
@@ -3550,7 +3833,7 @@
             state.selectedProductForCart = null;
         }
     }
-    
+
     // 执行搜索功能
     function performSearch() {
         const searchTerm = state.searchTerm.trim();
@@ -3575,7 +3858,7 @@
             header.classList.remove('active');
         });
     }
-    
+
     // 购物车开关功能
     function toggleCartSidebar() {
         const cartSidebar = document.getElementById('cart-sidebar');
@@ -3589,13 +3872,13 @@
             cartOverlay.classList.add('active');
         }
     }
-    
+
     // 关闭购物车
     function closeCartSidebar() {
         document.getElementById('cart-sidebar').classList.remove('active');
         document.getElementById('cart-overlay').classList.remove('active');
     }
-    
+
     function refreshCurrentView() {
         if (state.currentView === 'sheets') {
             showSheetsList();
@@ -3609,7 +3892,7 @@
             showProductDetail(state.selectedProduct, state.selectedSheet);
         }
     }
-    
+
     function activateSheetInTree(sheetName) {
         document.querySelectorAll('.tree-header').forEach(header => {
             header.classList.remove('active');
@@ -3620,7 +3903,7 @@
             sheetHeader.classList.add('active');
         }
     }
-    
+
     // ========== 事件监听器 ==========
     function setupEventListeners() {
         // 语言切换
