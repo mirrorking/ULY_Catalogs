@@ -352,7 +352,7 @@
         .product-card {
             animation: fadeIn 0.5s ease forwards;
             opacity: 0;
-            position: relative;
+            position:relative;
         }
 
         @keyframes fadeIn {
@@ -1240,22 +1240,31 @@
 <body>
     <!-- 简单验证脚本 -->
     <script>
+        // 验证检查脚本
         (function() {
             try {
+                // 尝试从本地存储读取认证状态
                 const token = localStorage.getItem('uly_access_token');
+                
                 if (!token) {
+                    // 未登录，跳转到验证页面
                     window.location.href = 'auth.html';
                     return;
                 }
                 
+                // 验证token有效性
                 const data = JSON.parse(atob(token));
                 const now = Date.now();
                 
                 if (now >= data.expires) {
+                    // token已过期，清除并重定向
                     localStorage.removeItem('uly_access_token');
                     window.location.href = 'auth.html';
                 }
+                
+                // token有效，允许访问
             } catch (error) {
+                // 解析失败，清除无效token并重定向
                 localStorage.removeItem('uly_access_token');
                 window.location.href = 'auth.html';
             }
@@ -1487,7 +1496,8 @@
             'loading': '加载中...',
             'checkingImages': '检查图片...',
             'imageLoadError': '图片加载错误',
-            'checkingImage': '检查图片路径...'
+            'checkingImage': '检查图片路径...',
+            'thumbnail': '缩略图'
         },
         'en-US': {
             'pageTitle': 'Basic Parts Directory - Selection System',
@@ -1560,7 +1570,8 @@
             'loading': 'Loading...',
             'checkingImages': 'Checking images...',
             'imageLoadError': 'Image load error',
-            'checkingImage': 'Checking image path...'
+            'checkingImage': 'Checking image path...',
+            'thumbnail': 'thumbnail'
         }
     };
 
@@ -2066,6 +2077,50 @@
     // 添加一个状态跟踪器
     let currentCarouselLoadId = 0;
 
+    // ========== 关键修复：简化的缩略图加载函数 ==========
+    function loadThumbnails(images, container, productCode, loadId) {
+        container.innerHTML = '';
+        
+        // 为每个缩略图创建独立的加载
+        images.forEach((url, index) => {
+            const thumbnail = document.createElement('div');
+            thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+            thumbnail.dataset.index = index;
+            
+            // 显示加载占位符
+            thumbnail.innerHTML = '<div class="skeleton-placeholder" style="width: 100%; height: 100%;"></div>';
+            
+            // 创建图片对象
+            const img = new Image();
+            img.alt = `${translate('thumbnail')} ${index + 1}`;
+            
+            img.onload = function() {
+                // 清理占位符并添加图片
+                thumbnail.innerHTML = '';
+                thumbnail.appendChild(img);
+                img.classList.add('loaded', 'quick-load');
+            };
+            
+            img.onerror = function() {
+                thumbnail.innerHTML = `
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+                    </div>
+                `;
+            };
+            
+            // 设置图片源，开始加载
+            img.src = url;
+            
+            // 添加点击事件
+            thumbnail.addEventListener('click', function() {
+                switchToImage(index, images, productCode);
+            });
+            
+            container.appendChild(thumbnail);
+        });
+    }
+
     async function loadProductCarousel(productCode) {
         const mainImageContainer = document.getElementById('carousel-main-image');
         const thumbnailContainer = document.getElementById('thumbnail-container');
@@ -2093,12 +2148,10 @@
             state.currentProductCode = productCode;
             
             if (allImages.length > 0) {
-                // 显示第一张图片
+                // ========== 关键修改：主图片立即开始加载 ==========
                 const mainImg = new Image();
-                mainImg.src = allImages[0];
                 mainImg.className = 'detail-image';
                 mainImg.alt = productCode;
-                mainImg.decoding = 'async';
                 
                 mainImg.onload = () => {
                     // 再次检查是否是最新的加载请求
@@ -2119,11 +2172,6 @@
                     mainImg.addEventListener('click', function() {
                         openImageModal(productCode, allImages[0], 0);
                     });
-                    
-                    // 如果有更多图片，加载缩略图
-                    if (allImages.length > 1) {
-                        loadThumbnails(allImages, thumbnailContainer, productCode);
-                    }
                 };
                 
                 mainImg.onerror = () => {
@@ -2133,9 +2181,12 @@
                     showCarouselError(mainImageContainer, productCode);
                 };
                 
-                // 如果图片已经在缓存中
-                if (mainImg.complete) {
-                    mainImg.onload();
+                // 设置图片源，开始加载
+                mainImg.src = allImages[0];
+                
+                // 如果有更多图片，加载缩略图
+                if (allImages.length > 1) {
+                    loadThumbnails(allImages, thumbnailContainer, productCode, loadId);
                 }
             } else {
                 mainImageContainer.innerHTML = `
@@ -2175,50 +2226,6 @@
         loadProductCarousel(productCode);
     }
 
-    // ========== 优化 loadThumbnails 函数 ==========
-    function loadThumbnails(images, container, productCode) {
-        container.innerHTML = '';
-        
-        images.forEach((url, index) => {
-            const thumbnail = document.createElement('div');
-            thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
-            thumbnail.dataset.index = index;
-            
-            const img = new Image();
-            img.src = url;
-            img.alt = `${translate('thumbnail')} ${index + 1}`;
-            img.decoding = 'async';
-            
-            // 添加图片加载状态管理
-            thumbnail.innerHTML = '<div class="skeleton-placeholder" style="width: 100%; height: 100%;"></div>';
-            
-            img.onload = function() {
-                if (thumbnail.contains(thumbnail.querySelector('.skeleton-placeholder'))) {
-                    thumbnail.innerHTML = '';
-                }
-                thumbnail.appendChild(img);
-                img.classList.add('loaded', 'quick-load');
-            };
-            
-            img.onerror = function() {
-                if (thumbnail.contains(thumbnail.querySelector('.skeleton-placeholder'))) {
-                    thumbnail.innerHTML = '';
-                }
-                thumbnail.innerHTML = `
-                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
-                    </div>
-                `;
-            };
-            
-            thumbnail.addEventListener('click', function() {
-                switchToImage(index, images, productCode);
-            });
-            
-            container.appendChild(thumbnail);
-        });
-    }
-
     function switchToImage(index, images, productCode) {
         const mainContainer = document.getElementById('carousel-main-image');
         const url = images[index];
@@ -2227,7 +2234,6 @@
             const newImg = new Image();
             newImg.alt = productCode;
             newImg.className = 'detail-image';
-            newImg.decoding = 'async';
             
             newImg.onload = function() {
                 newImg.classList.add('loaded', 'quick-load');
@@ -2257,10 +2263,6 @@
             };
             
             newImg.src = url;
-            
-            if (newImg.complete) {
-                newImg.onload();
-            }
         }
     }
 
