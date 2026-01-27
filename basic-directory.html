@@ -1596,7 +1596,7 @@
     
     // ========== 新增：缩略图加载验证系统 ==========
     const thumbnailVerification = {
-        enabled: true, // 设置为true开启验证
+        enabled: true,
         log: [],
         timestamps: new Map(),
         
@@ -1671,7 +1671,7 @@
                     console.log(`  加载耗时: ${loadTime}ms`);
                     console.log(`  显示延迟: ${displayDelay}ms`);
                     
-                    if (displayDelay < 50) { // 小于50ms认为是立即显示
+                    if (displayDelay < 50) {
                         console.log(`  ✅ 验证通过: 图片加载完成后立即显示`);
                         immediateCount++;
                     } else {
@@ -1712,7 +1712,6 @@
                 resolve(false);
             };
             
-            // 关键修复：设置更短的超时时间
             timer = setTimeout(() => {
                 img.onload = img.onerror = null;
                 img.src = '';
@@ -1736,10 +1735,8 @@
                 resolve({ cached: false });
             };
             
-            // 如果图片已经在缓存中，onload会立即触发
             img.src = url;
             
-            // 设置一个很小的超时来检测缓存
             setTimeout(() => {
                 if (img.complete && img.naturalWidth > 0) {
                     resolve({ cached: true, width: img.naturalWidth, height: img.naturalHeight });
@@ -1750,7 +1747,6 @@
 
     // ========== 关键修复：显示已缓存的图片 ==========
     function displayCachedImage(imageContainer, imageUrl, productCode, loadId, controller) {
-        // 检查加载是否被取消
         if (controller.signal.aborted || imageContainer.dataset.loadId !== loadId) {
             return;
         }
@@ -1761,23 +1757,19 @@
         img.className = 'lazy-image';
         img.decoding = 'async';
         
-        // 清空容器并添加图片
         imageContainer.innerHTML = '';
         imageContainer.appendChild(img);
         
-        // 立即添加loaded类，因为图片已经在缓存中
         requestAnimationFrame(() => {
             img.classList.add('loaded', 'quick-load');
             imageContainer.dataset.loaded = 'true';
             imageContainer.dataset.loading = 'false';
             
-            // 清理abortController
             delete imageContainer.abortController;
             
             console.log(`商品 ${productCode} 缓存的图片成功显示`);
         });
         
-        // 缓存到 loadedImages
         if (!state.loadedImages[productCode]) {
             state.loadedImages[productCode] = imageUrl;
         }
@@ -1791,7 +1783,6 @@
         if (imageCache.has(cacheKey)) {
             const cached = imageCache.get(cacheKey);
             if (cached.url === null) return null;
-            // 10秒内缓存有效
             if (Date.now() - cached.timestamp < 10000) {
                 return cached.url;
             }
@@ -1846,7 +1837,7 @@
         // 检查缓存
         if (imageCache.has(cacheKey)) {
             const cached = imageCache.get(cacheKey);
-            if (Date.now() - cached.timestamp < 30000) { // 附加图片缓存30秒
+            if (Date.now() - cached.timestamp < 30000) {
                 return cached.images;
             }
         }
@@ -1860,17 +1851,12 @@
             try {
                 const images = [];
                 
-                // 附加图片格式检查顺序：jpg → png → jpeg
                 const formats = ['.jpg', '.png', '.jpeg'];
-                
-                // 关键修复：智能停止检查逻辑
                 let consecutiveFailures = 0;
-                const maxConsecutiveFailures = 1; // 关键修改：连续1个变体没找到就停止（一轮失败就结束）
-                const maxVariants = 8;  // 最多检查到 (8)
+                const maxConsecutiveFailures = 1;
+                const maxVariants = 8;
                 
-                // 只检查带括号的变体图片 (1)-(8)
                 for (let i = 1; i <= maxVariants; i++) {
-                    // 如果连续1个变体都没找到任何格式的图片，立即停止检查
                     if (consecutiveFailures >= maxConsecutiveFailures) {
                         console.log(`商品 ${productCode}: 变体(${i})未找到任何格式图片，停止检查后续变体`);
                         break;
@@ -1878,7 +1864,6 @@
                     
                     let foundVariant = false;
                     
-                    // 检查当前变体的所有格式（按优先级顺序）
                     for (const format of formats) {
                         const url = `Moreimages/${productCode}(${i})${format}`;
                         
@@ -1887,15 +1872,14 @@
                             if (exists) {
                                 images.push(url);
                                 foundVariant = true;
-                                consecutiveFailures = 0; // 重置连续失败计数
-                                break; // 找到一种格式就够了，跳过其他格式检查
+                                consecutiveFailures = 0;
+                                break;
                             }
                         } catch (error) {
                             console.warn(`检查变体图片失败: ${url}`, error);
                         }
                     }
                     
-                    // 如果这个变体没找到任何格式的图片，增加连续失败计数
                     if (!foundVariant) {
                         consecutiveFailures++;
                     }
@@ -1920,113 +1904,47 @@
         return checkPromise;
     }
 
-    // ========== 关键修改：为商品详情页优化的图片查找函数（立即返回Promise）==========
-    async function findImagesForDetailPage(productCode) {
-        const cacheKey = `detail_${productCode}`;
-        
-        // 检查缓存
-        if (imageCache.has(cacheKey)) {
-            const cached = imageCache.get(cacheKey);
-            if (Date.now() - cached.timestamp < 60000) { // 详情页缓存1分钟
-                return cached.images;
-            }
-        }
-        
-        // 防止重复检查
-        if (imageLoadingPromises.has(cacheKey)) {
-            return imageLoadingPromises.get(cacheKey);
-        }
-        
-        const checkPromise = (async () => {
-            try {
-                const allImages = [];
-                
-                // 1. 先获取主图片（主图只有png格式，在images目录）
-                const mainImageUrl = await findMainImage(productCode);
-                if (mainImageUrl) {
-                    allImages.push(mainImageUrl);
-                }
-                
-                // 2. 获取附加图片
-                const additionalImages = await findAdditionalImages(productCode);
-                
-                // 合并图片，确保不重复
-                additionalImages.forEach(img => {
-                    if (!allImages.includes(img)) {
-                        allImages.push(img);
-                    }
-                });
-                
-                const result = { images: allImages, timestamp: Date.now() };
-                imageCache.set(cacheKey, result);
-                
-                return allImages;
-                
-            } catch (error) {
-                console.warn(`查找详情页图片失败: ${productCode}`, error);
-                const result = { images: [], timestamp: Date.now() };
-                imageCache.set(cacheKey, result);
-                return [];
-            } finally {
-                imageLoadingPromises.delete(cacheKey);
-            }
-        })();
-        
-        imageLoadingPromises.set(cacheKey, checkPromise);
-        return checkPromise;
-    }
-
-    // ========== 关键修复：优化的商品卡片图片加载（解决超时问题）==========
+    // ========== 关键修复：优化的商品卡片图片加载 ==========
     async function loadProductCardImage(imageContainer, productCode) {
-        // 关键修复：添加唯一的加载标识符
         const loadId = `card_${productCode}_${Date.now()}`;
         imageContainer.dataset.loadId = loadId;
         imageContainer.dataset.cardCode = productCode;
         
-        // 检查是否正在加载或已加载
         if (imageContainer.dataset.loading === 'true') {
             return;
         }
         
         if (imageContainer.dataset.loaded === 'true') {
-            // 如果已加载，确保显示图片
             const existingImg = imageContainer.querySelector('img.lazy-image');
             if (existingImg && existingImg.complete && existingImg.naturalWidth > 0) {
                 existingImg.classList.add('loaded');
                 return;
             }
-            // 如果标记为已加载但实际没有图片，重置状态
             imageContainer.dataset.loaded = 'false';
         }
         
-        // 设置加载状态
         imageContainer.dataset.loading = 'true';
         imageContainer.dataset.code = productCode;
         
-        // 立即显示骨架屏
         imageContainer.innerHTML = '<div class="skeleton-placeholder"></div>';
         
-        // 使用AbortController来支持取消
         const controller = new AbortController();
         imageContainer.abortController = controller;
         
-        // 定义超时ID
         let timeoutId = null;
         
         try {
-            // 商品卡片只查找主图片
+            // 直接获取主图片，没有预检查阶段
             const mainImageUrl = await findMainImage(productCode);
             
-            // 检查是否被取消
             if (controller.signal.aborted) {
                 return;
             }
             
             if (mainImageUrl) {
-                // 关键修复：先检查图片是否已缓存
+                // 优先检查图片是否已缓存
                 const cachedCheck = await checkIfImageIsCached(mainImageUrl);
                 if (cachedCheck.cached) {
-                    // 图片已缓存，直接显示
                     displayCachedImage(imageContainer, mainImageUrl, productCode, loadId, controller);
                     return;
                 }
@@ -2037,59 +1955,36 @@
                 img.loading = 'lazy';
                 img.className = 'lazy-image';
                 
-                // 关键修复：设置更合理的超时时间（4秒）
-                timeoutId = setTimeout(() => {
-                    // 检查图片是否已经加载完成
-                    if (img.complete && img.naturalWidth > 0) {
-                        // 图片已经加载完成，忽略超时
-                        return;
-                    }
-                    
-                    if (imageContainer.dataset.loading === 'true' && !controller.signal.aborted) {
-                        // 关键修复：不显示错误，只是不设置loaded状态
-                        // 图片可能还在加载中，让浏览器继续加载
-                        console.log(`商品 ${productCode} 图片加载较慢，继续等待...`);
-                    }
-                }, 4000);
-                
+                // 图片加载完成时立即显示
                 img.onload = () => {
-                    // 关键修复：立即清除超时定时器
                     clearTimeout(timeoutId);
                     
-                    // 检查加载是否被取消
                     if (controller.signal.aborted || imageContainer.dataset.loadId !== loadId) {
                         return;
                     }
                     
-                    // 直接显示图片
                     requestAnimationFrame(() => {
                         if (!imageContainer || !imageContainer.parentNode) {
                             return;
                         }
                         
-                        // 清空容器并添加图片
                         imageContainer.innerHTML = '';
                         imageContainer.appendChild(img);
                         
-                        // 添加加载完成类
                         setTimeout(() => {
                             img.classList.add('loaded', 'quick-load');
                         }, 10);
                         
-                        // 更新状态
                         imageContainer.dataset.loaded = 'true';
                         imageContainer.dataset.loading = 'false';
                         
-                        // 清理abortController
                         delete imageContainer.abortController;
                     });
                     
-                    // 缓存到 loadedImages
                     if (!state.loadedImages[productCode]) {
                         state.loadedImages[productCode] = mainImageUrl;
                     }
                     
-                    // 如果购物车中已有该商品，更新条目的 image
                     const cartItem = state.cart.items.find(it => it.code === productCode);
                     if (cartItem && !cartItem.image) {
                         cartItem.image = mainImageUrl;
@@ -2099,10 +1994,8 @@
                 };
                 
                 img.onerror = () => {
-                    // 清除超时定时器
                     clearTimeout(timeoutId);
                     
-                    // 检查加载是否被取消
                     if (controller.signal.aborted || imageContainer.dataset.loadId !== loadId) {
                         return;
                     }
@@ -2112,9 +2005,16 @@
                     delete imageContainer.abortController;
                 };
                 
+                // 直接开始加载图片，没有预检查
                 img.src = mainImageUrl;
                 
-                // 如果图片已经在缓存中
+                // 4秒超时，但让图片继续加载
+                timeoutId = setTimeout(() => {
+                    if (imageContainer.dataset.loading === 'true' && !controller.signal.aborted) {
+                        console.log(`商品 ${productCode} 图片加载较慢，继续等待...`);
+                    }
+                }, 4000);
+                
                 if (img.complete) {
                     if (img.naturalWidth > 0) {
                         img.onload();
@@ -2123,10 +2023,7 @@
                     }
                 }
             } else {
-                // 检查是否被取消
                 if (controller.signal.aborted) return;
-                
-                // 清除可能存在的超时
                 if (timeoutId) clearTimeout(timeoutId);
                 
                 showNoImagePlaceholder(imageContainer);
@@ -2136,10 +2033,8 @@
         } catch (error) {
             console.error(`加载商品图片失败: ${productCode}`, error);
             
-            // 清除超时定时器
             if (timeoutId) clearTimeout(timeoutId);
             
-            // 检查是否被取消
             if (controller.signal.aborted) return;
             
             showNoImagePlaceholder(imageContainer);
@@ -2150,15 +2045,12 @@
 
     // ========== 关键修复：清理图片加载状态 ==========
     function cleanupImageLoadingStates() {
-        // 清理所有图片容器的加载状态
         document.querySelectorAll('.product-image[data-loading="true"]').forEach(container => {
-            // 取消正在进行的加载
             if (container.abortController) {
                 container.abortController.abort();
                 delete container.abortController;
             }
             
-            // 重置状态
             container.dataset.loading = 'false';
             container.dataset.loaded = 'false';
             delete container.dataset.loadId;
@@ -2180,13 +2072,11 @@
         container.dataset.loading = 'false';
     }
 
-    // ========== 关键修复：优化的商品详情页图片加载（复用商品卡片已加载图片）==========
-    // 添加一个状态跟踪器
+    // ========== 关键修复：优化的商品详情页图片加载 ==========
     let currentCarouselLoadId = 0;
 
-    // ========== 新函数：快速加载商品详情主图（复用卡片已加载图片）==========
+    // ========== 新函数：快速加载商品详情主图 ==========
     function quickLoadDetailMainImage(productCode, container, loadId) {
-        // 检查是否已从商品卡片加载过该图片
         if (state.loadedImages[productCode]) {
             const cachedUrl = state.loadedImages[productCode];
             
@@ -2196,17 +2086,14 @@
             img.className = 'detail-image';
             img.decoding = 'async';
             
-            // 清空容器并添加图片
             container.innerHTML = '';
             container.appendChild(img);
             
-            // 立即显示
             requestAnimationFrame(() => {
                 if (loadId !== currentCarouselLoadId) return;
                 img.classList.add('loaded', 'quick-load');
             });
             
-            // 添加点击放大功能
             img.addEventListener('click', function() {
                 openImageModal(productCode, cachedUrl, 0);
             });
@@ -2223,10 +2110,8 @@
         const thumbnailContainer = document.getElementById('thumbnail-container');
         if (!thumbnailContainer) return;
         
-        // 清空容器
         thumbnailContainer.innerHTML = '';
         
-        // 创建4个骨架屏缩略图（预估数量，实际数量可能不同）
         for (let i = 0; i < 4; i++) {
             const thumbnail = document.createElement('div');
             thumbnail.className = `thumbnail ${i === 0 ? 'active' : ''}`;
@@ -2234,39 +2119,30 @@
             thumbnail.dataset.skeleton = 'true';
             thumbnail.dataset.loading = 'false';
             
-            // 显示骨架屏占位符
             thumbnail.innerHTML = '<div class="skeleton-placeholder" style="width: 100%; height: 100%;"></div>';
             
-            // 添加到容器
             thumbnailContainer.appendChild(thumbnail);
         }
     }
 
-    // ========== 关键修改：异步查找并加载详情页图片（立即显示缩略图）==========
+    // ========== 关键修改：异步查找并加载详情页图片 ==========
     async function asyncLoadDetailImages(productCode, loadId) {
         try {
-            // 启动验证系统
             thumbnailVerification.startVerification(productCode);
             
-            // 先尝试快速加载已缓存的图片
             const mainContainer = document.getElementById('carousel-main-image');
             const quickLoadResult = quickLoadDetailMainImage(productCode, mainContainer, loadId);
             
-            // ========== 关键修复：立即初始化缩略图骨架屏 ==========
             initializeThumbnailSkeletons();
             
-            // ========== 关键修改：异步查找图片，但立即开始处理 ==========
-            // 先查找主图片（这个很快，因为大部分已经在缓存中）
+            // 异步查找图片，立即开始加载
             const mainImagePromise = findMainImage(productCode);
-            
-            // 同时开始查找附加图片
             const additionalImagesPromise = findAdditionalImages(productCode);
             
             // 处理主图片
             mainImagePromise.then(mainImageUrl => {
                 if (loadId !== currentCarouselLoadId) return;
                 
-                // 如果快速加载失败，则使用查找到的主图
                 if (!quickLoadResult.success && mainImageUrl) {
                     const mainImg = new Image();
                     mainImg.className = 'detail-image';
@@ -2278,9 +2154,7 @@
                         if (loadId !== currentCarouselLoadId) return;
                         mainImg.classList.add('loaded', 'quick-load');
                         
-                        // 主图加载完成后，设置点击事件（需要等所有图片查找完成）
                         mainImg.addEventListener('click', function() {
-                            // 异步获取所有图片
                             Promise.all([mainImagePromise, additionalImagesPromise]).then(([mainUrl, additionalUrls]) => {
                                 const allImages = mainUrl ? [mainUrl, ...additionalUrls] : additionalUrls;
                                 if (allImages.length > 0) {
@@ -2300,36 +2174,30 @@
             additionalImagesPromise.then(additionalImages => {
                 if (loadId !== currentCarouselLoadId) return;
                 
-                // 获取主图片（可能已经缓存）
                 mainImagePromise.then(mainImageUrl => {
                     if (loadId !== currentCarouselLoadId) return;
                     
                     const allImages = mainImageUrl ? [mainImageUrl, ...additionalImages] : additionalImages;
                     
-                    // 更新状态
                     state.currentCarouselImages = allImages;
                     state.currentProductCode = productCode;
                     
                     if (allImages.length > 0) {
-                        // 异步加载缩略图（已经有骨架屏了，现在用实际图片替换）
                         if (allImages.length > 1) {
                             loadThumbnailsAsync(allImages, productCode, loadId);
                         } else {
-                            // 只有一张图片，移除骨架屏
                             const thumbnailContainer = document.getElementById('thumbnail-container');
                             if (thumbnailContainer) {
                                 thumbnailContainer.innerHTML = '';
                             }
                         }
                     } else {
-                        // 没有图片的情况
                         const thumbnailContainer = document.getElementById('thumbnail-container');
                         if (thumbnailContainer) {
                             thumbnailContainer.innerHTML = '';
                         }
                     }
                     
-                    // 延迟执行验证分析
                     setTimeout(() => {
                         thumbnailVerification.verifyImmediateDisplay();
                     }, 3000);
@@ -2338,7 +2206,6 @@
                 console.error('加载附加图片失败:', error);
                 if (loadId !== currentCarouselLoadId) return;
                 
-                // 移除骨架屏
                 const thumbnailContainer = document.getElementById('thumbnail-container');
                 if (thumbnailContainer) {
                     thumbnailContainer.innerHTML = '';
@@ -2352,19 +2219,16 @@
         }
     }
 
-    // ========== 关键修改：缩略图异步独立加载（单个加载完就立即显示）==========
+    // ========== 关键修改：缩略图异步独立加载 ==========
     function loadThumbnailsAsync(images, productCode, loadId) {
         const thumbnailContainer = document.getElementById('thumbnail-container');
         if (!thumbnailContainer) return;
         
-        // 获取现有的骨架屏数量
         const skeletonCount = thumbnailContainer.querySelectorAll('.thumbnail[data-skeleton="true"]').length;
         
-        // 如果骨架屏数量不够，先清空
         if (skeletonCount < images.length) {
             thumbnailContainer.innerHTML = '';
             
-            // 创建足够的骨架屏
             for (let i = 0; i < images.length; i++) {
                 const thumbnail = document.createElement('div');
                 thumbnail.className = `thumbnail ${i === 0 ? 'active' : ''}`;
@@ -2373,33 +2237,27 @@
                 thumbnail.dataset.loading = 'false';
                 thumbnail.dataset.url = images[i];
                 
-                // 显示骨架屏占位符
                 thumbnail.innerHTML = '<div class="skeleton-placeholder" style="width: 100%; height: 100%;"></div>';
                 
-                // 添加到容器
                 thumbnailContainer.appendChild(thumbnail);
                 
-                // 立即开始异步加载这个缩略图（但每个有延迟）
                 setTimeout(() => {
                     if (loadId !== currentCarouselLoadId) return;
                     loadSingleThumbnailAsync(thumbnail, images[i], i, productCode, loadId);
                 }, i * 100);
             }
         } else {
-            // 骨架屏数量足够，直接替换
             const thumbnails = thumbnailContainer.querySelectorAll('.thumbnail');
             thumbnails.forEach((thumbnail, index) => {
                 if (index < images.length) {
                     thumbnail.dataset.skeleton = 'false';
                     thumbnail.dataset.url = images[index];
                     
-                    // 立即开始异步加载这个缩略图（但每个有延迟）
                     setTimeout(() => {
                         if (loadId !== currentCarouselLoadId) return;
                         loadSingleThumbnailAsync(thumbnail, images[index], index, productCode, loadId);
                     }, index * 100);
                 } else {
-                    // 多余的骨架屏移除
                     thumbnail.remove();
                 }
             });
@@ -2408,15 +2266,12 @@
 
     // ========== 关键修复：单个缩略图立即显示版本 ==========
     function loadSingleThumbnailAsync(thumbnail, url, index, productCode, loadId) {
-        // 记录开始加载时间
         const loadStartTime = Date.now();
         thumbnail.dataset.loadStart = loadStartTime;
         thumbnail.dataset.loading = 'true';
         
-        // 记录验证日志
         thumbnailVerification.logEvent(index, '开始加载', url, loadStartTime);
         
-        // 检查是否还是当前的加载任务
         if (loadId !== currentCarouselLoadId) {
             return;
         }
@@ -2426,9 +2281,7 @@
         img.decoding = 'async';
         img.loading = 'eager';
         
-        // 监听加载完成事件
         img.addEventListener('load', function onImageLoad() {
-            // 记录加载完成时间
             const loadEndTime = Date.now();
             const loadDuration = loadEndTime - loadStartTime;
             thumbnail.dataset.loadEnd = loadEndTime;
@@ -2436,27 +2289,22 @@
             
             thumbnailVerification.logEvent(index, `加载完成 (耗时: ${loadDuration}ms)`, url, loadEndTime);
             
-            // 再次检查是否还是当前的加载任务
             if (loadId !== currentCarouselLoadId) {
                 return;
             }
             
-            // 关键修复：立即显示图片，不要延迟动画
             const displayStartTime = Date.now();
             
-            // 1. 立即移除骨架屏（不要等待动画）
             const placeholder = thumbnail.querySelector('.skeleton-placeholder');
             if (placeholder && placeholder.parentNode === thumbnail) {
                 placeholder.style.opacity = '0';
-                placeholder.style.transition = 'opacity 100ms ease'; // 改为快速淡出
+                placeholder.style.transition = 'opacity 100ms ease';
                 
-                // 立即开始淡出动画，不等待
                 requestAnimationFrame(() => {
                     placeholder.style.opacity = '0';
                 });
             }
             
-            // 2. 立即设置图片并显示
             thumbnail.style.position = 'relative';
             img.style.width = '100%';
             img.style.height = '100%';
@@ -2465,27 +2313,21 @@
             img.style.top = '0';
             img.style.left = '0';
             img.style.opacity = '0';
-            img.style.transition = 'opacity 150ms ease'; // 快速淡入
+            img.style.transition = 'opacity 150ms ease';
             
-            // 添加到DOM
             thumbnail.appendChild(img);
             
-            // 3. 立即触发淡入动画
             requestAnimationFrame(() => {
-                // 先移除骨架屏
                 if (placeholder && placeholder.parentNode === thumbnail) {
                     placeholder.remove();
                 }
                 
-                // 然后淡入图片
                 img.style.opacity = '1';
                 img.classList.add('loaded');
                 
-                // 记录显示完成时间
                 const displayEndTime = Date.now();
                 const displayDelay = displayEndTime - loadEndTime;
                 
-                // 验证是否立即显示
                 if (displayDelay < 50) {
                     thumbnailVerification.logEvent(index, `✅ 立即显示 (延迟: ${displayDelay}ms)`, url, displayEndTime);
                 } else {
@@ -2495,43 +2337,36 @@
                 thumbnail.dataset.displayed = 'true';
                 thumbnail.dataset.displayTime = displayEndTime;
                 
-                // 150ms后移除过渡效果，避免影响后续交互
                 setTimeout(() => {
                     img.style.transition = 'none';
                     img.style.position = 'static';
                 }, 150);
             });
             
-            // 添加点击事件
             thumbnail.addEventListener('click', function onThumbnailClick() {
                 if (loadId !== currentCarouselLoadId) return;
                 switchToImage(index, state.currentCarouselImages, productCode);
             });
             
-            // 移除事件监听器，避免重复触发
             img.removeEventListener('load', onImageLoad);
         });
         
         img.addEventListener('error', function onImageError() {
-            // 记录加载失败时间
             const errorTime = Date.now();
             thumbnail.dataset.loading = 'false';
             thumbnail.dataset.error = 'true';
             
             thumbnailVerification.logEvent(index, '加载失败', url, errorTime);
             
-            // 检查是否还是当前的加载任务
             if (loadId !== currentCarouselLoadId) {
                 return;
             }
             
-            // 立即移除骨架屏
             const placeholder = thumbnail.querySelector('.skeleton-placeholder');
             if (placeholder && placeholder.parentNode === thumbnail) {
                 placeholder.remove();
             }
             
-            // 显示错误状态
             thumbnail.innerHTML = `
                 <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f8f9fa;">
                     <div style="text-align: center; padding: 5px;">
@@ -2541,21 +2376,16 @@
                 </div>
             `;
             
-            // 更新数据属性
             thumbnail.dataset.skeleton = 'false';
-            
-            // 移除事件监听器
             img.removeEventListener('error', onImageError);
         });
         
-        // 开始加载图片
         setTimeout(() => {
             if (loadId !== currentCarouselLoadId) {
                 return;
             }
             img.src = url;
             
-            // 如果图片已经在缓存中，立即触发load事件
             if (img.complete) {
                 if (img.naturalWidth > 0) {
                     img.dispatchEvent(new Event('load'));
@@ -2568,18 +2398,14 @@
 
     // ========== 关键修复：优化的商品详情页图片加载函数 ==========
     async function loadProductCarousel(productCode) {
-        // 生成当前加载的唯一ID
         const loadId = ++currentCarouselLoadId;
         
-        // 清理旧的加载状态
         const mainImageContainer = document.getElementById('carousel-main-image');
         
         if (mainImageContainer) {
             mainImageContainer.innerHTML = '<div class="skeleton-placeholder"></div>';
         }
         
-        // ========== 关键修复：立即开始异步加载详情页图片 ==========
-        // 这里不会等待，会立即显示骨架屏并开始加载
         asyncLoadDetailImages(productCode, loadId);
     }
 
@@ -2596,16 +2422,14 @@
     }
 
     async function retryLoadCarousel(productCode) {
-        // 清除缓存
         imageCache.delete(`detail_${productCode}`);
         imageCache.delete(`additional_${productCode}`);
         imageCache.delete(`main_${productCode}`);
         
-        // 重新加载
         loadProductCarousel(productCode);
     }
 
-    // ========== 修改：切换图片函数 ==========
+    // ========== 切换图片函数 ==========
     function switchToImage(index, images, productCode) {
         const mainContainer = document.getElementById('carousel-main-image');
         const url = images[index];
@@ -2625,7 +2449,6 @@
                     openImageModal(productCode, url, index);
                 });
                 
-                // 更新缩略图选中状态
                 document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
                     thumb.classList.toggle('active', i === index);
                 });
@@ -2645,7 +2468,6 @@
             
             newImg.src = url;
             
-            // 如果图片已经在缓存中
             if (newImg.complete) {
                 newImg.onload();
             }
@@ -2685,7 +2507,6 @@
             const rect = container.getBoundingClientRect();
             const productCode = container.dataset.code;
             
-            // 预加载可见区域附近的图片（上下200px）
             if (rect.top < viewportHeight + 200 && rect.bottom > -200) {
                 loadProductCardImage(container, productCode);
             }
@@ -2694,7 +2515,6 @@
 
     // 设置商品卡片图片懒加载
     function setupProductCardLazyLoading() {
-        // 关键修复：在重新设置懒加载前，清理旧的加载状态
         cleanupImageLoadingStates();
         
         if (lazyImageObserver) {
@@ -2705,10 +2525,8 @@
         
         const imageContainers = document.querySelectorAll('.product-image:not([data-loaded])');
         imageContainers.forEach(container => {
-            // 关键修复：确保容器有正确的productCode
             const productCode = container.dataset.code;
             if (!productCode) {
-                // 尝试从父元素获取productCode
                 const productCard = container.closest('.product-card');
                 if (productCard && productCard.dataset.code) {
                     container.dataset.code = productCard.dataset.code;
@@ -3398,10 +3216,8 @@
             showSheetsList();
         }
         
-        // 初始化懒加载
         initializeLazyLoading();
         
-        // 添加滚动预加载
         window.addEventListener('scroll', () => {
             clearTimeout(scrollTimer);
             scrollTimer = setTimeout(() => {
@@ -3409,7 +3225,6 @@
             }, 100);
         });
         
-        // 页面加载完成后预加载首屏图片
         setTimeout(() => {
             preloadVisibleImages();
         }, 500);
@@ -3686,14 +3501,13 @@
         });
     }
 
-    // ========== 关键修复：按工作表显示商品（清理加载状态）==========
+    // ========== 关键修复：按工作表显示商品 ==========
     function showProductsBySheet(sheetName) {
         if (state.isSearchMode) {
             showSearchResults();
             return;
         }
         
-        // 关键修复：在显示新商品列表前清理旧的加载状态
         cleanupImageLoadingStates();
         
         const products = state.productsBySheet[sheetName] || [];
@@ -4048,9 +3862,8 @@
         document.querySelector('.products-grid').scrollTop = 0;
     }
 
-    // ========== 关键修改：显示商品详情页面（立即显示缩略图骨架屏）==========
+    // ========== 显示商品详情页面 ==========
     function showProductDetail(product, sheetName) {
-        // 关键修复：重置轮播加载ID
         currentCarouselLoadId = 0;
         
         const productCode = safeGetValue(product, ['CODE', 'code'], '未知编码');
@@ -4100,12 +3913,10 @@
                     <div class="detail-image-section" id="detail-image-section">
                         <div class="image-carousel">
                             <div class="carousel-main-image" id="carousel-main-image">
-                                <!-- 主图会立即加载（复用商品卡片已加载图片） -->
                             </div>
                             
                             <div class="thumbnail-container" id="thumbnail-container"></div>
                             
-                            <!-- 移除切换按钮 -->
                             <div class="carousel-indicators" id="carousel-indicators"></div>
                             
                             <div class="carousel-info" id="carousel-info" style="display: none;">
@@ -4150,7 +3961,6 @@
             </div>
         `;
         
-        // 关键修复：立即开始加载详情页图片（会立即显示缩略图骨架屏）
         setTimeout(() => {
             loadProductCarousel(productCode);
         }, 50);
