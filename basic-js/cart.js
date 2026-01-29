@@ -247,26 +247,26 @@ const cartState = {
             alert(window.translations.translate('cartEmpty'));
             return;
         }
-        
+
         const exportBtn = document.getElementById('export-cart');
         const originalText = exportBtn.innerHTML;
         exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在生成Excel...';
         exportBtn.disabled = true;
-        
+
         try {
             const workbook = new ExcelJS.Workbook();
             workbook.creator = '配件选购系统';
             workbook.lastModifiedBy = '配件选购系统';
             workbook.created = new Date();
             workbook.modified = new Date();
-            
+
             const worksheet = workbook.addWorksheet(
                 window.utils.state.currentLanguage === 'zh-CN' ? '订购清单' : 'Order List'
             );
-            
+
             worksheet.columns = [
                 { header: '序号', key: 'serial', width: 8 },
-                { header: '图片', key: 'image', width: 40 },
+                { header: '图片', key: 'image', width: 25 },
                 { header: '商品编码', key: 'code', width: 20 },
                 { header: '原始编码', key: 'originalCode', width: 20 },
                 { header: '商品名称', key: 'name', width: 30 },
@@ -274,19 +274,14 @@ const cartState = {
                 { header: '品牌', key: 'brand', width: 15 },
                 { header: '数量', key: 'quantity', width: 10 }
             ];
-            
-            worksheet.getColumn(2).height = 120;
-            
+
+            // 表头样式
             const headerRow = worksheet.getRow(1);
             headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
-            headerRow.fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: '3498DB' }
-            };
+            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '3498DB' } };
             headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
             headerRow.height = 25;
-            
+
             headerRow.eachCell((cell) => {
                 cell.border = {
                     top: { style: 'thin', color: { argb: '000000' } },
@@ -295,11 +290,12 @@ const cartState = {
                     right: { style: 'thin', color: { argb: '000000' } }
                 };
             });
-            
+
+            // 数据行
             for (let i = 0; i < this.items.length; i++) {
                 const item = this.items[i];
                 const rowNumber = i + 2;
-                
+
                 const row = worksheet.addRow({
                     serial: i + 1,
                     image: '',
@@ -310,9 +306,9 @@ const cartState = {
                     brand: item.selectedBrand || window.translations.translate('noBrand'),
                     quantity: item.quantity || 0
                 });
-                
-                row.height = 75;
-                
+
+                row.height = 120; // 放大行高，适合图片
+
                 for (let col = 1; col <= 8; col++) {
                     const cell = row.getCell(col);
                     cell.border = {
@@ -321,139 +317,86 @@ const cartState = {
                         bottom: { style: 'thin', color: { argb: 'DDDDDD' } },
                         right: { style: 'thin', color: { argb: 'DDDDDD' } }
                     };
-                    
-                    if (col === 1 || col === 8) {
-                        cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                    } else if (col === 2) {
+
+                    // 商品编码列换行
+                    if (col === 5) {
+                        cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+                    } else if ([1, 2, 8].includes(col)) {
                         cell.alignment = { vertical: 'middle', horizontal: 'center' };
                     } else {
                         cell.alignment = { vertical: 'middle', horizontal: 'left' };
                     }
                 }
-            }
-            
-            for (let i = 0; i < this.items.length; i++) {
-                const item = this.items[i];
-                const rowNumber = i + 2;
-                const row = worksheet.getRow(rowNumber);
-                
-                try {
-                    const imageBuffer = await this.loadImageToBuffer(item.code);
-                    if (imageBuffer) {
-                        const imageId = workbook.addImage({
-                            buffer: imageBuffer,
-                            extension: 'png'
-                        });
-                        
-                        const colIndex = 1;
-                        const rowIndex = rowNumber - 1;
-                        
+
+                // 图片插入，自动等比例缩放
+                if (item.image) {
+                    try {
+                        const response = await fetch(item.image);
+                        const blob = await response.blob();
+                        const buffer = await blob.arrayBuffer();
+
+                        const imageId = workbook.addImage({ buffer, extension: 'png' });
+
+                        const colWidth = worksheet.getColumn(2).width * 7;
+                        const rowHeight = row.height * 1.33;
+
+                        const imgBlob = new Blob([buffer], { type: 'image/png' });
+                        const bitmap = await createImageBitmap(imgBlob);
+
+                        const scale = Math.min((colWidth * 0.9) / bitmap.width, (rowHeight * 0.9) / bitmap.height);
+
+                        const width = bitmap.width * scale;
+                        const height = bitmap.height * scale;
+
                         worksheet.addImage(imageId, {
-                            tl: { 
-                                col: colIndex, 
-                                row: rowIndex,
-                                offset: 0
+                            tl: {
+                                col: 1 + (colWidth - width) / colWidth / 2,
+                                row: rowNumber - 1 + (rowHeight - height) / rowHeight / 2
                             },
-                            br: { 
-                                col: colIndex + 1,
-                                row: rowIndex + 1,
-                                offset: 0
-                            },
-                            editAs: 'oneCell'
+                            ext: { width, height }
                         });
-                        
-                        worksheet.getColumn(colIndex + 1).width = 12;
-                        
-                    } else {
-                        row.getCell(2).value = window.translations.translate('noImage');
-                        row.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
+
+                    } catch (e) {
+                        row.getCell(2).value = window.translations.translate('imageNotFound');
                     }
-                } catch (error) {
-                    console.warn(`无法加载图片: ${item.code}`, error);
-                    row.getCell(2).value = window.translations.translate('imageNotFound');
-                    row.getCell(2).alignment = { vertical: 'middle', horizontal: 'center' };
+                } else {
+                    row.getCell(2).value = window.translations.translate('noImage');
                 }
             }
-            
+
+            // 汇总信息
             const summaryStartRow = this.items.length + 3;
-            
-            const summaryTitleCell = worksheet.getCell(`A${summaryStartRow}`);
-            summaryTitleCell.value = '汇总信息';
-            summaryTitleCell.font = { bold: true, color: { argb: '3498DB' }, size: 12 };
-            summaryTitleCell.border = {
-                top: { style: 'thin', color: { argb: '3498DB' } },
-                left: { style: 'thin', color: { argb: '3498DB' } },
-                bottom: { style: 'thin', color: { argb: '3498DB' } },
-                right: { style: 'thin', color: { argb: '3498DB' } }
-            };
-            
+
+            worksheet.getCell(`A${summaryStartRow}`).value = '汇总信息';
+            worksheet.getCell(`A${summaryStartRow}`).font = { bold: true, color: { argb: '3498DB' }, size: 12 };
+
             worksheet.getCell(`A${summaryStartRow + 1}`).value = '商品种类';
             worksheet.getCell(`B${summaryStartRow + 1}`).value = this.items.length;
-            
+
             worksheet.getCell(`A${summaryStartRow + 2}`).value = '总数量';
             worksheet.getCell(`B${summaryStartRow + 2}`).value = this.getTotalItems();
-            
+
             const currentDate = new Date();
-            const dateFormatter = window.utils.state.currentLanguage === 'zh-CN' ? 
-                currentDate.toLocaleDateString('zh-CN') : 
-                currentDate.toLocaleDateString('en-US');
-            const timeFormatter = window.utils.state.currentLanguage === 'zh-CN' ?
-                currentDate.toLocaleTimeString('zh-CN') :
-                currentDate.toLocaleTimeString('en-US');
-            
             worksheet.getCell(`A${summaryStartRow + 3}`).value = '导出日期';
-            worksheet.getCell(`B${summaryStartRow + 3}`).value = dateFormatter;
-            
+            worksheet.getCell(`B${summaryStartRow + 3}`).value = currentDate.toLocaleDateString();
+
             worksheet.getCell(`A${summaryStartRow + 4}`).value = '导出时间';
-            worksheet.getCell(`B${summaryStartRow + 4}`).value = timeFormatter;
-            
-            for (let i = summaryStartRow; i <= summaryStartRow + 4; i++) {
-                const row = worksheet.getRow(i);
-                row.height = 20;
-                
-                const cellA = row.getCell(1);
-                cellA.font = { bold: true };
-                cellA.border = {
-                    top: { style: 'thin', color: { argb: 'DDDDDD' } },
-                    left: { style: 'thin', color: { argb: 'DDDDDD' } },
-                    bottom: { style: 'thin', color: { argb: 'DDDDDD' } },
-                    right: { style: 'thin', color: { argb: 'DDDDDD' } }
-                };
-                
-                for (let col = 2; col <= 8; col++) {
-                    const cell = row.getCell(col);
-                    cell.border = {
-                        top: { style: 'thin', color: { argb: 'DDDDDD' } },
-                        left: { style: 'thin', color: { argb: 'DDDDDD' } },
-                        bottom: { style: 'thin', color: { argb: 'DDDDDD' } },
-                        right: { style: 'thin', color: { argb: 'DDDDDD' } }
-                    };
-                }
-            }
-            
-            const fileName = window.utils.state.currentLanguage === 'zh-CN' ? 
-                `订购清单_${new Date().toISOString().slice(0,10)}.xlsx` :
-                `Order_List_${new Date().toISOString().slice(0,10)}.xlsx`;
-            
+            worksheet.getCell(`B${summaryStartRow + 4}`).value = currentDate.toLocaleTimeString();
+
+            // 导出 Excel
             const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { 
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-            });
-            
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = fileName;
+            link.download = window.utils.state.currentLanguage === 'zh-CN' ? `订购清单_${new Date().toISOString().slice(0,10)}.xlsx` : `Order_List_${new Date().toISOString().slice(0,10)}.xlsx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            setTimeout(() => {
-                window.URL.revokeObjectURL(url);
-            }, 100);
-            
+            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
             this.showNotification(window.translations.translate('exportSuccess'));
-            
+
         } catch (error) {
             console.error('导出Excel失败:', error);
             alert('导出失败: ' + error.message);
