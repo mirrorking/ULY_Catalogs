@@ -909,6 +909,24 @@ async function loadLazyImage(imageContainer, productCode) {
     }
 }
 
+async function asyncPool(limit, tasks) {
+    const results = [];
+    const executing = [];
+
+    for (const task of tasks) {
+        const p = Promise.resolve().then(() => task());
+        results.push(p);
+
+        if (limit <= tasks.length) {
+            const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+            executing.push(e);
+            if (executing.length >= limit) {
+                await Promise.race(executing);
+            }
+        }
+    }
+    return Promise.all(results);
+}
 // 显示懒加载图片
 function showLazyImage(imageContainer, imageUrl, productCode) {
     // 如果已经显示过了，跳过
@@ -2064,15 +2082,14 @@ function displayPartDetailImage(imageSection, productCode, imageUrl) {
     translatePage();
 }
 
-// 加载更多图片
+// 加载更多图片（单张加载即显示缩略图）
 async function loadMoreImages(productCode) {
     const thumbsContainer = document.getElementById('detail-thumbnails');
     if (!thumbsContainer) return;
-    
-    // 清空缩略图容器（不再创建"更多图片"区域）
+
     thumbsContainer.innerHTML = '';
 
-    // 首先添加主图到缩略图列表
+    /* ========= 主图缩略图 ========= */
     const mainImageUrl = `images/${productCode}.png`;
     const mainThumb = document.createElement('div');
     mainThumb.className = 'thumb-item active';
@@ -2088,54 +2105,70 @@ async function loadMoreImages(productCode) {
     mainImgEl.onerror = () => mainImgEl.classList.add('error');
 
     mainThumb.appendChild(mainImgEl);
-
-    mainThumb.addEventListener('click', function() {
-        // 切换主图
-        displayPartDetailImage(document.getElementById('detail-image-section'), productCode, this.dataset.url);
-        // 高亮当前缩略
-        document.querySelectorAll('#detail-thumbnails .thumb-item').forEach(t => t.classList.remove('active'));
+    mainThumb.addEventListener('click', function () {
+        displayPartDetailImage(
+            document.getElementById('detail-image-section'),
+            productCode,
+            this.dataset.url
+        );
+        document.querySelectorAll('#detail-thumbnails .thumb-item')
+            .forEach(t => t.classList.remove('active'));
         this.classList.add('active');
     });
 
     thumbsContainer.appendChild(mainThumb);
 
-    // 从Moreimages文件夹中读取更多图片
-    const moreImages = await getMoreImages(productCode);
+    /* ========= 更多图片：边检测，边显示 ========= */
+    const extensions = ['jpg', 'png', 'jpeg'];
+    let imageIndex = 1;
 
-    // 异步加载缩略图（分批/延迟）以减少阻塞
-    for (let i = 0; i < moreImages.length; i++) {
-        const image = moreImages[i];
+    while (true) {
+        let found = false;
 
-        // 小延时，避免一次性发起大量请求
-        await new Promise(res => setTimeout(res, 50));
+        for (const ext of extensions) {
+            const imageUrl = `Moreimages/${productCode}(${imageIndex}).${ext}`;
+            const exists = await checkImageExists(imageUrl);
 
-        const thumb = document.createElement('div');
-        thumb.className = 'thumb-item';
-        thumb.dataset.url = image.url;
+            if (exists) {
+                found = true;
 
-        const imgEl = document.createElement('img');
-        imgEl.alt = `图片 ${i + 1}`;
-        imgEl.className = 'thumb-img';
-        imgEl.src = image.url;
+                const thumb = document.createElement('div');
+                thumb.className = 'thumb-item';
+                thumb.dataset.url = imageUrl;
 
-        imgEl.onload = () => imgEl.classList.add('loaded');
-        imgEl.onerror = () => imgEl.classList.add('error');
+                const imgEl = document.createElement('img');
+                imgEl.alt = `图片 ${imageIndex}`;
+                imgEl.className = 'thumb-img';
 
-        thumb.appendChild(imgEl);
+                // ⚠️ 关键：一旦图片加载完成，立刻显示
+                imgEl.onload = () => imgEl.classList.add('loaded');
+                imgEl.onerror = () => imgEl.classList.add('error');
 
-        thumb.addEventListener('click', function() {
-            // 切换主图
-            displayPartDetailImage(document.getElementById('detail-image-section'), productCode, this.dataset.url);
-            // 高亮当前缩略
-            document.querySelectorAll('#detail-thumbnails .thumb-item').forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-        });
+                imgEl.src = imageUrl;
 
-        thumbsContainer.appendChild(thumb);
+                thumb.appendChild(imgEl);
+
+                thumb.addEventListener('click', function () {
+                    displayPartDetailImage(
+                        document.getElementById('detail-image-section'),
+                        productCode,
+                        this.dataset.url
+                    );
+                    document.querySelectorAll('#detail-thumbnails .thumb-item')
+                        .forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+
+                thumbsContainer.appendChild(thumb);
+                break;
+            }
+        }
+
+        if (!found) break;
+        imageIndex++;
     }
-
-    // 如果没有更多图片，不显示额外提示，仅保持主图缩略图
 }
+
 
 // 获取更多图片
 async function getMoreImages(productCode) {
