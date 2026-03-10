@@ -1,0 +1,162 @@
+[
+  {
+    "name": "STL MS210 MS230 MS250 021 023 025 WALBRO WT-215-1 WT-286 OEM 1123 120 0603",
+    "category": "CARBURETOR",
+    "code": "010121",
+    "oldCode": "STCS0103",
+    "brand": "WALBRO",
+    "specs": "WT-215-1 WT-286"
+  },
+  {
+    "name": "STL MS170 MS180 MS210 MS230 MS250 MS260 5200 WALBRO TYPE",
+    "category": "CARBURETOR REPAIR KIT",
+    "code": "240058",
+    "oldCode": "WBRP01",
+    "brand": "WALBRO",
+    "specs": ""
+  },
+  {
+    "name": "STL MS210 MS230 MS250 021 023 025 ZAMA C1Q-S76 TYPE OEM 1123 120 0603",
+    "category": "CARBURETOR",
+    "code": "010123",
+    "oldCode": "STCS0104",
+    "brand": "ZAMA",
+    "specs": "C1Q-S76"
+  },
+  {
+    "name": "STL MS230C MS250C 021 023 025 ZAMA",
+    "category": "CARBURETOR",
+    "code": "010124",
+    "oldCode": "STCS0104-1",
+    "brand": "ZAMA",
+    "specs": ""
+  },
+  {
+    "name": "ZAMA RB-105 FITS MS210 MS230 MS250 CARBURETOR",
+    "category": "CARBURETOR REPAIR KIT",
+    "code": "240218",
+    "oldCode": "ZMRP60",
+    "brand": "ZAMA",
+    "specs": "RB-105"
+  },
+  {
+    "name": "STL 021 023 025 MS210 MS230 MS250 OEM # 1123 120 1613",
+    "category": "AIR FILTER",
+    "code": "250006",
+    "oldCode": "STAF03",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL MS250 42.5MM CYLINDER WITH PAN",
+    "category": "CYLINDER KIT",
+    "code": "030049",
+    "oldCode": "STCS0304-1",
+    "brand": "STIHL",
+    "specs": "42.5MM WITH PAN"
+  },
+  {
+    "name": "STIHL 021 MS210 023 MS230 025 MS250 OEM: 1123-080-2104",
+    "category": "RECOIL STARTER",
+    "code": "040104",
+    "oldCode": "STCS0401",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL 017 018 MS170 MS180 MS210 MS230 MS250 OEM 1123 640 7105",
+    "category": "WORM",
+    "code": "060054",
+    "oldCode": "STCS0601G",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "FUEL FILTER 064 065 MS180 MS210 MS230 MS250 MS381 023 024 025 026 029 034 036 038 039 044 046 066 088",
+    "category": "FUEL FILTER",
+    "code": "260126",
+    "oldCode": "",
+    "brand": "",
+    "specs": "064 065"
+  },
+  {
+    "name": "STIHL 021 023 025 MS210 MS230 MS250 CHAINSAW FUEL GAS LINE HOSE OEM: 1123 358 7702",
+    "category": "FUEL PIPE",
+    "code": "020029",
+    "oldCode": "STFL0202",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL 021 MS210 023 MS230 025 MS250 OEM: 1123 020 3003",
+    "category": "CRANKCASE",
+    "code": "090014",
+    "oldCode": "STCS0902",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL 018 018 019T 021 023 MS170 MS180 MS190T MS191T MS210 MS230 MS231 MS251 MS241 & MS250 OEM 1123 160 2050",
+    "category": "CLUTCH",
+    "code": "080017",
+    "oldCode": "STCS0802",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL MS251 MS170 MS180 MS231 MS241 MS210 MS230 MS250 CLUTCH DRUM",
+    "category": "CLUTCH DRUM",
+    "code": "080092",
+    "oldCode": "STCS0802C",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL MS251 MS170 MS180 MS231 MS241 MS210 MS230 MS250",
+    "category": "CLUTCH DRUM",
+    "code": "080110",
+    "oldCode": "STCS0815C",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL 023 025 MS230 MS250 OEM: 1123-030-0400",
+    "category": "CRANKSHAFT",
+    "code": "120013",
+    "oldCode": "STCS1201",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL MS180 MS230 MS250",
+    "category": "GASKET SET",
+    "code": "140147",
+    "oldCode": "STCS1405S",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL MS210 MS230 MS250 OEM: 1125 140 0604 1123 140 0605",
+    "category": "MUFFLER",
+    "code": "150026",
+    "oldCode": "STCS1502",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL MS250 MS230 MS210 025 023 021 OEM: 0000-400-1306",
+    "category": "IGNITION COIL",
+    "code": "160033",
+    "oldCode": "STCS1618",
+    "brand": "STIHL",
+    "specs": ""
+  },
+  {
+    "name": "STIHL 021 MS210 023 MS230 025 MS250 OEM: 1123-400-1203",
+    "category": "FLYWHEEL",
+    "code": "160259",
+    "oldCode": "STCS1603F",
+    "brand": "STIHL",
+    "specs": ""
+  }
+]

@@ -1,0 +1,210 @@
+[
+  {
+    "name": "ZENOAH CHINESE CHAINSAW 4500 5200 5800",
+    "category": "CARBURETOR",
+    "code": "010930",
+    "oldCode": "ZECS0101",
+    "brand": "ZENOAH",
+    "specs": ""
+  },
+  {
+    "name": "STL MS170 MS180 MS210 MS230 MS250 MS260 5200 WALBRO TYPE",
+    "category": "CARBURETOR REPAIR KIT",
+    "code": "240058",
+    "oldCode": "WBRP01",
+    "brand": "WALBRO",
+    "specs": ""
+  },
+  {
+    "name": "ZENOAH 4500 5200 5800 CHAINSAW OEM # 2810-83010",
+    "category": "AIR FILTER",
+    "code": "250001",
+    "oldCode": "ZEAF01",
+    "brand": "ZENOAH",
+    "specs": ""
+  },
+  {
+    "name": "ZENOAH 4500 5200 5800 CHAINSAW",
+    "category": "AIR FILTER",
+    "code": "250002",
+    "oldCode": "ZEAF01-1",
+    "brand": "ZENOAH",
+    "specs": ""
+  },
+  {
+    "name": "ZENOAH 4500 5200 5800 CHAINSAW (S/PL) 30*50*63mm",
+    "category": "AIR FILTER",
+    "code": "250430",
+    "oldCode": "ZEAF02",
+    "brand": "ZENOAH",
+    "specs": "30*50*63mm"
+  },
+  {
+    "name": "ZENOAH 4500 5200 5800 CHAINSAW (S/PL) 28*50*70mm",
+    "category": "AIR FILTER",
+    "code": "250431",
+    "oldCode": "ZEAF03",
+    "brand": "ZENOAH",
+    "specs": "28*50*70mm"
+  },
+  {
+    "name": "ZENOAH 4500 5200 5800 CHAINSAW (S/AL) 36*50*70mm",
+    "category": "AIR FILTER",
+    "code": "250432",
+    "oldCode": "ZEAF04",
+    "brand": "ZENOAH",
+    "specs": "36*50*70mm"
+  },
+  {
+    "name": "AIR FILTER CHAINSAW MS 5200/5800 ITC 524",
+    "category": "AIR FILTER",
+    "code": "250463",
+    "oldCode": "",
+    "brand": "ITC",
+    "specs": "5200/5800"
+  },
+  {
+    "name": "ZENOAH 4500 CYLINDER 43MM",
+    "category": "CYLINDER KIT",
+    "code": "030003",
+    "oldCode": "ZECS0303A",
+    "brand": "ZENOAH",
+    "specs": "43MM"
+  },
+  {
+    "name": "ZENOAH 5200 CYLINDER 45MM",
+    "category": "CYLINDER KIT",
+    "code": "030005",
+    "oldCode": "ZECS0304A",
+    "brand": "ZENOAH",
+    "specs": "45MM"
+  },
+  {
+    "name": "ZENOAH G4500",
+    "category": "RECOIL STARTER",
+    "code": "040001",
+    "oldCode": "ZECS0401",
+    "brand": "ZENOAH",
+    "specs": ""
+  },
+  {
+    "name": "ZENOAH G5200A",
+    "category": "RECOIL STARTER",
+    "code": "040002",
+    "oldCode": "ZECS0401-1",
+    "brand": "ZENOAH",
+    "specs": ""
+  },
+  {
+    "name": "CHINESE CHAINSAW 5200 4500 5800 52CC 45CC 58CC",
+    "category": "OIL PUMP",
+    "code": "060001",
+    "oldCode": "ZECS0601",
+    "brand": "CHINESE",
+    "specs": "45CC 52CC 58CC"
+  },
+  {
+    "name": "5200 5800 CHAINSAW OIL PIPE HOSE with fuel filter",
+    "category": "FUEL FILTER",
+    "code": "260130",
+    "oldCode": "",
+    "brand": "",
+    "specs": "5200/5800"
+  },
+  {
+    "name": "ZENOAH 5200 CHAINSAW",
+    "category": "OIL FILTER",
+    "code": "260038",
+    "oldCode": "HUOF02",
+    "brand": "ZENOAH",
+    "specs": "5200"
+  },
+  {
+    "name": "4500 5200 5800 CHAINSAW",
+    "category": "FUEL PIPE",
+    "code": "020025",
+    "oldCode": "ZEFL0202",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "5200 Crankcase",
+    "category": "CRANKCASE",
+    "code": "030496",
+    "oldCode": "ZECS0301H",
+    "brand": "",
+    "specs": "5200"
+  },
+  {
+    "name": "CHINESE CHAINSAW 4500 5200 5800 45CC 52CC 58CC",
+    "category": "CLUTCH",
+    "code": "080009",
+    "oldCode": "ZECS0801",
+    "brand": "CHINESE",
+    "specs": "45CC 52CC 58CC"
+  },
+  {
+    "name": "CHINESE CHAINSAW 4500 5200 5800 45CC 52CC 58CC",
+    "category": "CLUTCH DRUM",
+    "code": "080076",
+    "oldCode": "ZECS0801C",
+    "brand": "CHINESE",
+    "specs": "45CC 52CC 58CC"
+  },
+  {
+    "name": "CHINESE CHAINSAW 4500 5200 5800 45CC 52CC 58CC",
+    "category": "CLUTCH DRUM",
+    "code": "080077",
+    "oldCode": "ZECS0802C",
+    "brand": "CHINESE",
+    "specs": "45CC 52CC 58CC"
+  },
+  {
+    "name": "ZENOAH 45CC 52CC 58CC 4500 5200 5800",
+    "category": "FUEL TANK ASSY",
+    "code": "090009",
+    "oldCode": "ZECS0901",
+    "brand": "ZENOAH",
+    "specs": "45CC 52CC 58CC"
+  },
+  {
+    "name": "ZENOAH 45CC 52CC  4500 5200",
+    "category": "CRANKSHAFT",
+    "code": "120008",
+    "oldCode": "ZECS1201",
+    "brand": "ZENOAH",
+    "specs": "4500/5200"
+  },
+  {
+    "name": "ZENOAH 45CC 52CC 58CC 4500 5200 5800",
+    "category": "GASKET SET",
+    "code": "140137",
+    "oldCode": "ZECS1401S",
+    "brand": "ZENOAH",
+    "specs": "45CC 52CC 58CC"
+  },
+  {
+    "name": "ZENOAH CHINESE CHAINSAW 4500 5200 5800",
+    "category": "MUFFLER",
+    "code": "150022",
+    "oldCode": "ZECS1501",
+    "brand": "ZENOAH",
+    "specs": ""
+  },
+  {
+    "name": "CHINESE CHAINSAW 4500 5200 5800 152F-100A 45CC 52CC 58CC",
+    "category": "IGNITION COIL",
+    "code": "160010",
+    "oldCode": "ZECS1601",
+    "brand": "CHINESE",
+    "specs": "45CC 52CC 58CC"
+  },
+  {
+    "name": "CHINESE CHAINSAW 4500 5200 5800 MT-9999 TARUS 45CC 52CC 58CC FLYWHEEL",
+    "category": "FLYWHEEL",
+    "code": "160253",
+    "oldCode": "ZECS1601F",
+    "brand": "CHINESE",
+    "specs": "45CC 52CC 58CC"
+  }
+]

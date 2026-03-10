@@ -10,7 +10,7 @@
     "id": "MS170",
     "name": "MS170",
     "type": "chainsaw",
-    "description": "油锯M170",
+    "description": "油锯MS170",
     "icon": "fas fa-tree"
   },
   {
@@ -21,10 +21,24 @@
     "icon": "fas fa-leaf"
   },
   {
+    "id": "MS250",
+    "name": "MS250",
+    "type": "chainsaw",
+    "description": "油锯MS250",
+    "icon": "fas fa-tree"
+  },
+  {
+    "id": "4500-5200-5800",
+    "name": "4500-5200-5800",
+    "type": "chainsaw",
+    "description": "油锯4500/5200/5800",
+    "icon": "fas fa-tree"
+  },
+  {
     "id": "MS180",
     "name": "MS180",
     "type": "chainsaw",
-    "description": "油锯M180",
+    "description": "油锯MS180",
     "icon": "fas fa-tree"
   }
 ]
