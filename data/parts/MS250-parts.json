@@ -7,8 +7,7 @@
     "brand": "WALBRO",
     "specs": "WT-215-1 WT-286"
   },
-  {
-    "name": "STL MS170 MS180 MS210 MS230 MS250 MS260 5200 WALBRO TYPE",
+  {    "name": "STL MS170 MS180 MS210 MS230 MS250 MS260 5200 WALBRO TYPE",
     "category": "CARBURETOR REPAIR KIT",
     "code": "240058",
     "oldCode": "WBRP01",
@@ -157,6 +156,6 @@
     "code": "160259",
     "oldCode": "STCS1603F",
     "brand": "STIHL",
-    "specs": ""
+    "specs": "" 
   }
 ]

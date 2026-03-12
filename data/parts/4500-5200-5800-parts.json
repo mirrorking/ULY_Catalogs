@@ -196,7 +196,7 @@
     "category": "IGNITION COIL",
     "code": "160010",
     "oldCode": "ZECS1601",
-    "brand": "CHINESE",
+    "brand": "",
     "specs": "45CC 52CC 58CC"
   },
   {
@@ -204,7 +204,7 @@
     "category": "FLYWHEEL",
     "code": "160253",
     "oldCode": "ZECS1601F",
-    "brand": "CHINESE",
+    "brand": "",
     "specs": "45CC 52CC 58CC"
   }
 ]
