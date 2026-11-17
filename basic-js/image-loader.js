@@ -225,7 +225,7 @@ async function findMainImage(productCode) {
     
     const checkPromise = (async () => {
         try {
-            const mainImageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
+            const mainImageUrl = `images/${productCode}.png`;
             const checkResult = await checkImageExists(mainImageUrl);
             
             if (checkResult.success) {
@@ -299,7 +299,7 @@ async function findAdditionalImages(productCode, onImageFound = null) {
                 let foundImage = null;
                 
                 for (const format of formats) {
-                    const url = `Morehttps://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}(${i})${format}`;
+                    const url = `Moreimages/${productCode}(${i})${format}`;
                     try {
                         const checkResult = await checkImageExists(url);
                         
