@@ -479,7 +479,7 @@ const state = {
         
         async loadImageToBuffer(productCode) {
             // 直接使用.png格式
-            const url = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
+            const url = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
@@ -897,7 +897,7 @@ async function loadLazyImage(imageContainer, productCode) {
     imageContainer.classList.add('loading');
     
     // 直接加载.png图片
-    const imageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
+    const imageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
     const exists = await checkImageExists(imageUrl);
 
     if (exists) {
@@ -997,7 +997,7 @@ function showNoImage(imageContainer, productCode) {
 // 检查图片是否存在
 async function checkImage(code) {
     // 直接使用.png格式
-    const url = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${code}.png`;
+    const url = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${code}.png`;
     const exists = await checkImageExists(url);
     
     if (exists) {
@@ -1994,7 +1994,7 @@ async function loadPartDetailImage(productCode) {
     }
     
     // 直接加载.png图片
-    const imageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
+    const imageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
     const exists = await checkImageExists(imageUrl);
     
     if (exists) {
@@ -2090,7 +2090,7 @@ async function loadMoreImages(productCode) {
     thumbsContainer.innerHTML = '';
 
     /* ========= 主图缩略图 ========= */
-    const mainImageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
+    const mainImageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${productCode}.png`;
     const mainThumb = document.createElement('div');
     mainThumb.className = 'thumb-item active';
     mainThumb.dataset.url = mainImageUrl;
@@ -2184,7 +2184,7 @@ async function getMoreImages(productCode) {
         let foundImage = false;
         
         for (const ext of extensions) {
-            const imageUrl = `Morehttps://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/images/${baseCode}(${imageIndex})${ext}`;
+            const imageUrl = `https://cdn.jsdelivr.net/gh/mirrorking/ULY_Catalogs@main/Moreimages/${baseCode}(${imageIndex}).${ext}`;
             const exists = await checkImageExists(imageUrl);
             
             if (exists) {
