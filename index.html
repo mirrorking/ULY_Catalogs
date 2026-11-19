@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ULY - Mechanical Parts Intelligent Query System</title>
-    <link rel="icon" type="image/png" href="Info/Title.png">
-    <link rel="apple-touch-icon" href="Info/Title.png">
+    <link rel="icon" type="image/png" href="Info/favicon.png">
+    <link rel="apple-touch-icon" href="Info/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -573,7 +573,7 @@
                     <div class="brand-sub" data-zh="机械配件智能查询系统" data-en="Mechanical Parts Intelligent Query System">Mechanical Parts Intelligent Query System</div>
                 </div>
             </div>
-            <form class="topbar-search" id="searchForm" action="basic-directory.html" method="get">
+            <form class="topbar-search" id="searchForm" action="basic-directory" method="get">
                 <input type="text" id="searchInput" placeholder="Please enter keyword" data-zh-ph="请输入关键词" data-en-ph="Please enter keyword">
                 <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
             </form>
@@ -634,7 +634,7 @@
                             <li><i class="fas fa-check-circle"></i><span data-zh="高清配件图片展示" data-en="HD parts image display">HD parts image display</span></li>
                             <li><i class="fas fa-check-circle"></i><span data-zh="快速智能搜索功能" data-en="Fast intelligent search">Fast intelligent search</span></li>
                         </ul>
-                        <a href="basic-directory.html" class="btn-outline">
+                        <a href="basic-directory" class="btn-outline">
                             <span data-zh="进入基础目录" data-en="Enter Basic Catalog">Enter Basic Catalog</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -656,7 +656,7 @@
                             <li><i class="fas fa-check-circle"></i><span data-zh="多型号整机支持" data-en="Multi-model machine support">Multi-model machine support</span></li>
                             <li><i class="fas fa-check-circle"></i><span data-zh="快速切换整机型号" data-en="Quick model switching">Quick model switching</span></li>
                         </ul>
-                        <a href="machine-directory.html" class="btn-outline">
+                        <a href="machine-directory" class="btn-outline">
                             <span data-zh="进入整机目录" data-en="Enter Machine Catalog">Enter Machine Catalog</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -708,8 +708,8 @@
             <div>
                 <h4 data-zh="快速链接" data-en="Quick Links">Quick Links</h4>
                 <ul class="footer-links">
-                    <li><a href="basic-directory.html"><i class="fas fa-book-open"></i><span data-zh="基础配件目录" data-en="Basic Parts Catalog">Basic Parts Catalog</span></a></li>
-                    <li><a href="machine-directory.html"><i class="fas fa-tractor"></i><span data-zh="整机配件目录" data-en="Machine Parts Catalog">Machine Parts Catalog</span></a></li>
+                    <li><a href="basic-directory"><i class="fas fa-book-open"></i><span data-zh="基础配件目录" data-en="Basic Parts Catalog">Basic Parts Catalog</span></a></li>
+                    <li><a href="machine-directory"><i class="fas fa-tractor"></i><span data-zh="整机配件目录" data-en="Machine Parts Catalog">Machine Parts Catalog</span></a></li>
                     <li><a href="#about"><i class="fas fa-info-circle"></i><span data-zh="关于我们" data-en="About Us">About Us</span></a></li>
                     <li><a href="#contact"><i class="fas fa-envelope"></i><span data-zh="联系我们" data-en="Contact Us">Contact Us</span></a></li>
                 </ul>
@@ -768,7 +768,7 @@
                 searchForm.addEventListener('submit', function (e) {
                     const kw = searchInput.value.trim();
                     if (kw) {
-                        searchForm.action = 'basic-directory.html?q=' + encodeURIComponent(kw);
+                        searchForm.action = 'basic-directory?q=' + encodeURIComponent(kw);
                     }
                 });
             }
