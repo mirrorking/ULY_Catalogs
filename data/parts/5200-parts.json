@@ -1,0 +1,970 @@
+[
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010930",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010931",
+    "oldCode": "",
+    "brand": "",
+    "specs": "COOPER PIPE"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010932",
+    "oldCode": "",
+    "brand": "",
+    "specs": "COOPER PIPE WITH OIL PRIMER"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010933",
+    "oldCode": "",
+    "brand": "",
+    "specs": "COOPER PIPE WITH OIL PRIMER AUTO TYPE"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010934",
+    "oldCode": "",
+    "brand": "",
+    "specs": "COOPER PIPE AUTO TYPE"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "011070",
+    "oldCode": "",
+    "brand": "",
+    "specs": "STELL PIPE AUTO TYPE"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "011074",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Plastic Pipe Primer"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "011084",
+    "oldCode": "",
+    "brand": "",
+    "specs": "WITH OIL PRIMER  AUTO TYPE"
+  },
+  {
+    "name": "",
+    "category": "Fuel Pipe",
+    "code": "020025",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Pipe",
+    "code": "020027",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Pipe",
+    "code": "020073",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Pump Hose",
+    "code": "020075",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Intake Manifold",
+    "code": "020121",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Intake Manifold",
+    "code": "020124",
+    "oldCode": "",
+    "brand": "",
+    "specs": "G4500/G5200"
+  },
+  {
+    "name": "",
+    "category": "Buffer Set",
+    "code": "020195",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Buffer Set",
+    "code": "020196",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Buffer Set",
+    "code": "020197",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030003",
+    "oldCode": "",
+    "brand": "",
+    "specs": "43MM 4500"
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030004",
+    "oldCode": "",
+    "brand": "",
+    "specs": "DOUBLE AIR PASSAGE 43MM 4500"
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030005",
+    "oldCode": "",
+    "brand": "",
+    "specs": "45MM"
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030006",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Double Air 45MM"
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030007",
+    "oldCode": "",
+    "brand": "",
+    "specs": "45.2MM 5800"
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030008",
+    "oldCode": "",
+    "brand": "",
+    "specs": "DOUBLE AIR PASSAGE 45.2MM 5800"
+  },
+  {
+    "name": "",
+    "category": "Piston Kit",
+    "code": "030213",
+    "oldCode": "",
+    "brand": "",
+    "specs": "43MM"
+  },
+  {
+    "name": "",
+    "category": "Piston Kit",
+    "code": "030214",
+    "oldCode": "",
+    "brand": "",
+    "specs": "45MM"
+  },
+  {
+    "name": "",
+    "category": "Piston Kit",
+    "code": "030215",
+    "oldCode": "",
+    "brand": "",
+    "specs": "45.2MM 5800"
+  },
+  {
+    "name": "",
+    "category": "Piston Ring",
+    "code": "030424",
+    "oldCode": "",
+    "brand": "",
+    "specs": "43MMX1.2MMX2"
+  },
+  {
+    "name": "",
+    "category": "Piston Ring",
+    "code": "030425",
+    "oldCode": "",
+    "brand": "",
+    "specs": "45MMX1.5MMX2 WM80 BS500-650 BH22-24 952"
+  },
+  {
+    "name": "",
+    "category": "Piston Ring",
+    "code": "030426",
+    "oldCode": "",
+    "brand": "",
+    "specs": "45.2MMX1.5MMX2 5800"
+  },
+  {
+    "name": "",
+    "category": "Crankcase",
+    "code": "030496",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Crankcase",
+    "code": "030528",
+    "oldCode": "",
+    "brand": "",
+    "specs": "52CC/58CC"
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040001",
+    "oldCode": "",
+    "brand": "",
+    "specs": "G4500"
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040002",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040003",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040004",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040005",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040006",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040007",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040008",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040009",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040010",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040011",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040012",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040013",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040014",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040015",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040016",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040017",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Handle Assy",
+    "code": "040228",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Rear Handle"
+  },
+  {
+    "name": "",
+    "category": "Handle Assy",
+    "code": "040231",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Throttle Control"
+  },
+  {
+    "name": "",
+    "category": "Brake Band",
+    "code": "040247",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Sprocket",
+    "code": "040264",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Nylon 6PCS"
+  },
+  {
+    "name": "",
+    "category": "Sprocket",
+    "code": "040265",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Metal 6PCS"
+  },
+  {
+    "name": "",
+    "category": "Recoil Spring",
+    "code": "040285",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Spring",
+    "code": "040288",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Housing"
+  },
+  {
+    "name": "",
+    "category": "Recoil Spring",
+    "code": "040289",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Frame"
+  },
+  {
+    "name": "",
+    "category": "Pulley",
+    "code": "040349",
+    "oldCode": "",
+    "brand": "",
+    "specs": "2 pcs set"
+  },
+  {
+    "name": "",
+    "category": "Pulley",
+    "code": "040350",
+    "oldCode": "",
+    "brand": "",
+    "specs": "4T"
+  },
+  {
+    "name": "",
+    "category": "Pulley",
+    "code": "040351",
+    "oldCode": "",
+    "brand": "",
+    "specs": "2T"
+  },
+  {
+    "name": "",
+    "category": "Pulley",
+    "code": "040352",
+    "oldCode": "",
+    "brand": "",
+    "specs": "4T"
+  },
+  {
+    "name": "",
+    "category": "T-Handle",
+    "code": "040399",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040480",
+    "oldCode": "",
+    "brand": "",
+    "specs": "5800"
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040483",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Pump",
+    "code": "060001",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Chain Tensioner",
+    "code": "060002",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Pump Cover",
+    "code": "060049",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Pump Bushing",
+    "code": "060052",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Chain Tensioner",
+    "code": "060086",
+    "oldCode": "",
+    "brand": "",
+    "specs": "5800"
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080009",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080076",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Spline"
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080077",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Sprocket 8T"
+  },
+  {
+    "name": "",
+    "category": "Clutch Tool",
+    "code": "080181",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Needle Bearing",
+    "code": "080196",
+    "oldCode": "",
+    "brand": "",
+    "specs": "K11*15*12.5"
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum w/ Bearing",
+    "code": "080229",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch",
+    "code": "080238",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Long spring"
+  },
+  {
+    "name": "",
+    "category": "Clutch Sprocket Kit",
+    "code": "080262",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Tank Assy",
+    "code": "090009",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Cap",
+    "code": "090062",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Tether"
+  },
+  {
+    "name": "",
+    "category": "Oil Cap",
+    "code": "090064",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Handle",
+    "code": "090119",
+    "oldCode": "",
+    "brand": "",
+    "specs": "1.2mm"
+  },
+  {
+    "name": "",
+    "category": "Oil Cap",
+    "code": "090125",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Handle",
+    "code": "090146",
+    "oldCode": "",
+    "brand": "",
+    "specs": "1mm"
+  },
+  {
+    "name": "",
+    "category": "NUT",
+    "code": "110092",
+    "oldCode": "",
+    "brand": "",
+    "specs": "7MM"
+  },
+  {
+    "name": "",
+    "category": "Crankshaft",
+    "code": "120008",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "seal",
+    "code": "120075",
+    "oldCode": "",
+    "brand": "",
+    "specs": "15X28X5MM/15X35X5MM"
+  },
+  {
+    "name": "",
+    "category": "Gasket",
+    "code": "140007",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Gasket",
+    "code": "140008",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Gasket Kit",
+    "code": "140137",
+    "oldCode": "",
+    "brand": "",
+    "specs": "6PCS"
+  },
+  {
+    "name": "",
+    "category": "Gasket",
+    "code": "140138",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Cylinder Gasket",
+    "code": "140263",
+    "oldCode": "",
+    "brand": "",
+    "specs": "52/58"
+  },
+  {
+    "name": "",
+    "category": "Rubber Gasket",
+    "code": "140275",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Gasket",
+    "code": "140277",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Gasket",
+    "code": "140284",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Muffler",
+    "code": "150022",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Deflector"
+  },
+  {
+    "name": "",
+    "category": "Ignition Coil",
+    "code": "160010",
+    "oldCode": "",
+    "brand": "",
+    "specs": "152F-100A"
+  },
+  {
+    "name": "",
+    "category": "Woodruff Key",
+    "code": "160252",
+    "oldCode": "",
+    "brand": "",
+    "specs": "MT-9999"
+  },
+  {
+    "name": "",
+    "category": "Flywheel",
+    "code": "160253",
+    "oldCode": "",
+    "brand": "",
+    "specs": "MT-9999 TARUS"
+  },
+  {
+    "name": "",
+    "category": "3-Way Joint",
+    "code": "160304",
+    "oldCode": "",
+    "brand": "",
+    "specs": "w/ Spring"
+  },
+  {
+    "name": "",
+    "category": "Fuel Switch",
+    "code": "160325",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Switch Stop",
+    "code": "160326",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "THROTTLE COMMAND",
+    "code": "200052",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Throttle Trigger Spring",
+    "code": "200101",
+    "oldCode": "",
+    "brand": "",
+    "specs": "5200 5800"
+  },
+  {
+    "name": "",
+    "category": "Throttle Trigger Spring",
+    "code": "200102",
+    "oldCode": "",
+    "brand": "",
+    "specs": "5200 5800"
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240018",
+    "oldCode": "95-526",
+    "brand": "",
+    "specs": "Walbro 95-526"
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240058",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Walbro Type STL MS170-260"
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240442",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250001",
+    "oldCode": "2810-83010",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250002",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250430",
+    "oldCode": "",
+    "brand": "",
+    "specs": "30*50*63mm"
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250431",
+    "oldCode": "",
+    "brand": "",
+    "specs": "28*50*70mm"
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250432",
+    "oldCode": "",
+    "brand": "",
+    "specs": "36*50*70mm"
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250463",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250475",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250522",
+    "oldCode": "",
+    "brand": "",
+    "specs": "with RUBBER GASKET NYLON MESH"
+  },
+  {
+    "name": "",
+    "category": "Oil Filter",
+    "code": "260038",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "PRIMER",
+    "code": "260104",
+    "oldCode": "",
+    "brand": "",
+    "specs": "5800"
+  },
+  {
+    "name": "",
+    "category": "Oil Pipe w/ Fuel Filter",
+    "code": "260130",
+    "oldCode": "",
+    "brand": "",
+    "specs": "OIL PIPE HOSE"
+  },
+  {
+    "name": "",
+    "category": "Guide Bar",
+    "code": "310003",
+    "oldCode": "",
+    "brand": "",
+    "specs": "20\" (325)"
+  },
+  {
+    "name": "",
+    "category": "Chain",
+    "code": "400009",
+    "oldCode": "",
+    "brand": "",
+    "specs": "24\" 3/8\" Pitch 84DL .058\" 5800"
+  },
+  {
+    "name": "",
+    "category": "Chain",
+    "code": "400010",
+    "oldCode": "",
+    "brand": "",
+    "specs": "24 Inch .325\" Pitch 94DL .058\" 5800"
+  },
+  {
+    "name": "",
+    "category": "Guide Bar",
+    "code": "400011",
+    "oldCode": "",
+    "brand": "",
+    "specs": "24\" 3/8\" Pitch .058\" Gauge 5800"
+  }
+]

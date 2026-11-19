@@ -1,0 +1,378 @@
+[
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010296",
+    "oldCode": "A021 004980",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010301",
+    "oldCode": "A021 002360 / 70170 81020",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Adjustment Nut",
+    "code": "010949",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Adjustment Nut",
+    "code": "011190",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Line",
+    "code": "020058",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Line",
+    "code": "020110",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Buffer",
+    "code": "020194",
+    "oldCode": "",
+    "brand": "",
+    "specs": "25.5×10mm"
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030190",
+    "oldCode": "",
+    "brand": "",
+    "specs": "40MM"
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030193",
+    "oldCode": "",
+    "brand": "",
+    "specs": "40MM"
+  },
+  {
+    "name": "",
+    "category": "Piston Kit",
+    "code": "030376",
+    "oldCode": "20021 12110 / 20021 12111",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Piston Ring",
+    "code": "030430",
+    "oldCode": "4119 034 3003 / 1114 034 3001",
+    "brand": "",
+    "specs": "40MM×1.5MM×2"
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040196",
+    "oldCode": "70020 75100",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Spring",
+    "code": "040329",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Pawl Cup",
+    "code": "040385",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Starter Pawl",
+    "code": "040498",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Gear Box",
+    "code": "050009",
+    "oldCode": "",
+    "brand": "",
+    "specs": "28×11"
+  },
+  {
+    "name": "",
+    "category": "Gear Set",
+    "code": "050038",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Gear Box Housing",
+    "code": "050141",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch",
+    "code": "080054",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch",
+    "code": "080056",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch Kit",
+    "code": "080057",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080138",
+    "oldCode": "A556 001790",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Tank",
+    "code": "090008",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Hex Head Blade Bolt",
+    "code": "110106",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Crankshaft",
+    "code": "120038",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Seal",
+    "code": "120098",
+    "oldCode": "502849201 / T401921210",
+    "brand": "",
+    "specs": "35×20×7mm"
+  },
+  {
+    "name": "",
+    "category": "Oil Seal",
+    "code": "120099",
+    "oldCode": "",
+    "brand": "",
+    "specs": "15×25×7mm"
+  },
+  {
+    "name": "",
+    "category": "Connecting Rod",
+    "code": "120150",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Gasket",
+    "code": "140232",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Muffler",
+    "code": "150084",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Ignition Coil",
+    "code": "160120",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Flywheel",
+    "code": "160288",
+    "oldCode": "70200 71200",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Spark Plug Cap",
+    "code": "160346",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Ignition Coil",
+    "code": "160355",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Ignition Coil",
+    "code": "160362",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Ignition Coil",
+    "code": "160383",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Level Sensor",
+    "code": "200053",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Throttle Cable",
+    "code": "200063",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Throttle Cable",
+    "code": "200064",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240312",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240313",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Needle",
+    "code": "240314",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240433",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240519",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Repair Kit",
+    "code": "240532",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250411",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250443",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  }
+]

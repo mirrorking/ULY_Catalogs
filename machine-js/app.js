@@ -45,8 +45,11 @@ const translations = {
         // 机器类型相关
         "chainsaw": "油锯",
         "brush_cutter": "割灌机",
+        "brushcutter": "割灌机",
+        "engine": "发动机",
         "chainsaw_description": "用于砍伐树木、修剪树枝的便携式锯类工具，主要用于林业、园艺和建筑行业。",
         "brush_cutter_description": "用于清理灌木、杂草、小树苗的便携式工具，主要用于园林绿化、农业和道路维护。",
+        "engine_description": "用于动力设备的内燃发动机，广泛应用于园林机械、发电机组和工业设备。",
         "machine_models": "机型数量",
         "parts_count": "配件总数",
         "back_to_type": "返回类型选择",
@@ -142,8 +145,11 @@ const translations = {
         // 机器类型相关
         "chainsaw": "Chainsaw",
         "brush_cutter": "Brush Cutter",
+        "brushcutter": "Brush Cutter",
+        "engine": "Engine",
         "chainsaw_description": "Portable saw tool for cutting trees and trimming branches, mainly used in forestry, gardening and construction.",
         "brush_cutter_description": "Portable tool for clearing bushes, weeds and small trees, mainly used in landscaping, agriculture and road maintenance.",
+        "engine_description": "Internal combustion engine for power equipment, widely used in garden machinery, generator sets and industrial equipment.",
         "machine_models": "Machine Models",
         "parts_count": "Parts Count",
         "back_to_type": "Back to Type Selection",
@@ -199,92 +205,353 @@ const translations = {
     }
 };
 
-// 标准化配件分类体系
-const standardizedPartsCatalog = {
-    'chainsaw': [
-        'CARBURETOR', 'CARBURETOR REPAIR KIT', 'CARBURETOR DIAPHRGAM', 'CARBURETOR NEEDLE',
-        'AIR FILTER', 'CYLINDER KIT', 'CYLINDER', 'CYLINDER HEAD ASSY', 'PISTON SET',
-        'PISTON RING', 'PISTION BEARING', 'VLAUE', 'RECOIL STARTER', 'CHAIN GUIDE',
-        'STARTER SPRING', 'STARTER PAW', 'STARTER SPRING COVER', 'BRAKE BAND',
-        'STARTER PULLEY', 'STARTER HANDLE', 'OIL PUMP', 'WORM',
-        'OIL PUMP COVER', 'FUEL FILTER', 'FUEL SWITCH', 'OIL FILTER', 'FUEL PIPE',
-        'OIL PIPE', 'MANIFOLD', 'BUFFER SET', 'CLUTCH', 'CLUTCH DRUM', 'CLUTCH TOOLS',
-        'CLUTCH BEARING', 'SPROCKET RIM', 'CLUTCH WASHER', 'SPARK PLUG', 'FUEL TANK',
-        'FUEL TANK ASSY', 'FUEL CAP', 'CRANKSHAFT', 'CRANKSHAFT ROD SET', 'OIL SEAL',
-        'GASKET', 'CYLINDER GASKET', 'CRANKCASE GASKET', 'MUFFLER GASKET', 'MUFFLER',
-        'MUFFLER SUPPORT', 'IGNITION COIL', 'IGNITION SWITCH CABLE', 'COIL CAP',
-        'FLYWHEEL', 'FLYWHEEL PAWL SET', 'HANDLE', 
-        'BUMPER SPIKE', 'THROTTLE TRIGGER', 'CHAIN SPROCKET COVER',
-        'METAL PLATE', 'FOUNT GUARD', 'CHAIN CATCH', 'SNAP RING', 'CRANKCASE',
-        'ADJUSTING SCREW NIT', 'BRAKE SPRING'
+// 配件分类模板 (来自 generate_catalog_v7.py PART_TEMPLATES)
+const PART_TEMPLATES = {
+    "chainsaw": [
+        "Carburetor", "Repair Kit", "Fuel Line", "Manifold", "Buffer",
+        "Cylinder Kit", "Piston Kit", "Piston Ring", "Recoil Starter",
+        "Chain Cover", "Cylinder Cover", "Brake Band", "Pawl Kit",
+        "Recoil Spring", "Pulley", "Oil Pump", "Oil Pump Cover",
+        "Chain Tensioner", "Worm", "Clutch", "Clutch Drum",
+        "Needle Bearing", "Fuel Tank", "Crankcase", "Fuel Cap",
+        "Mounting Nut", "Crankshaft", "Oil Seal", "Bearing",
+        "Gasket Kit",
+        "Muffler", "Ignition Coil", "Flywheel", "Air Filter", "Fuel Filter",
     ],
-    'brush_cutter': [
-        'CARBURETOR', 'CARBURETOR FUEL SWITCH', 'CARBURETOR PUMP', 'CARBURETOR ADJUST SCREW',
-        'CARBURETOR REPAIR KIT', 'CARBURETOR DIAPHRGAM', 'CARBURETOR NEEDLE', 'AIR FILTER ASSEMBLY',
-        'AIR FILTER COVER', 'AIR FILTER SMALL COVER', 'AIR FILTER SPONGE', 'AIR FILTER PLATE',
-        'AIR FILTER SUPPORT', 'CYLINDER KIT', 'CYLINDER', 'PISTON SET', 'PISTON RING',
-        'PISTION BEARING', 'PISTION PIN', 'RECOIL STARTER', 'STEEL STARTER PARTS',
-        'STARTER PULLEY', 'STARTER SPRING', 'STARTER TOP SPRING', 'STARTER HANDLE WITH ROPE',
-        'STARTER HANDLE', 'STARTER ROPE', 'STARTER PAW', 'STARTER PULLEY PLATE PAWL SET',
-        'ROUND PULLEY PLATE', 'STARTER PLATE', 'GEAR CASE', 'GEAR CASE PARTS SET',
-        'GEAR CASE PLATE SET', 'PROTECTOR COVER', 'THREAD NUT', 'GEAR CASE COVER',
-        'GEAR CASE PLATE', 'GEAR SET', 'CONNETING PIPE', 'CONNETING PIPE RUBBER',
-        'OIL BEARING', 'CONNETING CASE', 'CONNETING PLATE SET', 'FUEL PUMP',
-        'FUEL FILTER PIPE ASSEMBLY', 'FUEL PIPE', 'FUEL FILTER', 'FUEL TANK',
-        'FUEL CAP', 'FUEL TANK SUPPORT', 'FUELTANK RUBBER WASHER', 'FUEL TANK PALTE',
-        'FUEL TANK GROMMENT', 'CLUTCH', 'CLUTCH SHOE', 'CLUTCH SPRING', 'CLUTCH SCREW SET',
-        'CLUTCH WAVY WASHER', 'CLUTCH WASHER', 'CLUTCH SCREW', 'CLUTCH DRUM', 'SPARK PLUG',
-        'MANIFOLD', 'TRIMMER HEAD', 'CRANKSHAFT', 'SEMI KEY', 'CRANKSHAFT ROD',
-        'GASKET KIT', 'CRANKCASE  GASKET', 'CYLINDER GASKET', 'CARBURETOR GASKET',
-        'MANIFOLD GASKET', 'MUFFER GASKET', 'MUFFLER', 'IGNITION COIL', 'FLYWHEEL',
-        'IGNITION CAP', 'IGNITION CAP SPRING', 'IGNITION SWITCH CABLE', 'TROTHLE WIRE',
-        'GRASS GUARD', 'GRASS GUARD PLATE WITH SCREW', 'GRASS GUARD PLATE',
-        'GRASS GUARD SUPPORT', 'GRASS GUARD SUPPORT PLATE', 'GRASS GUARD BLADE SCREW',
-        'GRASS GUARD SCREW NUT SET', 'GRASS GUARD BLADE', 'GRASS GUARD SIDE PARTS',
-        'HANDLE SUPPORT', 'HANDLE SUPPORT WITH RUBBER', 'HANDLE SUPPORT RUBBER',
-        'RIGHT SWITCH HANDLE', 'LEFT HANDLE', 'SWITCH HANDLE PARTS', 'SWTICH HANDLE BIG SPRING',
-        'SWTICH HANDLE SMALL SPRING', 'SWTICH TRIGGER', 'HANGER', 'TRANSIT', 'SHAFT PIPE',
-        'SHAFT PIPE WITH TRANSIT', 'SHAFT PIPE WITH ROTATED PIPE', 'RORATED PIPE',
-        'SHAFT PIPE ASSY', 'SHAFT ASSY', 'BRUSH CUTTER PASS PLATE', 'BRUSH CUTTER GRASS HARVSTER',
-        'MUFFER COVER', 'TOP COVER', 'CRANKCASE  COVER', 'CYLINDER COVER', 'CRANKCASE',
-        'SIDE COVER', 'CONNETING CASE SCREW', 'PIN', 'PRIMER BULB', 'CICRLE',
-        'STOP RING FOR CLUTCH CASE', 'SNAP RING', 'OIL SEAL', 'NEEDLE BEARING'
-    ]
+    "brushcutter": [
+        "Carburetor", "Repair Kit", "Manifold", "Buffer",
+        "Cylinder Kit", "Piston Kit", "Piston Ring", "Crankcase",
+        "Recoil Starter", "Recoil Spring", "Torsion Spring", "Pulley",
+        "Recoil Starter Handle", "Gear Box", "Gear Box Housing",
+        "Gear Set", "Multi-function Attachment Heads", "Drive Shaft",
+        "Clutch", "Clutch Drum", "Clutch Spring", "Needle Bearing",
+        "Fuel Tank", "Fuel Tank Plate", "Fuel Cap", "Trimmer Head", "Grass Shield",
+        "Crankshaft", "Oil Seal", "Gasket Kit",
+        "Muffler",
+        "Ignition Coil", "Flywheel", "Spark Plug", "Spark Plug Cap",
+        "Fuel Mouth", "Throttle Cable", "Throttle Handle",
+        "Air Filter", "Fuel Filter",
+    ],
+    "engine": [
+        "Carburetor", "Repair Kit", "Fuel Line", "Manifold",
+        "Cylinder Kit", "Piston Kit", "Piston Ring", "Recoil Starter",
+        "Recoil Spring", "Pulley", "Float Bowl Cup", "Oil Pump",
+        "Chain Tensioner", "Clutch", "Clutch Drum", "Fuel Tank",
+        "Fuel Cap", "Oil Dipstick", "Motor", "Crankshaft", "Camshaft",
+        "Connecting Rod", "Oil Seal", "Gasket Kit",
+        "Muffler",
+        "Ignition Coil", "Flywheel", "Spark Plug", "Stop Switch",
+        "AVR", "Fuel Tap", "Intake Valve", "Needle",
+        "Air Filter", "Fuel Filter",
+    ],
 };
 
-// 分类映射
-const categoryMapping = {
-    'CARBURETOR': 'CARBURETOR',
-    'FUEL HOSE': 'FUEL PIPE',
-    'MANIFOLD': 'MANIFOLD',
-    'BUFFER SET': 'BUFFER SET',
-    'CYLINDER': 'CYLINDER',
-    'PISTON ASSEMBLY': 'PISTON SET',
-    'PISTON RING': 'PISTON RING',
-    'SPIRAL SPRING': 'STARTER SPRING',
-    'CLUTCH RETURN SPRING': 'CLUTCH SPRING',
-    'ROPE PULLEY': 'STARTER PULLEY',
-    'PULLEY DIAL': 'STARTER PULLEY',
-    'STARTER PULLEY': 'STARTER PULLEY',
-    'GEAR BOX': 'GEAR CASE',
-    'CLUTCH HOUSING': 'CLUTCH',
-    'HOLDER': 'HANDLE',
-    'CLUTCH': 'CLUTCH',
-    'CLUTCH DRUM': 'CLUTCH DRUM',
-    'NEEDLE GAGE': 'NEEDLE BEARING',
-    'FUEL TANK': 'FUEL TANK',
-    'LEFT SCREW/GEAR BOX': 'GEAR CASE',
-    'CRANKSHAFT': 'CRANKSHAFT',
-    'OIL SEAL': 'OIL SEAL',
-    'GASKET': 'GASKET',
-    'MUFFLER': 'MUFFLER',
-    'IGNITION COIL': 'IGNITION COIL',
-    'FLYWHEEL': 'FLYWHEEL',
-    'THROTTLE LINE': 'THROTTLE CABLE',
-    'SHUT OFF': 'IGNITION SWITCH CABLE',
-    'AIR FILTER ASSEMBLY': 'AIR FILTER',
-    'FUEL FILTER': 'FUEL FILTER'
+// 机型类型别名映射 (数据中的 brush_cutter 对应模板中的 brushcutter)
+const machineTypeAlias = {
+    'brush_cutter': 'brushcutter',
+    'chainsaw': 'chainsaw',
+    'engine': 'engine',
 };
+
+// 分类映射 (根据 CLASSIFY_KEYWORDS 生成)
+const categoryMapping = {
+    'carburetor': 'Carburetor',
+    'carb': 'Carburetor',
+    'carb.': 'Carburetor',
+    '化油器': 'Carburetor',
+    'repair kit': 'Repair Kit',
+    'repair set': 'Repair Kit',
+    'rebuild kit': 'Repair Kit',
+    '维修包': 'Repair Kit',
+    '修理包': 'Repair Kit',
+    'fuel line': 'Fuel Line',
+    'fuel hose': 'Fuel Line',
+    'oil line': 'Fuel Line',
+    'fuel pipe': 'Fuel Line',
+    '油管': 'Fuel Line',
+    '燃油管': 'Fuel Line',
+    'fuel filter': 'Fuel Filter',
+    'gas filter': 'Fuel Filter',
+    '燃油滤': 'Fuel Filter',
+    '汽油滤': 'Fuel Filter',
+    'fuel cap': 'Fuel Cap',
+    'gas cap': 'Fuel Cap',
+    'tank cap': 'Fuel Cap',
+    '油箱盖': 'Fuel Cap',
+    '燃油盖': 'Fuel Cap',
+    'fuel tank plate': 'Fuel Tank Plate',
+    'tank plate': 'Fuel Tank Plate',
+    'fuel tank cap': 'Fuel Tank Cap',
+    'fuel tank': 'Fuel Tank',
+    'gas tank': 'Fuel Tank',
+    'oil tank': 'Fuel Tank',
+    '油箱': 'Fuel Tank',
+    'fuel cup': 'Fuel Cup',
+    'oil cup': 'Fuel Cup',
+    '浮子室杯': 'Fuel Cup',
+    '油杯': 'Fuel Cup',
+    'float bowl': 'Float Bowl Cup',
+    'bowl cup': 'Float Bowl Cup',
+    'fuel mouth': 'Fuel Mouth',
+    'fuel inlet': 'Fuel Mouth',
+    'fuel filler': 'Fuel Mouth',
+    'fuel tap': 'Fuel Tap',
+    'fuel valve': 'Fuel Tap',
+    'fuel cock': 'Fuel Tap',
+    '燃油开关': 'Fuel Tap',
+    'oil pump cover': 'Oil Pump Cover',
+    'pump cover': 'Oil Pump Cover',
+    'oil pump': 'Oil Pump',
+    'oilier pump': 'Oil Pump',
+    '机油泵': 'Oil Pump',
+    'oil dipstick': 'Oil Dipstick',
+    'dipstick': 'Oil Dipstick',
+    'oil gauge': 'Oil Dipstick',
+    '油尺': 'Oil Dipstick',
+    'oil seal': 'Oil Seal',
+    'oil seals': 'Oil Seal',
+    'crankshaft seal': 'Oil Seal',
+    '油封': 'Oil Seal',
+    'air filter': 'Air Filter',
+    'air cleaner': 'Air Filter',
+    'filter element': 'Air Filter',
+    'air filter cover': 'Air Filter',
+    '空气滤': 'Air Filter',
+    '空滤': 'Air Filter',
+    'manifold': 'Manifold',
+    'intake manifold': 'Manifold',
+    'insulator': 'Manifold',
+    '进气管': 'Manifold',
+    '歧管': 'Manifold',
+    'buffer': 'Buffer',
+    'bumper': 'Buffer',
+    'damper': 'Buffer',
+    '缓冲': 'Buffer',
+    'intake valve': 'Intake Valve',
+    'inlet valve': 'Intake Valve',
+    '进气门': 'Intake Valve',
+    'needle': 'Needle',
+    'needle valve': 'Needle',
+    'jet needle': 'Needle',
+    '油针': 'Needle',
+    'cylinder cover': 'Cylinder Cover',
+    'cylinder shroud': 'Cylinder Cover',
+    'cylinder housing': 'Cylinder Cover',
+    '气缸盖罩': 'Cylinder Cover',
+    '缸罩': 'Cylinder Cover',
+    'cylinder head cover': 'Cylinder Cover',
+    'cylinder kit': 'Cylinder Kit',
+    'cylinder assembly': 'Cylinder Kit',
+    'cylinder & piston': 'Cylinder Kit',
+    '气缸套件': 'Cylinder Kit',
+    'cylinder': 'Cylinder Kit',
+    '气缸': 'Cylinder Kit',
+    'piston kit': 'Piston Kit',
+    'piston assembly': 'Piston Kit',
+    'piston & ring': 'Piston Kit',
+    '活塞套件': 'Piston Kit',
+    'piston ring': 'Piston Ring',
+    'ring set': 'Piston Ring',
+    '活塞环': 'Piston Ring',
+    'crankcase': 'Crankcase',
+    'crank case': 'Crankcase',
+    '曲轴箱': 'Crankcase',
+    'crankshaft': 'Crankshaft',
+    'crank shaft': 'Crankshaft',
+    '曲轴': 'Crankshaft',
+    'camshaft': 'Camshaft',
+    'cam shaft': 'Camshaft',
+    '凸轮轴': 'Camshaft',
+    'connecting rod': 'Connecting Rod',
+    'con rod': 'Connecting Rod',
+    '连杆': 'Connecting Rod',
+    'bearing': 'Bearing',
+    'ball bearing': 'Bearing',
+    '轴承': 'Bearing',
+    'needle bearing': 'Needle Bearing',
+    'roller bearing': 'Needle Bearing',
+    '滚针轴承': 'Needle Bearing',
+    'mounting nut': 'Mounting Nut',
+    'flywheel nut': 'Mounting Nut',
+    'clutch nut': 'Mounting Nut',
+    'recoil starter': 'Recoil Starter',
+    'pull starter': 'Recoil Starter',
+    'starter assembly': 'Recoil Starter',
+    'starter assy': 'Recoil Starter',
+    '启动器': 'Recoil Starter',
+    'recoil spring': 'Recoil Spring',
+    'starter spring': 'Recoil Spring',
+    'rewind spring': 'Recoil Spring',
+    '启动弹簧': 'Recoil Spring',
+    'starter handle': 'Recoil Starter Handle',
+    'recoil handle': 'Recoil Starter Handle',
+    'pull handle': 'Recoil Starter Handle',
+    '启动手柄': 'Recoil Starter Handle',
+    'torsion spring': 'Torsion Spring',
+    '扭簧': 'Torsion Spring',
+    'pulley': 'Pulley',
+    'rope pulley': 'Pulley',
+    'starter pulley': 'Pulley',
+    '绳轮': 'Pulley',
+    'motor': 'Motor',
+    'starter motor': 'Motor',
+    '启动电机': 'Motor',
+    'stop switch': 'Stop Switch',
+    'kill switch': 'Stop Switch',
+    'on/off switch': 'Stop Switch',
+    '熄火开关': 'Stop Switch',
+    'clutch': 'Clutch',
+    '离合器': 'Clutch',
+    'clutch drum': 'Clutch Drum',
+    'clutch housing': 'Clutch Drum',
+    '离合鼓': 'Clutch Drum',
+    'clutch spring': 'Clutch Spring',
+    '离合弹簧': 'Clutch Spring',
+    'drive shaft': 'Drive Shaft',
+    'drive tube': 'Drive Shaft',
+    '传动轴': 'Drive Shaft',
+    'gear box housing': 'Gear Box Housing',
+    'gearbox housing': 'Gear Box Housing',
+    'gear case housing': 'Gear Box Housing',
+    'gear box': 'Gear Box',
+    'gearbox': 'Gear Box',
+    'gear case': 'Gear Box',
+    '齿轮箱': 'Gear Box',
+    'gear set': 'Gear Set',
+    'gear pair': 'Gear Set',
+    'bevel gear': 'Gear Set',
+    '齿轮组': 'Gear Set',
+    'worm': 'Worm',
+    'worm gear': 'Worm',
+    '蜗杆': 'Worm',
+    'chain tensioner': 'Chain Tensioner',
+    'tensioner': 'Chain Tensioner',
+    '张紧器': 'Chain Tensioner',
+    'chain cover': 'Chain Cover',
+    'chain guard': 'Chain Cover',
+    'sprocket cover': 'Chain Cover',
+    '链盖': 'Chain Cover',
+    '导板盖': 'Chain Cover',
+    'brake band': 'Brake Band',
+    'brake strap': 'Brake Band',
+    '刹车带': 'Brake Band',
+    'pawl': 'Pawl Kit',
+    'ratchet pawl': 'Pawl Kit',
+    '棘爪': 'Pawl Kit',
+    'attachment head': 'Multi-function Attachment Heads',
+    'multi-function': 'Multi-function Attachment Heads',
+    'multi function': 'Multi-function Attachment Heads',
+    '多功能头': 'Multi-function Attachment Heads',
+    'grass shield': 'Grass Shield',
+    'grass guard': 'Grass Shield',
+    'deflector': 'Grass Shield',
+    '草挡': 'Grass Shield',
+    'trimmer head': 'Trimmer Head',
+    '割草机头': 'Trimmer Head',
+    '修剪机头': 'Trimmer Head',
+    'cutting head': 'Trimmer Head',
+    'mower head': 'Trimmer Head',
+    'throttle cable': 'Throttle Cable',
+    'throttle wire': 'Throttle Cable',
+    '油门线': 'Throttle Cable',
+    'throttle handle': 'Throttle Handle',
+    'throttle grip': 'Throttle Handle',
+    'control handle': 'Throttle Handle',
+    '油门手柄': 'Throttle Handle',
+    'spark plug cap': 'Spark Plug Cap',
+    'plug cap': 'Spark Plug Cap',
+    'spark plug boot': 'Spark Plug Cap',
+    'spark plug': 'Spark Plug',
+    '火花塞': 'Spark Plug',
+    'ignition coil': 'Ignition Coil',
+    'ign coil': 'Ignition Coil',
+    'igniton coil': 'Ignition Coil',
+    '点火线圈': 'Ignition Coil',
+    'flywheel': 'Flywheel',
+    'fly wheel': 'Flywheel',
+    '飞轮': 'Flywheel',
+    'avr': 'AVR',
+    'voltage regulator': 'AVR',
+    'regulator': 'AVR',
+    'muffler': 'Muffler',
+    'silencer': 'Muffler',
+    'exhaust': 'Muffler',
+    '消声器': 'Muffler',
+    '排气管': 'Muffler',
+    'gasket kit': 'Gasket Kit',
+    'gasket set': 'Gasket Kit',
+    'full gasket': 'Gasket Kit',
+    'gasket': 'Gasket Kit',
+    '垫片': 'Gasket Kit',
+    '密封垫': 'Gasket Kit',
+};
+
+// 分类关键词表：[标准分类, [关键词...]]，用于类别文本包含匹配（命中时按关键词长度降序，避免短词抢先）
+const CLASSIFY_KEYWORDS = [
+    ["Carburetor", ["carburetor", "carb.", "carb", "化油器"]],
+    ["Repair Kit", ["repair kit", "repair set", "rebuild kit", "维修包", "修理包"]],
+    ["Fuel Line", ["fuel line", "fuel hose", "oil line", "fuel pipe", "oil pipe", "油管", "燃油管"]],
+    ["Fuel Filter", ["fuel filter", "gas filter", "oil filter", "燃油滤", "汽油滤"]],
+    ["Fuel Cap", ["fuel cap", "gas cap", "tank cap", "fuel tank cap", "oil cap", "油箱盖", "燃油盖"]],
+    ["Fuel Tank Plate", ["fuel tank plate", "tank plate"]],
+    ["Fuel Tank Cap", ["fuel tank cap"]],
+    ["Fuel Tank", ["fuel tank", "gas tank", "oil tank", "油箱"]],
+    ["Fuel Cup", ["fuel cup", "oil cup", "浮子室杯", "油杯"]],
+    ["Float Bowl Cup", ["float bowl", "bowl cup"]],
+    ["Fuel Mouth", ["fuel mouth", "fuel inlet", "fuel filler"]],
+    ["Fuel Tap", ["fuel tap", "fuel valve", "fuel cock", "fuel switch", "燃油开关"]],
+    ["Oil Pump Cover", ["oil pump cover", "pump cover"]],
+    ["Oil Pump", ["oil pump", "oilier pump", "机油泵"]],
+    ["Oil Dipstick", ["oil dipstick", "dipstick", "oil gauge", "油尺"]],
+    ["Oil Seal", ["oil seal", "oil seals", "crankshaft seal", "油封"]],
+    ["Air Filter", ["air filter", "air cleaner", "filter element", "air filter cover", "空气滤", "空滤"]],
+    ["Manifold", ["manifold", "intake manifold", "insulator", "进气管", "歧管"]],
+    ["Buffer", ["buffer", "bumper", "damper", "缓冲"]],
+    ["Intake Valve", ["intake valve", "inlet valve", "进气门"]],
+    ["Needle", ["needle valve", "jet needle", "needle", "油针"]],
+    ["Cylinder Cover", ["cylinder cover", "cylinder shroud", "cylinder housing", "cylinder head cover", "气缸盖罩", "缸罩"]],
+    ["Cylinder Kit", ["cylinder kit", "cylinder assembly", "cylinder & piston", "cylinder", "气缸套件", "气缸"]],
+    ["Piston Kit", ["piston kit", "piston assembly", "piston & ring", "活塞套件"]],
+    ["Piston Ring", ["piston ring", "ring set", "活塞环"]],
+    ["Crankcase", ["crankcase", "crank case", "曲轴箱"]],
+    ["Crankshaft", ["crankshaft", "crank shaft", "曲轴"]],
+    ["Camshaft", ["camshaft", "cam shaft", "凸轮轴"]],
+    ["Connecting Rod", ["connecting rod", "con rod", "连杆"]],
+    ["Bearing", ["ball bearing", "bearing", "轴承"]],
+    ["Needle Bearing", ["needle bearing", "roller bearing", "滚针轴承"]],
+    ["Mounting Nut", ["mounting nut", "flywheel nut", "clutch nut"]],
+    ["Recoil Starter", ["recoil starter", "pull starter", "starter assembly", "starter assy", "启动器"]],
+    ["Recoil Spring", ["recoil spring", "starter spring", "rewind spring", "启动弹簧"]],
+    ["Recoil Starter Handle", ["recoil starter handle", "starter handle", "recoil handle", "pull handle", "启动手柄"]],
+    ["Torsion Spring", ["torsion spring", "扭簧"]],
+    ["Pulley", ["rope pulley", "starter pulley", "pulley", "绳轮"]],
+    ["Motor", ["starter motor", "motor", "启动电机"]],
+    ["Stop Switch", ["stop switch", "kill switch", "switch stop", "on/off switch", "熄火开关"]],
+    ["Clutch", ["clutch", "离合器"]],
+    ["Clutch Drum", ["clutch drum", "clutch housing", "clutch sprocket", "sprocket", "离合鼓"]],
+    ["Clutch Spring", ["clutch spring", "离合弹簧"]],
+    ["Drive Shaft", ["drive shaft", "drive tube", "传动轴"]],
+    ["Gear Box Housing", ["gear box housing", "gearbox housing", "gear case housing"]],
+    ["Gear Box", ["gear box", "gearbox", "gear case", "齿轮箱"]],
+    ["Gear Set", ["gear set", "gear pair", "bevel gear", "齿轮组"]],
+    ["Worm", ["worm gear", "worm", "蜗杆"]],
+    ["Chain Tensioner", ["chain tensioner", "tensioner", "张紧器"]],
+    ["Chain Cover", ["chain cover", "chain guard", "sprocket cover", "链盖", "导板盖"]],
+    ["Brake Band", ["brake band", "brake strap", "刹车带"]],
+    ["Pawl Kit", ["ratchet pawl", "starter pawl", "pawl cup", "pawl", "棘爪"]],
+    ["Multi-function Attachment Heads", ["attachment head", "multi-function", "multi function", "多功能头"]],
+    ["Grass Shield", ["grass shield", "grass guard", "deflector", "草挡"]],
+    ["Trimmer Head", ["trimmer head", "cutting head", "mower head", "割草机头", "修剪机头"]],
+    ["Throttle Cable", ["throttle cable", "throttle wire", "油门线"]],
+    ["Throttle Handle", ["throttle handle", "throttle grip", "control handle", "油门手柄"]],
+    ["Spark Plug Cap", ["spark plug cap", "plug cap", "spark plug boot"]],
+    ["Spark Plug", ["spark plug", "火花塞"]],
+    ["Ignition Coil", ["ignition coil", "ign coil", "igniton coil", "点火线圈"]],
+    ["Flywheel", ["flywheel", "fly wheel", "飞轮"]],
+    ["AVR", ["voltage regulator", "regulator", "avr"]],
+    ["Muffler", ["muffler", "silencer", "exhaust", "muffer", "消声器", "排气管"]],
+    ["Gasket Kit", ["gasket kit", "gasket set", "full gasket", "gasket", "垫片", "密封垫"]],
+];
 
 // 分类图标映射
 const categoryIcons = {
@@ -299,8 +566,9 @@ const imageExtensions = ['.png'];
 // 全局状态
 const state = {
     machinesData: [],
-    standardizedPartsCatalog: standardizedPartsCatalog,
+    standardizedPartsCatalog: PART_TEMPLATES,
     categoryMapping: categoryMapping,
+    machineTypeAlias: machineTypeAlias,
     currentMachineType: null,
     currentMachine: null,
     treeData: {},
@@ -478,31 +746,36 @@ const state = {
         },
         
         async loadImageToBuffer(productCode) {
-            // 直接使用.png格式
-            const url = `images/${productCode}.png`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP错误! 状态: ${response.status}`);
+            // Excel 导出使用原图
+            const candidates = [originalImageUrl(productCode)];
+            for (const url of candidates) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) continue;
+
+                    const blob = await response.blob();
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = function() {
+                            resolve(this.result);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsArrayBuffer(blob);
+                    });
+                } catch (error) {
+                    console.warn(`无法加载图片 ${url}:`, error);
                 }
-                
-                const blob = await response.blob();
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = function() {
-                        resolve(this.result);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsArrayBuffer(blob);
-                });
-            } catch (error) {
-                console.warn(`无法加载图片 ${url}:`, error);
-                return null;
             }
+            return null;
         },
-        
+
         getImageExtensionFromBuffer(buffer, productCode) {
-            // 现在只返回'png'
+            // 按文件头魔数识别 WebP / PNG
+            const bytes = new Uint8Array(buffer);
+            if (bytes.length >= 12 && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+                bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) {
+                return 'webp';
+            }
             return 'png';
         },
         getScaledImageSize(imgWidth, imgHeight, cellWidthPx, cellHeightPx) {
@@ -823,38 +1096,32 @@ function hideLoading() {
 async function loadMachineTypeImages() {
     const machineTypeImages = document.querySelectorAll('.lazy-machine-image');
     
-    machineTypeImages.forEach(async (container) => {
+    machineTypeImages.forEach((container) => {
         const imageUrl = container.dataset.image;
         if (!imageUrl) return;
-        
-        try {
-            const exists = await checkImageExists(imageUrl);
-            if (exists) {
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.className = 'machine-type-image';
-                img.alt = container.closest('.machine-type-card').querySelector('h3').textContent;
-                
-                // 替换加载指示器
-                container.innerHTML = '';
-                container.appendChild(img);
-            } else {
-                container.innerHTML = `
-                    <div class="image-placeholder">
-                        <i class="fas fa-image"></i>
-                        <p data-key="no_image">无图片</p>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.warn('加载机器类型图片失败:', error);
+
+        const img = document.createElement('img');
+        img.className = 'machine-type-image';
+        img.decoding = 'async';
+        img.alt = container.closest('.machine-type-card').querySelector('h3').textContent;
+
+        const fallback = () => {
             container.innerHTML = `
                 <div class="image-placeholder">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p data-key="image_not_found">图片加载失败</p>
+                    <i class="fas fa-image"></i>
+                    <p data-key="no_image">无图片</p>
                 </div>
             `;
-        }
+            translatePage();
+        };
+
+        // 直接由 <img> 加载，onerror 兜底为无图；不再前置整图探测
+        img.onload = () => {
+            container.innerHTML = '';
+            container.appendChild(img);
+        };
+        img.onerror = fallback;
+        img.src = imageUrl;
     });
 }
 
@@ -880,33 +1147,27 @@ function initializeLazyLoading() {
 }
 
 // 加载懒加载图片
-async function loadLazyImage(imageContainer, productCode) {
+function loadLazyImage(imageContainer, productCode) {
     // 如果已经在加载中或已加载完成，跳过
     if (!imageContainer || !imageContainer.isConnected) return; // 已经从DOM移除，直接跳过
+    // 占位（未收录）卡片不参与图片懒加载
+    if (imageContainer.closest('.placeholder-card')) return;
     if (imageContainer.classList.contains('loading') || imageContainer.classList.contains('loaded')) {
         return;
     }
-    
+
     // 如果图片已经在缓存中
     if (state.loadedImages[productCode]) {
         showLazyImage(imageContainer, state.loadedImages[productCode], productCode);
         return;
     }
-    
+
     // 标记为加载中
     imageContainer.classList.add('loading');
-    
-    // 直接加载.png图片
-    const imageUrl = `images/${productCode}.png`;
-    const exists = await checkImageExists(imageUrl);
 
-    if (exists) {
-        // 缓存成功的图片地址，后续直接使用
-        state.loadedImages[productCode] = imageUrl;
-        showLazyImage(imageContainer, imageUrl, productCode);
-    } else {
-        showNoImage(imageContainer, productCode);
-    }
+    // 优先 WebP，onerror 回退 PNG；不再前置整图探测，避免每张图重复下载两遍
+    const imageUrl = thumbImageUrl(productCode);
+    showLazyImage(imageContainer, imageUrl, productCode);
 }
 
 async function asyncPool(limit, tasks) {
@@ -937,6 +1198,7 @@ function showLazyImage(imageContainer, imageUrl, productCode) {
     const img = document.createElement('img');
     img.alt = productCode;
     img.className = 'part-image';
+    img.decoding = 'async';
 
     const onLoad = () => {
         try {
@@ -948,13 +1210,20 @@ function showLazyImage(imageContainer, imageUrl, productCode) {
                 imageContainer.appendChild(img);
             }
             // 将成功加载的图片地址写回缓存，供详情页和购物车使用
-            if (productCode) state.loadedImages[productCode] = imageUrl;
+            if (productCode) state.loadedImages[productCode] = img.src;
         } catch (e) {
             console.error('showLazyImage onLoad error', e);
         }
     };
 
+    let retriedPng = false;
     const onError = () => {
+        // WebP 未命中时回退同名 PNG；PNG 也失败再显示无图
+        if (!retriedPng && productCode && imageUrl.endsWith('.webp')) {
+            retriedPng = true;
+            img.src = thumbFallbackUrl(productCode);
+            return;
+        }
         showNoImage(imageContainer, productCode);
     };
 
@@ -1017,6 +1286,13 @@ function checkImageExists(url) {
     });
 }
 
+// 缩略图（卡片 / 详情主图 / 缩略条展示用），目录 image_webp
+function thumbImageUrl(code) { return `image_webp/${code}.webp`; }
+// 缩略图缺失时回退到原图目录 PNG
+function thumbFallbackUrl(code) { return `images/${code}.png`; }
+// 原图（点击放大 / 下载 / Excel 导出用）
+function originalImageUrl(code) { return `images/${code}.png`; }
+
 // 加载整机数据
 async function loadMachinesData() {
     try {
@@ -1045,7 +1321,7 @@ async function loadMachinesData() {
                     name: machine.name,
                     type: machine.type,
                     description: machine.description || '',
-                    icon: machine.icon || (machine.type === 'chainsaw' ? 'fas fa-tree' : 'fas fa-leaf'),
+                    icon: machine.icon || getMachineIcon(machine.type),
                     parts: standardizedParts
                 });
             } else {
@@ -1055,7 +1331,7 @@ async function loadMachinesData() {
                     name: machine.name,
                     type: machine.type,
                     description: machine.description || '',
-                    icon: machine.icon || (machine.type === 'chainsaw' ? 'fas fa-tree' : 'fas fa-leaf'),
+                    icon: machine.icon || getMachineIcon(machine.type),
                     parts: []
                 });
             }
@@ -1069,33 +1345,77 @@ async function loadMachinesData() {
     }
 }
 
+// 判定单个类别归属：精确字典 → 关键词包含（长词优先）→ 模板名匹配；仅归入当前机型模板内的标准分类
+// 类别名规范：英文单词首字母大写、其余小写，用于合并仅大小写不同的非标类别
+function canonicalNonStandard(name) {
+    const s = (name || "").trim();
+    if (!s) return s;
+    return s.toLowerCase().replace(/(^|\s|[-/&])\w/g, ch => ch.toUpperCase());
+}
+
+// 判定单个类别归属：精确字典 → 关键词包含（长词优先）→ 模板名匹配；全程忽略大小写，仅归入当前机型模板内的标准分类
+function classifyCategory(originalCategory, machineType) {
+    const templateType = state.machineTypeAlias[machineType] || machineType;
+    const standardCategories = state.standardizedPartsCatalog[templateType] || [];
+    const stdByLower = {};
+    standardCategories.forEach(c => { stdByLower[c.toLowerCase()] = c; });
+    const low = (originalCategory || "").toLowerCase().trim();
+    if (!low) return originalCategory;
+
+    // 1. 精确字典匹配（目标须在当前模板内，忽略大小写）
+    const mappingKey = Object.keys(state.categoryMapping).find(
+        k => k.toLowerCase() === low
+    );
+    if (mappingKey) {
+        const mapped = state.categoryMapping[mappingKey];
+        const std = stdByLower[mapped.toLowerCase()];
+        if (std) return std;
+    }
+
+    // 2. 关键词包含匹配（仅当前模板内分类；关键词长度降序，避免短词抢先）
+    const hits = [];
+    for (const [std, keywords] of CLASSIFY_KEYWORDS) {
+        if (!stdByLower[std.toLowerCase()]) continue;
+        for (const kw of keywords) {
+            const k = (kw || "").toLowerCase().trim();
+            if (!k) continue;
+            // 纯英文/数字短词（<4 字符）不做子串包含，防止误命中
+            if (/^[a-z0-9 .&/-]+$/.test(k) && k.length < 4) continue;
+            if (low.includes(k)) hits.push({ len: k.length, std: stdByLower[std.toLowerCase()] });
+        }
+    }
+    if (hits.length) {
+        hits.sort((a, b) => b.len - a.len);
+        return hits[0].std;
+    }
+
+    // 3. 模板标准分类名匹配：相等优先，其次原文包含标准名（长名优先）；不做反向子串弱匹配
+    const nameMatches = standardCategories
+        .filter(cat => {
+            const cl = cat.toLowerCase();
+            return cl === low || low.includes(cl);
+        })
+        .sort((a, b) => b.length - a.length);
+    if (nameMatches.length) return nameMatches[0];
+
+    // 未识别：规范非标类别大小写，合并仅大小写不同的写法
+    return canonicalNonStandard(originalCategory);
+}
+
 // 标准化配件分类
 function mapPartsToStandardized(parts, machineType) {
+    const templateType = state.machineTypeAlias[machineType] || machineType;
+    const standardCategories = state.standardizedPartsCatalog[templateType] || [];
+    const stdByLower = {};
+    standardCategories.forEach(c => { stdByLower[c.toLowerCase()] = c; });
     return parts.map(part => {
         const originalCategory = part.category;
-        let standardizedCategory = originalCategory;
-        
-        if (state.categoryMapping[originalCategory]) {
-            standardizedCategory = state.categoryMapping[originalCategory];
-        }
-        
-        const standardCategories = state.standardizedPartsCatalog[machineType];
-        if (!standardCategories.includes(standardizedCategory)) {
-            const found = standardCategories.find(cat => 
-                cat.includes(originalCategory) || originalCategory.includes(cat)
-            );
-            if (found) {
-                standardizedCategory = found;
-            } else {
-                standardizedCategory = originalCategory;
-            }
-        }
-        
+        const standardizedCategory = classifyCategory(originalCategory, machineType);
         return {
             ...part,
             originalCategory: originalCategory,
             category: standardizedCategory,
-            isStandardized: standardCategories.includes(standardizedCategory)
+            isStandardized: !!stdByLower[standardizedCategory.toLowerCase()]
         };
     });
 }
@@ -1166,9 +1486,10 @@ function selectMachineType(type) {
     state.currentMachine = null;
     state.selectedPart = null;
     
+    const typeKey = state.machineTypeAlias[type] || type;
     const typeName = state.currentLanguage === 'zh' ? 
-        (type === 'chainsaw' ? '油锯' : '割灌机') :
-        (type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter');
+        translations[state.currentLanguage][typeKey] || type :
+        translations[state.currentLanguage][typeKey] || type;
     
     document.getElementById('type-selector-title').textContent = `${typeName} - ${translations[state.currentLanguage].select_machine_model}`;
     
@@ -1180,6 +1501,16 @@ function selectMachineType(type) {
     initializeMachineSelectorByType(type);
 }
 
+// 获取模板类型 (处理 brush_cutter → brushcutter 等别名)
+function getTemplateType(machineType) {
+    return state.machineTypeAlias[machineType] || machineType;
+}
+
+// 获取机器类型图标
+function getMachineIcon(machineType) {
+    return machineType === 'chainsaw' ? 'fas fa-tree' : 'fas fa-leaf';
+}
+
 // 根据类型初始化整机选择器
 function initializeMachineSelectorByType(type) {
     const machineGrid = document.getElementById('machine-grid');
@@ -1188,10 +1519,10 @@ function initializeMachineSelectorByType(type) {
     const filteredMachines = state.machinesData.filter(machine => machine.type === type);
     
     filteredMachines.forEach(machine => {
-        const categories = [...new Set(machine.parts.map(part => part.category))];
+        const categories = [...new Set(machine.parts.map(part => part.category))]; // 当前机型实际出现的分类（已有，含非标）
         const totalParts = machine.parts.length;
-        
-        const standardCategories = state.standardizedPartsCatalog[type] || [];
+
+        const standardCategories = state.standardizedPartsCatalog[state.machineTypeAlias[type] || type] || []; // 模板标准分类（应有）
         
         const machineCard = document.createElement('div');
         machineCard.className = 'machine-card fade-in';
@@ -1232,7 +1563,7 @@ function initializeMachineSelectorByType(type) {
         machineGrid.innerHTML = `
             <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
                 <i class="fas fa-exclamation-circle" style="font-size: 48px; color: #7f8c8d; margin-bottom: 20px;"></i>
-                <h3>暂无${state.currentLanguage === 'zh' ? (type === 'chainsaw' ? '油锯' : '割灌机') : (type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter')}机型</h3>
+                <h3>暂无${translations[state.currentLanguage][state.machineTypeAlias[type] || type] || type}机型</h3>
                 <p>该类型下暂无整机数据</p>
                 <button class="action-button" id="back-to-type-btn" style="margin-top: 20px;">
                     <i class="fas fa-arrow-left"></i> ${state.currentLanguage === 'zh' ? '返回类型选择' : 'Back to Type Selection'}
@@ -1292,7 +1623,7 @@ function initializeTreeData() {
     
     if (!state.currentMachine) return;
     
-    const standardCategories = state.standardizedPartsCatalog[state.currentMachine.type] || [];
+    const standardCategories = state.standardizedPartsCatalog[getTemplateType(state.currentMachine.type)] || [];
     
     standardCategories.forEach(category => {
         state.treeData[category] = [];
@@ -1344,9 +1675,8 @@ function updateCurrentMachineDisplay() {
     const currentMachineType = document.getElementById('current-machine-type');
     const partDetailSubtitle = document.getElementById('part-detail-subtitle');
     
-    const typeName = state.currentLanguage === 'zh' ? 
-        (state.currentMachine.type === 'chainsaw' ? '油锯' : '割灌机') :
-        (state.currentMachine.type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter');
+    const typeKey = state.machineTypeAlias[state.currentMachine.type] || state.currentMachine.type;
+    const typeName = translations[state.currentLanguage][typeKey] || typeKey;
     
     currentMachineName.textContent = state.currentMachine.name;
     currentMachineCode.textContent = state.currentMachine.description;
@@ -1402,59 +1732,47 @@ function renderTree() {
     
     if (!state.currentMachine || !state.currentMachineType) return;
     
-    const standardCategories = state.standardizedPartsCatalog[state.currentMachine.type] || [];
+    const standardCategories = state.standardizedPartsCatalog[getTemplateType(state.currentMachine.type)] || [];
     
     // 添加"全部"分类到最前面
     const allCategoryNode = createTreeNode('全部', state.currentMachine.parts.length, 
         state.expandedCategories.has('全部'), state.currentCategory === '全部', true);
     treeContainer.appendChild(allCategoryNode);
     
-    // 将分类分为两组：有配件的和没配件的
-    const categoriesWithParts = [];
-    const categoriesWithoutParts = [];
-    
+    // 导航顺序：标准有配件 → 非标有配件 → 标准无配件；标准组内保持模板标准顺序
+    const standardSet = new Set(standardCategories);
+    const withParts = [];
+    const withoutParts = [];
+
     standardCategories.forEach(category => {
         const categoryParts = state.partsByCategory[category] || [];
-        const hasParts = categoryParts.length > 0;
-        
-        if (hasParts) {
-            categoriesWithParts.push(category);
+        if (categoryParts.length > 0) {
+            withParts.push(category);
         } else {
-            categoriesWithoutParts.push(category);
+            withoutParts.push(category);
         }
     });
-    
-    // 有配件的分类按照配件数量降序排列
-    categoriesWithParts.sort((a, b) => {
-        const countA = state.partsByCategory[a]?.length || 0;
-        const countB = state.partsByCategory[b]?.length || 0;
-        return countB - countA;
-    });
-    
-    // 无配件的分类按字母顺序排列
-    categoriesWithoutParts.sort();
-    
-    // 先显示有配件的分类
-    categoriesWithParts.forEach(category => {
+
+    const renderTreeNode = (category, hasParts) => {
         const categoryParts = state.partsByCategory[category] || [];
-        const hasParts = categoryParts.length > 0;
         const isExpanded = state.expandedCategories.has(category);
         const isActive = state.currentCategory === category;
-        
         const treeNode = createTreeNode(category, categoryParts.length, isExpanded, isActive, hasParts);
         treeContainer.appendChild(treeNode);
-    });
-    
-    // 显示无配件的分类
-    categoriesWithoutParts.forEach(category => {
-        const categoryParts = state.partsByCategory[category] || [];
-        const hasParts = false;
-        const isExpanded = state.expandedCategories.has(category);
-        const isActive = state.currentCategory === category;
-        
-        const treeNode = createTreeNode(category, 0, isExpanded, isActive, hasParts);
-        treeContainer.appendChild(treeNode);
-    });
+    };
+
+    // 有配件的标准分类在前（保持模板标准顺序）
+    withParts.forEach(category => renderTreeNode(category, true));
+
+    // 模板之外、但有配件的非标分类接在有配件分类后面（按字母序）
+    const extraCategories = Object.keys(state.partsByCategory)
+        .filter(category => !standardSet.has(category) && (state.partsByCategory[category] || []).length > 0)
+        .sort();
+
+    extraCategories.forEach(category => renderTreeNode(category, true));
+
+    // 无配件的标准分类统一排在最后（保持模板标准顺序）
+    withoutParts.forEach(category => renderTreeNode(category, false));
     
     if (standardCategories.length === 0 && !state.currentMachine.parts.length) {
         const emptyNode = document.createElement('li');
@@ -1710,42 +2028,130 @@ function renderFilteredParts(parts, titleText, subtitleText) {
     const partsGrid = document.getElementById('parts-grid');
     partsGrid.innerHTML = '';
     
-    if (parts.length === 0 && state.currentCategory) {
-        const emptyMessage = document.createElement('div');
-        emptyMessage.className = 'empty-state';
-        emptyMessage.style.gridColumn = '1 / -1';
-        
-        if (state.currentFilter.search.trim() !== '') {
+    // 当前类别的模板配件列表（用于生成占位卡片）
+    const templateParts = state.currentMachine && state.currentMachine.type 
+        ? (state.standardizedPartsCatalog[getTemplateType(state.currentMachine.type)] || [])
+        : [];
+    
+    // 生成占位配件对象（缺少的配件）
+    function createPlaceholderPart(categoryName) {
+        return {
+            code: categoryName.replace(/\s+/g, '-').toUpperCase(),
+            oldCode: '',
+            name: '',
+            brand: '',
+            specs: '',
+            category: categoryName,
+            originalCategory: categoryName,
+            isPlaceholder: true,
+            isStandardized: true
+        };
+    }
+    
+    const hasSearch = state.currentFilter.search.trim() !== '';
+    const isAllCategory = state.currentCategory === '全部';
+
+    // 搜索状态下不生成占位卡片，仅展示关键词匹配结果
+    if (hasSearch) {
+        if (parts.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-state';
+            emptyMessage.style.gridColumn = '1 / -1';
             emptyMessage.innerHTML = `
                 <i class="fas fa-search"></i>
                 <h3 data-key="no_parts_found">未找到配件</h3>
                 <p>${state.currentLanguage === 'zh' ? '未找到与' : 'No parts found for'} "${state.currentFilter.search}" ${state.currentLanguage === 'zh' ? '相关的配件' : ''}</p>
             `;
-        } else {
-            emptyMessage.innerHTML = `
-                <i class="fas fa-box-open"></i>
-                <h3>${state.currentLanguage === 'zh' ? '该分类暂无配件' : 'No parts in this category'}</h3>
-                <p>${state.currentLanguage === 'zh' ? '该分类下暂无配件数据' : 'No parts data in this category'}</p>
-            `;
+            partsGrid.appendChild(emptyMessage);
+            translatePage();
+            return;
         }
-        
+
+        parts.forEach(part => {
+            partsGrid.appendChild(createPartCard(part));
+        });
+
+        document.getElementById('parts-grid-title').textContent = titleText;
+        document.getElementById('parts-grid-subtitle').textContent = subtitleText;
+        document.getElementById('visible-parts-count').textContent = parts.length;
+        document.getElementById('total-parts-count').textContent = state.currentMachine.parts.length;
+
+        updateCartButtonStates();
+
+        if (state.lazyImageObserver) {
+            setTimeout(() => {
+                document.querySelectorAll('.lazy-image').forEach(img => {
+                    const productCode = img.dataset.code;
+                    if (state.loadedImages[productCode]) {
+                        showLazyImage(img, state.loadedImages[productCode], productCode);
+                    } else {
+                        state.lazyImageObserver.observe(img);
+                    }
+                });
+            }, 50);
+        }
+        return;
+    }
+
+    // 非搜索状态：空列表处理
+    if (parts.length === 0) {
+        if (isAllCategory) {
+            showEmptyPartsGrid();
+            return;
+        }
+
+        // 具体分类：若属于模板分类，生成一张未收录占位卡片
+        const isTemplateCategory = templateParts.includes(state.currentCategory);
+
+        if (isTemplateCategory) {
+            const placeholderPart = createPlaceholderPart(state.currentCategory);
+            partsGrid.appendChild(createPartCard(placeholderPart));
+
+            document.getElementById('parts-grid-title').textContent = titleText;
+            document.getElementById('parts-grid-subtitle').textContent = subtitleText;
+            // 该分类无真实配件（已有 0），仅 1 张未收录占位卡片（应有 1）
+            document.getElementById('visible-parts-count').textContent = '0';
+            document.getElementById('total-parts-count').textContent = '1';
+
+            translatePage();
+            return;
+        }
+
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'empty-state';
+        emptyMessage.style.gridColumn = '1 / -1';
+        emptyMessage.innerHTML = `
+            <i class="fas fa-box-open"></i>
+            <h3>${state.currentLanguage === 'zh' ? '该分类暂无配件' : 'No parts in this category'}</h3>
+            <p>${state.currentLanguage === 'zh' ? '该分类下暂无配件数据' : 'No parts data in this category'}</p>
+        `;
         partsGrid.appendChild(emptyMessage);
         translatePage();
         return;
-    } else if (parts.length === 0) {
-        showEmptyPartsGrid();
-        return;
     }
-    
-    parts.forEach(part => {
-        const partCard = createPartCard(part);
-        partsGrid.appendChild(partCard);
+
+    // 收集需要渲染的配件：已收录配件在前，未收录分类的占位卡片在后
+    const renderList = [...parts];
+
+    // 在"全部"分类视图下，为模板中存在、但当前机型尚未收录的分类生成占位卡片
+    if (isAllCategory) {
+        const existingCategories = new Set(state.currentMachine.parts.map(p => p.category));
+        templateParts.forEach(cat => {
+            if (!existingCategories.has(cat)) {
+                renderList.push(createPlaceholderPart(cat));
+            }
+        });
+    }
+
+    renderList.forEach(part => {
+        partsGrid.appendChild(createPartCard(part));
     });
     
     document.getElementById('parts-grid-title').textContent = titleText;
     document.getElementById('parts-grid-subtitle').textContent = subtitleText;
+    // 左=已收录真实配件数；右=卡片总数（真实配件 + 未收录占位）
     document.getElementById('visible-parts-count').textContent = parts.length;
-    document.getElementById('total-parts-count').textContent = state.currentMachine.parts.length;
+    document.getElementById('total-parts-count').textContent = renderList.length;
     
     updateCartButtonStates();
     
@@ -1767,18 +2173,27 @@ function renderFilteredParts(parts, titleText, subtitleText) {
 
 // 创建配件卡片
 function createPartCard(part) {
+    const isPlaceholder = part.isPlaceholder === true;
     const isSelected = state.selectedPart && state.selectedPart.code === part.code;
     const inCart = state.cart.items.find(item => item.code === part.code);
     
     const card = document.createElement('div');
-    card.className = `part-card fade-in ${isSelected ? 'active' : ''}`;
+    card.className = `part-card fade-in ${isSelected ? 'active' : ''} ${isPlaceholder ? 'placeholder-card' : ''}`;
     card.dataset.code = part.code;
     card.dataset.category = part.category;
     
     const productCode = part.code;
     
-    // 使用懒加载图片容器
-    const imageHtml = `
+    // 占位卡片不使用懒加载图片，显示"未收录 / 即将到来"占位提示
+    const imageHtml = isPlaceholder ? `
+        <div class="placeholder-image" data-code="${productCode}">
+            <div class="image-placeholder">
+                <i class="fas fa-box-open"></i>
+                <p style="font-size: 12px; margin-top: 8px; color: #95a5a6; font-weight: 600;">${state.currentLanguage === 'zh' ? '未收录' : 'Not Listed'}</p>
+                <p style="font-size: 11px; margin-top: 4px; color: #b0b8b8;">${state.currentLanguage === 'zh' ? '即将到来' : 'Coming Soon'}</p>
+            </div>
+        </div>
+    ` : `
         <div class="lazy-image" data-code="${productCode}">
             <div class="image-loading">
                 <i class="fas fa-spinner"></i>
@@ -1793,16 +2208,21 @@ function createPartCard(part) {
         `<span class="part-match-status part-matched" title="${state.currentLanguage === 'zh' ? '标准化分类' : 'Standardized category'}">STD</span>` : 
         `<span class="part-match-status part-not-matched" title="${state.currentLanguage === 'zh' ? '非标准化分类' : 'Non-standardized category'}">NON</span>`;
     
+    const placeholderStatus = isPlaceholder ?
+        `<span class="part-match-status part-not-matched" title="${state.currentLanguage === 'zh' ? '未收录配件' : 'Unlisted part'}">${state.currentLanguage === 'zh' ? '未收录' : 'NOT LISTED'}</span>` : '';
+    
     card.innerHTML = `
+        ${!isPlaceholder ? `
         <button class="cart-button ${inCart ? 'added' : ''}" title="${inCart ? (state.currentLanguage === 'zh' ? '已在购物车中' : 'Already in cart') : (state.currentLanguage === 'zh' ? '添加到购物车' : 'Add to cart')}" data-code="${part.code}">
             <i class="fas ${inCart ? 'fa-check' : 'fa-cart-plus'}"></i>
         </button>
+        ` : ''}
         <div class="part-image-section">
             ${imageHtml}
         </div>
         <div class="part-content">
             <div class="part-header">
-                <div class="part-code">${part.code} ${standardizedStatus}</div>
+                <div class="part-code">${part.code} ${standardizedStatus} ${placeholderStatus}</div>
                 <div class="category-badge">${part.category}</div>
                 ${categoryTag}
             </div>
@@ -1816,20 +2236,22 @@ function createPartCard(part) {
         </div>
     `;
     
-    card.addEventListener('click', function(e) {
-        if (!e.target.closest('.cart-button')) {
-            selectPart(part);
-            closeCart();
-        }
-    });
-    
-    const cartBtn = card.querySelector('.cart-button');
-    if (cartBtn) {
-        cartBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            addToCart(part);
+    if (!isPlaceholder) {
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('.cart-button')) {
+                selectPart(part);
+                closeCart();
+            }
         });
+        
+        const cartBtn = card.querySelector('.cart-button');
+        if (cartBtn) {
+            cartBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                addToCart(part);
+            });
+        }
     }
     
     return card;
@@ -1879,9 +2301,7 @@ async function renderPartDetailContent(part) {
     
     document.getElementById('part-detail-title').textContent = displayTitle;
     
-    const machineType = state.currentLanguage === 'zh' ? 
-        (state.currentMachine.type === 'chainsaw' ? '油锯' : '割灌机') :
-        (state.currentMachine.type === 'chainsaw' ? 'Chainsaw' : 'Brush Cutter');
+    const machineType = translations[state.currentLanguage][state.machineTypeAlias[state.currentMachine.type] || state.currentMachine.type] || state.currentMachine.type;
         
     const machineModelText = state.currentLanguage === 'zh' ? '整机型号' : 'Machine Model';
     const machineTypeText = state.currentLanguage === 'zh' ? '机器类型' : 'Machine Type';
@@ -1993,39 +2413,28 @@ async function loadPartDetailImage(productCode) {
         return;
     }
     
-    // 直接加载.png图片
-    const imageUrl = `images/${productCode}.png`;
-    const exists = await checkImageExists(imageUrl);
-    
-    if (exists) {
-        state.loadedImages[productCode] = imageUrl;
-        displayPartDetailImage(imageSection, productCode, imageUrl);
-    } else {
-        imageSection.innerHTML = `
-            <div class="image-placeholder" style="width: 100%; height: 100%;">
-                <i class="fas fa-image"></i>
-                <p data-key="image_not_found">图片未找到</p>
-                <p style="font-size: 12px; margin-top: 8px;" data-key="product_code_label">商品编码: ${productCode}</p>
-            </div>
-        `;
-        translatePage();
-    }
+    // 优先 WebP，失败由 displayPartDetailImage 的 onerror 回退 PNG；不再前置整图探测
+    const imageUrl = thumbImageUrl(productCode);
+    displayPartDetailImage(imageSection, productCode, imageUrl, originalImageUrl(productCode));
 }
 
-// 显示配件详情图片
-function displayPartDetailImage(imageSection, productCode, imageUrl) {
+// 显示配件详情图片；imageUrl 为展示用缩略图，origUrl 为点击放大用原图（缺省时沿用 imageUrl）
+function displayPartDetailImage(imageSection, productCode, imageUrl, origUrl) {
     // 主图容器只包含当前主图
     const mainSection = document.getElementById('detail-image-section');
     if (!mainSection) return;
     mainSection.innerHTML = '';
+    const originalUrl = origUrl || imageUrl;
 
     const wrapper = document.createElement('div');
     wrapper.className = 'detail-image-wrapper';
     wrapper.dataset.imageUrl = imageUrl;
+    wrapper.dataset.orig = originalUrl;
 
     const img = document.createElement('img');
     img.alt = productCode;
     img.className = 'detail-image';
+    img.decoding = 'async';
 
     const hint = document.createElement('div');
     hint.className = 'zoom-hint';
@@ -2037,9 +2446,18 @@ function displayPartDetailImage(imageSection, productCode, imageUrl) {
 
     const onLoad = () => {
         img.classList.add('loaded');
+        wrapper.dataset.imageUrl = img.src;
+        if (productCode) state.loadedImages[productCode] = img.src;
     };
 
+    let retriedPng = false;
     const onError = () => {
+        // WebP 未命中时回退同名 PNG；PNG 也失败再显示无图
+        if (!retriedPng && productCode && imageUrl.endsWith('.webp')) {
+            retriedPng = true;
+            img.src = thumbFallbackUrl(productCode);
+            return;
+        }
         mainSection.innerHTML = `
             <div class="image-placeholder" style="width: 100%; height: 100%;">
                 <i class="fas fa-image"></i>
@@ -2070,7 +2488,7 @@ function displayPartDetailImage(imageSection, productCode, imageUrl) {
     img.onerror = wrap(onError);
 
     wrapper.addEventListener('click', function() {
-        openImageModal(productCode, imageUrl);
+        openImageModal(productCode, originalUrl);
     });
 
     // 如果缩略图列存在，尝试高亮对应缩略图
@@ -2090,10 +2508,12 @@ async function loadMoreImages(productCode) {
     thumbsContainer.innerHTML = '';
 
     /* ========= 主图缩略图 ========= */
-    const mainImageUrl = `images/${productCode}.png`;
+    let mainImageUrl = thumbImageUrl(productCode);
+    const mainOrigUrl = originalImageUrl(productCode);
     const mainThumb = document.createElement('div');
     mainThumb.className = 'thumb-item active';
     mainThumb.dataset.url = mainImageUrl;
+    mainThumb.dataset.orig = mainOrigUrl;
     mainThumb.title = '主图';
 
     const mainImgEl = document.createElement('img');
@@ -2101,15 +2521,27 @@ async function loadMoreImages(productCode) {
     mainImgEl.className = 'thumb-img';
     mainImgEl.src = mainImageUrl;
 
+    let thumbRetried = false;
     mainImgEl.onload = () => mainImgEl.classList.add('loaded');
-    mainImgEl.onerror = () => mainImgEl.classList.add('error');
+    mainImgEl.onerror = () => {
+        // 缩略图 WebP 未命中回退原图目录 PNG；放大仍用原图
+        if (!thumbRetried && mainImageUrl.endsWith('.webp')) {
+            thumbRetried = true;
+            mainImageUrl = thumbFallbackUrl(productCode);
+            mainThumb.dataset.url = mainImageUrl;
+            mainImgEl.src = mainImageUrl;
+            return;
+        }
+        mainImgEl.classList.add('error');
+    };
 
     mainThumb.appendChild(mainImgEl);
     mainThumb.addEventListener('click', function () {
         displayPartDetailImage(
             document.getElementById('detail-image-section'),
             productCode,
-            this.dataset.url
+            this.dataset.url,
+            this.dataset.orig
         );
         document.querySelectorAll('#detail-thumbnails .thumb-item')
             .forEach(t => t.classList.remove('active'));
@@ -2119,7 +2551,7 @@ async function loadMoreImages(productCode) {
     thumbsContainer.appendChild(mainThumb);
 
     /* ========= 更多图片：边检测，边显示 ========= */
-    const extensions = ['jpg', 'png', 'jpeg'];
+    const extensions = ['webp', 'png', 'jpg', 'jpeg'];
     let imageIndex = 1;
 
     while (true) {
@@ -2135,6 +2567,7 @@ async function loadMoreImages(productCode) {
                 const thumb = document.createElement('div');
                 thumb.className = 'thumb-item';
                 thumb.dataset.url = imageUrl;
+                thumb.dataset.orig = imageUrl;
 
                 const imgEl = document.createElement('img');
                 imgEl.alt = `图片 ${imageIndex}`;
@@ -2152,7 +2585,8 @@ async function loadMoreImages(productCode) {
                     displayPartDetailImage(
                         document.getElementById('detail-image-section'),
                         productCode,
-                        this.dataset.url
+                        this.dataset.url,
+                        this.dataset.orig
                     );
                     document.querySelectorAll('#detail-thumbnails .thumb-item')
                         .forEach(t => t.classList.remove('active'));
@@ -2176,7 +2610,7 @@ async function getMoreImages(productCode) {
     const moreImages = [];
     
     // 定义扩展名顺序：jpg, png, jpeg
-    const extensions = ['jpg', 'png', 'jpeg'];
+    const extensions = ['webp', 'png', 'jpg', 'jpeg'];
     let imageIndex = 1;
     
     // 尝试读取带括号的图片文件
@@ -2607,3 +3041,46 @@ function setupEventListeners() {
         }
     });
 }
+
+// 注入占位卡片样式
+(function injectPlaceholderCardStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .placeholder-card {
+            opacity: 0.6;
+            border: 2px dashed #ccc !important;
+            background: #fafafa !important;
+        }
+        .placeholder-card .part-image-section {
+            background: #f0f0f0 !important;
+        }
+        .placeholder-card .part-code {
+            color: #999;
+        }
+        .placeholder-card .part-specs {
+            color: #999;
+            font-style: italic;
+        }
+        .placeholder-card .part-footer {
+            color: #999;
+        }
+        .placeholder-card .placeholder-image {
+            width: 100%;
+            height: 100%;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .placeholder-card .placeholder-image .image-placeholder {
+            width: 100%;
+            height: 100%;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    `;
+    document.head.appendChild(style);
+})();

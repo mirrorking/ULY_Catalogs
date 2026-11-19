@@ -1,0 +1,282 @@
+[
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010938",
+    "oldCode": "",
+    "brand": "",
+    "specs": "With Primer"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010939",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Without Primer"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010940",
+    "oldCode": "",
+    "brand": "",
+    "specs": "With Primer Metal Auto"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010942",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Straight Fuel Line"
+  },
+  {
+    "name": "",
+    "category": "Fuel Line",
+    "code": "020026",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Line",
+    "code": "020072",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Line with Filter",
+    "code": "020108",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Cylinder Kit",
+    "code": "030002",
+    "oldCode": "",
+    "brand": "",
+    "specs": "39MM"
+  },
+  {
+    "name": "",
+    "category": "Piston Kit",
+    "code": "030217",
+    "oldCode": "",
+    "brand": "",
+    "specs": "39MM"
+  },
+  {
+    "name": "",
+    "category": "Piston Ring",
+    "code": "030428",
+    "oldCode": "10001113330",
+    "brand": "",
+    "specs": "39MM×1.5MM×1"
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040019",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040020",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040021",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Handle Assy",
+    "code": "040229",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Brake Band",
+    "code": "040249",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Spring",
+    "code": "040286",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Pulley",
+    "code": "040353",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Pump",
+    "code": "060003",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Fits 2500/3800"
+  },
+  {
+    "name": "",
+    "category": "Worm",
+    "code": "060053",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Fits 2500/3800"
+  },
+  {
+    "name": "",
+    "category": "Clutch",
+    "code": "080011",
+    "oldCode": "848C405121",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080078",
+    "oldCode": "",
+    "brand": "",
+    "specs": "3/8 7T Rim Sprocket"
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080079",
+    "oldCode": "",
+    "brand": "",
+    "specs": "3/8 6T"
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum with bearing",
+    "code": "080228",
+    "oldCode": "",
+    "brand": "",
+    "specs": "3/8 6T + Bearing"
+  },
+  {
+    "name": "",
+    "category": "Fuel Tank Assy",
+    "code": "090011",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Cap",
+    "code": "090062",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Fits 3800/4500/5200/5800"
+  },
+  {
+    "name": "",
+    "category": "Oil Cap",
+    "code": "090064",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Fits 3800/4500/5200/5800"
+  },
+  {
+    "name": "",
+    "category": "Oil Cap",
+    "code": "090125",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Fits 3800/4500/5200/5800"
+  },
+  {
+    "name": "",
+    "category": "Crankshaft",
+    "code": "120009",
+    "oldCode": "T2100-42000",
+    "brand": "",
+    "specs": "Fits 3800/4100"
+  },
+  {
+    "name": "",
+    "category": "Seal",
+    "code": "120076",
+    "oldCode": "",
+    "brand": "",
+    "specs": "12X32X5MM / 12X22X7MM"
+  },
+  {
+    "name": "",
+    "category": "Gasket Kit",
+    "code": "140139",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Muffer",
+    "code": "150023",
+    "oldCode": "T2100-15112",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Ignition Coil",
+    "code": "160014",
+    "oldCode": "T2100-71300",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Flywheel",
+    "code": "160254",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Fits 3800/3900/4100"
+  },
+  {
+    "name": "",
+    "category": "Switch Stop",
+    "code": "160326",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Fits 3800/4500/5200/5800"
+  },
+  {
+    "name": "",
+    "category": "Gasket",
+    "code": "240018",
+    "oldCode": "95-526",
+    "brand": "",
+    "specs": "WALBRO 95-526 Fits 3800/4500/5200/5800"
+  }
+]

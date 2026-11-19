@@ -1,0 +1,258 @@
+[
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010935",
+    "oldCode": "",
+    "brand": "",
+    "specs": "WT-962"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010936",
+    "oldCode": "",
+    "brand": "",
+    "specs": "ZAMA TYPE"
+  },
+  {
+    "name": "",
+    "category": "Carburetor",
+    "code": "010937",
+    "oldCode": "",
+    "brand": "",
+    "specs": "PLASTIC AUTO TYPE"
+  },
+  {
+    "name": "",
+    "category": "Fuel Pipe",
+    "code": "020024",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Hose",
+    "code": "020122",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Hose",
+    "code": "020123",
+    "oldCode": "",
+    "brand": "",
+    "specs": "B TYPE"
+  },
+  {
+    "name": "",
+    "category": "Fuel Line",
+    "code": "020256",
+    "oldCode": "Z284131201",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Line",
+    "code": "020275",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Cylinder KIT",
+    "code": "030001",
+    "oldCode": "",
+    "brand": "",
+    "specs": "34MM"
+  },
+  {
+    "name": "",
+    "category": "Piston Kit",
+    "code": "030216",
+    "oldCode": "",
+    "brand": "",
+    "specs": "34MM"
+  },
+  {
+    "name": "",
+    "category": "Piston Ring",
+    "code": "030427",
+    "oldCode": "072700048",
+    "brand": "",
+    "specs": "34MMx1.5MMx1"
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040018",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Starter",
+    "code": "040048",
+    "oldCode": "DA00000062",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Handle Assy",
+    "code": "040230",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Brake Band",
+    "code": "040248",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Recoil Spring",
+    "code": "040287",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Oil Pump",
+    "code": "060003",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Chain Tensioner",
+    "code": "060004",
+    "oldCode": "",
+    "brand": "",
+    "specs": "Lateral"
+  },
+  {
+    "name": "",
+    "category": "Pulley",
+    "code": "060053",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch",
+    "code": "080010",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080080",
+    "oldCode": "",
+    "brand": "",
+    "specs": "6T"
+  },
+  {
+    "name": "",
+    "category": "Clutch Drum",
+    "code": "080081",
+    "oldCode": "",
+    "brand": "",
+    "specs": "8T"
+  },
+  {
+    "name": "",
+    "category": "Clutch Spring",
+    "code": "080233",
+    "oldCode": "",
+    "brand": "",
+    "specs": "21*8.8mm"
+  },
+  {
+    "name": "",
+    "category": "Crankcase",
+    "code": "090010",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Fuel Cap",
+    "code": "090063",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Crankshaft",
+    "code": "120010",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Seal",
+    "code": "120077",
+    "oldCode": "T2041-21210 / T2041-21220",
+    "brand": "",
+    "specs": "12X22X5MM"
+  },
+  {
+    "name": "",
+    "category": "Gasket Kit",
+    "code": "140140",
+    "oldCode": "",
+    "brand": "",
+    "specs": "T425/2125T"
+  },
+  {
+    "name": "",
+    "category": "Muffler",
+    "code": "150024",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Ignition Coil",
+    "code": "160012",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Flywheel",
+    "code": "160255",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  },
+  {
+    "name": "",
+    "category": "Air Filter",
+    "code": "250626",
+    "oldCode": "",
+    "brand": "",
+    "specs": ""
+  }
+]

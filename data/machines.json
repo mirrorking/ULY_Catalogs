@@ -40,5 +40,40 @@
     "type": "chainsaw",
     "description": "油锯MS180",
     "icon": "fas fa-tree"
+  },
+  {
+    "id": "2500",
+    "name": "2500",
+    "type": "engine",
+    "description": "G2500 25CC",
+    "icon": "fas fa-leaf"
+  },
+  {
+    "id": "3800",
+    "name": "3800",
+    "type": "chainsaw",
+    "description": "G3800 38CC",
+    "icon": "fas fa-tree"
+  },
+  {
+    "id": "44-5",
+    "name": "44-5",
+    "type": "brush_cutter",
+    "description": "1E44F-5",
+    "icon": "fas fa-leaf"
+  },
+  {
+    "id": "5200",
+    "name": "5200",
+    "type": "chainsaw",
+    "description": "4500/5800",
+    "icon": "fas fa-tree"
+  },
+  {
+    "id": "B45",
+    "name": "B45",
+    "type": "brush_cutter",
+    "description": "ECHO Shindaiwa B45 B450",
+    "icon": "fas fa-leaf"
   }
 ]
