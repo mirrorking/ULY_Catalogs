@@ -125,6 +125,13 @@ const imageCache = new Map();
 const imageLoadingPromises = new Map();
 let lazyImageObserver = null;
 
+// 展示用缩略图（卡片 / 详情主图 / 缩略条），目录 image_webp
+function thumbImageUrl(code) { return `image_webp/${code}.webp`; }
+// 缩略图缺失时回退到原图目录 PNG
+function thumbFallbackUrl(code) { return `images/${code}.png`; }
+// 原图（点击放大 / 下载 / Excel 导出用）
+function originalImageUrl(code) { return `images/${code}.png`; }
+
 // 检查图片是否存在
 function checkImageExists(url, timeout = 3000) {
     return new Promise((resolve) => {
@@ -225,12 +232,15 @@ async function findMainImage(productCode) {
     
     const checkPromise = (async () => {
         try {
-            const mainImageUrl = `images/${productCode}.png`;
-            const checkResult = await checkImageExists(mainImageUrl);
-            
+            const thumbUrl = thumbImageUrl(productCode);
+            const origUrl = originalImageUrl(productCode);
+
+            // 优先探测 WebP 缩略图；命中则展示缩略图，放大仍用原图
+            let checkResult = await checkImageExists(thumbUrl);
             if (checkResult.success) {
-                const result = { 
-                    url: mainImageUrl, 
+                const result = {
+                    url: thumbUrl,
+                    origUrl: origUrl,
                     image: checkResult.image,
                     timestamp: Date.now(),
                     loaded: true
@@ -238,19 +248,35 @@ async function findMainImage(productCode) {
                 imageCache.set(cacheKey, result);
                 return result;
             }
-            
+
+            // WebP 未命中，回退原图 PNG（展示与放大都用它）
+            checkResult = await checkImageExists(origUrl);
+            if (checkResult.success) {
+                const result = {
+                    url: origUrl,
+                    origUrl: origUrl,
+                    image: checkResult.image,
+                    timestamp: Date.now(),
+                    loaded: true
+                };
+                imageCache.set(cacheKey, result);
+                return result;
+            }
+
             // 未找到主图片
-            imageCache.set(cacheKey, { 
-                url: null, 
+            imageCache.set(cacheKey, {
+                url: null,
+                origUrl: null,
                 timestamp: Date.now(),
                 loaded: false
             });
             return null;
-            
+
         } catch (error) {
             console.warn(`检查主图失败: ${productCode}`, error);
-            imageCache.set(cacheKey, { 
-                url: null, 
+            imageCache.set(cacheKey, {
+                url: null,
+                origUrl: null,
                 timestamp: Date.now(),
                 loaded: false
             });
@@ -291,7 +317,7 @@ async function findAdditionalImages(productCode, onImageFound = null) {
             const images = [];
             const imageObjects = [];
             
-            const formats = ['.jpg', '.png', '.jpeg'];
+            const formats = ['.webp', '.png', '.jpg', '.jpeg'];
             const maxVariants = 8;
             
             for (let i = 1; i <= maxVariants; i++) {
@@ -692,7 +718,7 @@ function quickLoadDetailMainImage(productCode, container, loadId) {
         });
         
         img.addEventListener('click', function() {
-            openImageModal(productCode, cachedUrl, 0);
+            openImageModal(productCode, originalImageUrl(productCode), 0);
         });
         
         return { success: true, url: cachedUrl };
@@ -722,9 +748,12 @@ async function asyncLoadDetailImages(productCode, loadId) {
             if (loadId !== window.imageLoader.currentCarouselLoadId) return;
             
             if (mainImageResult && mainImageResult.url) {
-                // 添加主图到列表
-                window.utils.state.currentCarouselImages.push(mainImageResult.url);
-                
+                // 添加主图到列表：thumb 展示缩略图，orig 放大原图
+                window.utils.state.currentCarouselImages.push({
+                    thumb: mainImageResult.url,
+                    orig: mainImageResult.origUrl || mainImageResult.url
+                });
+
                 // 显示主图
                 if (!quickLoadResult.success) {
                     const img = mainImageResult.image || new Image();
@@ -732,7 +761,7 @@ async function asyncLoadDetailImages(productCode, loadId) {
                     img.alt = productCode;
                     img.decoding = 'async';
                     img.loading = 'eager';
-                    
+
                     if (img.complete && img.naturalWidth > 0) {
                         img.classList.add('loaded', 'quick-load');
                     } else {
@@ -740,17 +769,17 @@ async function asyncLoadDetailImages(productCode, loadId) {
                             if (loadId !== window.imageLoader.currentCarouselLoadId) return;
                             img.classList.add('loaded', 'quick-load');
                         };
-                        
+
                         if (!img.src) {
                             img.src = mainImageResult.url;
                         }
                     }
-                    
+
                     mainContainer.innerHTML = '';
                     mainContainer.appendChild(img);
-                    
+
                     img.addEventListener('click', function() {
-                        openImageModal(productCode, mainImageResult.url, 0);
+                        openImageModal(productCode, mainImageResult.origUrl || mainImageResult.url, 0);
                     });
                 }
                 
@@ -777,7 +806,8 @@ async function asyncLoadDetailImages(productCode, loadId) {
             
             const displayIndex = foundAdditionalImages.length + 1;
             foundAdditionalImages.push({url, imageObject});
-            window.utils.state.currentCarouselImages.push(url);
+            // 副图无独立缩略目录，展示与放大沿用同一 Moreimages 地址
+            window.utils.state.currentCarouselImages.push({ thumb: url, orig: url });
             
             setTimeout(() => {
                 if (loadId !== window.imageLoader.currentCarouselLoadId) return;
@@ -975,8 +1005,10 @@ async function retryLoadCarousel(productCode) {
 // 切换图片函数
 function switchToImage(index, images, productCode) {
     const mainContainer = document.getElementById('carousel-main-image');
-    const url = images[index];
-    
+    const item = images[index];
+    const url = item ? item.thumb : null;
+    const orig = item ? (item.orig || item.thumb) : null;
+
     if (url) {
         const newImg = new Image();
         newImg.alt = productCode;
@@ -989,7 +1021,7 @@ function switchToImage(index, images, productCode) {
             mainContainer.appendChild(newImg);
             
             newImg.addEventListener('click', function() {
-                openImageModal(productCode, url, index);
+                openImageModal(productCode, orig, index);
             });
             
             // 更新所有缩略图激活状态

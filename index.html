@@ -4,909 +4,774 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ULY - Mechanical Parts Intelligent Query System</title>
+    <link rel="icon" type="image/png" href="Info/Title.png">
+    <link rel="apple-touch-icon" href="Info/Title.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>        * {
+    <style>
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            font-family: system-ui, Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
         }
-        
+
         :root {
-            --uly-primary: #ffab40;
-            --uly-primary-light: #ffab40;
-            --uly-primary-dark: #ffab40;
-            --uly-orange: #ff6600;
-            --uly-orange-light: #ff8533;
-            --uly-gray: #4d4d4d;
-            --uly-gray-light: #f5f5f5;
-            --uly-gray-dark: #333333;
-            --shadow-md: 0 4px 12px rgba(0, 102, 204, 0.12);
-            --shadow-lg: 0 8px 24px rgba(0, 102, 204, 0.15);
-            --radius-md: 12px;
-            --radius-lg: 16px;
-        
+            --orange: #FF9900;
+            --orange-dark: #E68200;
+            --orange-light: #FFB84D;
+            --black: #161616;
+            --dark: #1f1f1f;
+            --gray: #777;
+            --gray-light: #f5f5f5;
+            --white: #ffffff;
         }
-        
+
+        html { scroll-behavior: smooth; }
+
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%);
-            color: var(--uly-gray);
+            background: var(--white);
+            color: var(--black);
             line-height: 1.6;
             min-height: 100vh;
         }
-        
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
         .container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 24px;
         }
-        
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #ff9500 0%, #ff8c00 100%);
-            color: white;
-            padding: 20px 0;
-            position: relative;
-            overflow: hidden;
+
+        /* ===== Top Bar (dark) ===== */
+        .topbar {
+            background: var(--black);
+            color: var(--white);
+            padding: 14px 0;
         }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(30%, -30%);
-        }
-        
-        .nav-bar {
+
+        .topbar-inner {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            gap: 20px;
         }
-        
-        .logo {
+
+        .brand {
             display: flex;
             align-items: center;
-            gap: 15px;
-            z-index: 2;
-            position: relative;
+            gap: 14px;
         }
-        
-        .logo-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: var(--radius-md);
+
+        .brand-logo {
+            width: 176px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
         }
-        
-        .logo-icon img {
+
+        .brand-logo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
         }
-        
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .logo-main {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-        
-        .logo-subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-top: 2px;
-        }
-        
-        .header-content {
-            text-align: center;
-            padding: 40px 0;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .header-title {
-            font-size: 42px;
+
+        .brand-name {
+            font-size: 15px;
             font-weight: 700;
-            margin-bottom: 15px;
-            line-height: 1.2;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
-        
-        .header-subtitle {
-            font-size: 20px;
-            opacity: 0.9;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            line-height: 1.5;
+
+        .brand-sub {
+            font-size: 11px;
+            color: #bbb;
+            letter-spacing: 0.5px;
         }
-        
-        /* Language Switcher */
-        .language-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 10;
-        }
-        
-        .lang-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
+
+        .topbar-search {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .lang-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px); box-shadow: 0 2px 8px rgba(255, 149, 0, 0.15);
-        }
-        
-        /* Main Content */
-        .main-content {
-            padding: 80px 0;
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-        
-        .section-title h2 {
-            font-size: 36px;
-            color: #ffab40;;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-        
-        .section-title p {
-            font-size: 18px;
-            color: #ffab40;;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        /* System Cards */
-        .systems-grid {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 80px;
-        }
-        
-        .system-card {
-            background: white;
-            border-radius: var(--radius-lg);
+            align-items: stretch;
+            background: var(--white);
+            border-radius: 4px;
             overflow: hidden;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-            position: relative;
-            border: 1px solid rgba(0, 102, 204, 0.1);
-            width: 400px;
+            width: 300px;
+            max-width: 40vw;
         }
-        
-        .system-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--uly-primary-light);
-        }
-        
-        .card-header {
-            padding: 25px 25px 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            background: linear-gradient(135deg, #ff9500 0%, #ffab40 100%);
-            color: white;
-        }
-        
-        .card-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-        
-        .card-name h3 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .card-description {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .card-body {
-            padding: 25px;
-        }
-        
-        .card-features {
-            list-style: none;
-        }
-        
-        .card-features li {
-            padding: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #ffab40;;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .card-features li:last-child {
-            border-bottom: none;
-        }
-        
-        .card-features i {
-            color: #ff9500;
-            font-size: 14px;
-            width: 20px;
-        }
-        
-        .card-footer {
-            padding: 20px 25px 25px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .card-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: #ff9500;
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .card-btn:hover {
-            background: #ffab40;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.08);
-        }
-        
-        .card-btn.machine {
-            background: var(--uly-orange);
-        }
-        
-        .card-btn.machine:hover {
-            background: var(--uly-orange-light);
-        }
-        
-        /* Features Section */
-        .features-section {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 50px;
-            margin-bottom: 80px;
-            box-shadow: var(--shadow-md);
-        }
-        
-        .features-grid {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-        }
-        
-        .feature-item {
-            text-align: center;
-            padding: 30px 20px;
-            border-radius: var(--radius-md);
-            transition: all 0.3s ease;
-            width: 250px;
-        }
-        
-        .feature-item:hover {
-            background: var(--uly-gray-light);
-            transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--uly-primary) 0%, var(--uly-primary-light) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 28px;
-            color: white;
-        }
-        
-        .feature-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #ffab40;;
-            margin-bottom: 15px;
-        }
-        
-        .feature-description {
-            color: #333333;
-            line-height: 1.6;
-        }
-        
-        /* Footer - Foreign Trade Company */
-        .footer {
-            background: linear-gradient(135deg, #0d0d15 0%, #1a1a2e 100%);
-            color: white;
-            padding: 60px 0 30px;
-            border-top: 4px solid var(--uly-orange);
-        }
-        
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-        
-        .footer-section {
+
+        .topbar-search input {
             flex: 1;
-            margin-right: 40px;
+            border: none;
+            outline: none;
+            padding: 9px 14px;
+            font-size: 13px;
+            color: var(--black);
         }
-        
-        .footer-section:last-child {
-            margin-right: 0;
+
+        .topbar-search button {
+            border: none;
+            background: var(--orange);
+            color: var(--white);
+            padding: 0 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
         }
-        
-        .footer-section h4 {
-            font-size: 20px;
-            margin-bottom: 25px;
-            color: white;
+
+        .topbar-search button:hover { background: var(--orange-dark); }
+
+        /* ===== Nav Bar (orange) ===== */
+        .navbar {
+            background: var(--orange);
             position: relative;
-            padding-bottom: 12px;
-            font-weight: 600;
+            z-index: 50;
         }
-        
-        .footer-section h4::after {
+
+        .nav-menu {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .nav-menu > li {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-menu > li + li::before {
             content: '';
+            width: 1px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .nav-menu > li > a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 16px 20px;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+
+        .nav-menu > li > a:hover,
+        .nav-menu > li > a.active {
+            background: var(--orange-dark);
+        }
+
+        /* Dropdown */
+        .dropdown {
             position: absolute;
-            bottom: 0;
+            top: 100%;
             left: 0;
-            width: 50px;
-            height: 3px;
-            background: var(--uly-orange);
+            min-width: 260px;
+            background: var(--white);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+            border-radius: 0 0 6px 6px;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.22s ease;
         }
-        
-        .footer-links {
-            list-style: none;
+
+        .nav-menu li:hover .dropdown,
+        .nav-menu li:focus-within .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
-        
-        .footer-links li {
+
+        .dropdown li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 18px;
+            color: var(--black);
+            font-size: 13.5px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.15s;
+        }
+
+        .dropdown li:last-child a { border-bottom: none; }
+
+        .dropdown li a i { color: var(--orange); width: 18px; text-align: center; }
+
+        .dropdown li a:hover {
+            background: var(--gray-light);
+            color: var(--orange-dark);
+            padding-left: 22px;
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            position: relative;
+            background:
+                radial-gradient(circle at 75% 30%, rgba(255, 153, 0, 0.18), transparent 45%),
+                linear-gradient(120deg, #111 0%, #1f1f1f 55%, #2a2a2a 100%);
+            color: var(--white);
+            overflow: hidden;
+        }
+
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 40px;
+            align-items: center;
+            padding: 70px 0;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+            color: var(--orange);
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: #e8e8e8;
+            max-width: 620px;
+            margin-bottom: 30px;
+        }
+
+        .hero-icons {
+            display: flex;
+            gap: 22px;
+        }
+
+        .hero-icon {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background: var(--orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--white);
+        }
+
+        .hero-stat {
+            background: var(--orange);
+            border-radius: 10px;
+            padding: 34px 28px;
+            text-align: center;
+        }
+
+        .hero-stat .stat-num {
+            font-size: 46px;
+            font-weight: 900;
+            color: var(--white);
+            line-height: 1;
+        }
+
+        .hero-stat .stat-num sup { font-size: 22px; }
+
+        .hero-stat .stat-label {
+            margin-top: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--white);
+        }
+
+        /* ===== Section common ===== */
+        .section { padding: 70px 0; }
+
+        .section-head {
+            text-align: center;
+            margin-bottom: 44px;
+        }
+
+        .section-head h2 {
+            font-size: 32px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 12px;
         }
-        
-        .footer-links a {
-            color: rgba(224, 224, 224, 0.9);
-            text-decoration: none;
+
+        .section-head p {
+            color: var(--gray);
+            font-size: 16px;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        /* ===== Products ===== */
+        .products { background: var(--white); }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .product-card {
+            border: 1px solid #ececec;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--white);
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+            border-color: var(--orange-light);
+        }
+
+        .product-banner {
+            position: relative;
+            background: linear-gradient(135deg, #222 0%, #3a3a3a 100%);
+            padding: 40px 32px;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .product-banner .banner-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: var(--orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .product-banner h3 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .product-banner p {
+            font-size: 14px;
+            color: #d5d5d5;
+        }
+
+        .product-body {
+            padding: 26px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            flex: 1;
+        }
+
+        .product-features {
+            display: grid;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .product-features li {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 15px;
-        }
-        
-        .footer-links a:hover {
-            color: var(--uly-orange);
-            transform: translateX(8px);
-        }
-        
-        .footer-info {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .footer-info div {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 15px;
-            line-height: 1.5;
-        }
-        
-        .footer-info i {
-            color: var(--uly-orange);
-            margin-top: 2px;
-            min-width: 16px;
-        }
-        
-        .footer-bottom {
-            text-align: center;
-            padding-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(224, 224, 224, 0.7);
             font-size: 14px;
+            color: #444;
         }
-        
-        .footer-logo {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 15px;
-            color: white;
+
+        .product-features li i { color: var(--orange); }
+
+        .btn-outline {
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 26px;
+            border: 2px solid var(--orange);
+            color: var(--orange-dark);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        /* ===== Why us (dark) ===== */
+        .why-us { background: var(--black); color: var(--white); }
+
+        .why-us .section-head p { color: #bbb; }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 26px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 30px 22px;
+            border: 1px solid #2e2e2e;
+            border-radius: 10px;
+            transition: all 0.25s;
+        }
+
+        .feature-item:hover { border-color: var(--orange); }
+
+        .feature-icon {
+            width: 62px;
+            height: 62px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: rgba(255, 153, 0, 0.15);
+            color: var(--orange);
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .feature-item h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .feature-item p { font-size: 13.5px; color: #bbb; }
+
+        /* ===== Footer ===== */
+        .footer { background: var(--dark); color: #ddd; }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1.2fr;
+            gap: 40px;
+            padding: 56px 0 36px;
+        }
+
+        .footer h4 {
+            color: var(--white);
+            font-size: 16px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
-        .footer-logo img {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .trade-description {
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.7;
-            margin-bottom: 25px;
-            font-size: 15px;
-        }
-        
-        .trade-services {
+
+        .footer-brand .brand-logo { margin-bottom: 16px; width: 120px; height: 56px; }
+
+        .footer-brand p { font-size: 13.5px; color: #bbb; }
+
+        .footer-links li { margin-bottom: 12px; }
+
+        .footer-links a {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 20px;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            color: #bbb;
+            transition: color 0.15s;
         }
-        
-        .service-tag {
-            background: rgba(255, 102, 0, 0.15);
-            color: #ffab40;
-            padding: 6px 15px;
-            border-radius: 20px;
+
+        .footer-links a:hover { color: var(--orange); }
+
+        .footer-links a i { color: var(--orange); width: 16px; }
+
+        .footer-info div {
+            display: flex;
+            gap: 12px;
+            font-size: 13.5px;
+            color: #bbb;
+            margin-bottom: 14px;
+        }
+
+        .footer-info div i { color: var(--orange); margin-top: 3px; width: 16px; }
+
+        .footer-bottom {
+            background: var(--orange);
+            color: var(--white);
+            text-align: center;
+            padding: 18px 0;
             font-size: 13px;
-            font-weight: 500;
-            border: 1px solid rgba(255, 102, 0, 0.3);
+            letter-spacing: 0.5px;
         }
-        
-        .business-hours {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border-left: 3px solid var(--uly-orange);
-        }
-        
-        .business-hours h5 {
-            color: var(--uly-orange-light);
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .business-hours p {
-            color: #ffab40;;
+
+        /* ===== Language switcher ===== */
+        .lang-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 100;
+            background: var(--orange);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
             font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
-        
-        /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 960px) {
+            .hero-inner { grid-template-columns: 1fr; }
+            .products-grid { grid-template-columns: 1fr; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-content { grid-template-columns: 1fr; gap: 28px; }
+            .hero-title { font-size: 36px; }
         }
-        
-        .animate-fade-in-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-        
-        .delay-1 {
-            animation-delay: 0.2s;
-        }
-        
-        .delay-2 {
-            animation-delay: 0.4s;
-        }
-        
-        .uly-highlight {
-            color: var(--uly-orange);
-            font-weight: 700;
+
+        @media (max-width: 640px) {
+            .topbar-inner { flex-direction: column; align-items: flex-start; }
+            .topbar-search { width: 100%; max-width: 100%; }
+            .nav-menu { flex-wrap: wrap; }
+            .nav-menu > li > a { padding: 13px 16px; }
+            .features-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <!-- Language Switcher -->
-    <div class="language-switcher">
-        <button class="lang-btn" id="langToggle">
-            <i class="fas fa-language"></i>
-            <span id="langText">中文</span>
-        </button>
-    </div>
-    
-    <!-- Header -->
-    <div class="header">
-        <div class="container">
-            <div class="nav-bar">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <img src="Info/Title.jpg" alt="ULY Logo">
-                    </div>
-                    <div class="logo-text">
-                        <div class="logo-main">ULY</div>
-                        <div class="logo-subtitle" data-zh="机械配件智能查询系统" data-en="Mechanical Parts Intelligent Query System">Mechanical Parts Intelligent Query System</div>
-                    </div>
-                </div>
-                
-                <div class="nav-links" style="color: white; font-size: 14px;">
-                    <i class="fas fa-phone-alt" style="margin-right: 8px;"></i> 400-888-ULY1
-                    <span style="margin: 0 15px;">|</span>
-                    <i class="fas fa-envelope" style="margin-right: 8px;"></i> support@uly.com
-                </div>
-            </div>
-            
-            <div class="header-content">
-                <h1 class="header-title animate-fade-in-up" data-zh="查找您需要的机械配件" data-en="Find Your Mechanical Parts">
-                    Find Your Mechanical Parts
-                    <span class="uly-highlight" data-zh="从未如此简单" data-en="Made Simple">Made Simple</span>
-                </h1>
-                <p class="header-subtitle animate-fade-in-up delay-1" data-zh="ULY提供专业的机械配件查询服务，快速定位您需要的配件信息，包括详细规格、图片和技术参数" data-en="ULY provides professional mechanical parts query service, quickly locate the parts information you need, including detailed specifications, images and technical parameters">
-                    ULY provides professional mechanical parts query service, quickly locate the parts information you need, including detailed specifications, images and technical parameters
-                </p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="container">
-            <!-- System Selection -->
-            <div class="section-title animate-fade-in-up">
-                <h2 data-zh="选择查询系统" data-en="Select Query System">Select Query System</h2>
-                <p data-zh="根据您的需求选择适合的查询方式，快速找到您需要的配件信息" data-en="Choose the appropriate query method according to your needs to quickly find the parts information you need">
-                    Choose the appropriate query method according to your needs to quickly find the parts information you need
-                </p>
-            </div>
+    <button class="lang-toggle" id="langToggle">
+        <i class="fas fa-language"></i>
+        <span id="langText">中文</span>
+    </button>
 
-<!-- System Cards -->
-            <div class="systems-grid">
-                <!-- Basic Catalog Card -->
-                <div class="system-card animate-fade-in-up">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <div class="card-icon">
-                                <i class="fas fa-book-open"></i>
-                            </div>
-                            <div class="card-name">
-                                <h3 data-zh="基础配件目录" data-en="Basic Parts Catalog">Basic Parts Catalog</h3>
-                                <div class="card-description" data-zh="全面覆盖所有基础配件" data-en="Comprehensive coverage of all basic parts">Comprehensive coverage of all basic parts</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <ul class="card-features">
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="按系统分类管理配件" data-en="Manage parts by system classification">Manage parts by system classification</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="专业配件分类" data-en="Professional parts categories">Professional parts categories</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="详细规格参数查询" data-en="Detailed specification parameter query">Detailed specification parameter query</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="高清配件图片展示" data-en="HD parts image display">HD parts image display</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="快速智能搜索功能" data-en="Fast intelligent search function">Fast intelligent search function</span></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="card-footer">
-                        <a href="basic-directory.html" class="card-btn">
-                            <i class="fas fa-arrow-right"></i> 
-                            <span data-zh="进入基础目录系统" data-en="Enter Basic Catalog System">Enter Basic Catalog System</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Machine Catalog Card -->
-                <div class="system-card animate-fade-in-up delay-1">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <div class="card-icon">
-                                <i class="fas fa-tractor"></i>
-                            </div>
-                            <div class="card-name">
-                                <h3 data-zh="整机配件目录" data-en="Complete Machine Parts Catalog">Complete Machine Parts Catalog</h3>
-                                <div class="card-description" data-zh="按整机型号快速定位" data-en="Quickly locate by machine model">Quickly locate by machine model</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <ul class="card-features">
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="按整机型号管理配件" data-en="Manage parts by machine model">Manage parts by machine model</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="树形目录清晰展示" data-en="Clear tree directory display">Clear tree directory display</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="配件与整机关联" data-en="Parts-machine association">Parts-machine association</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="多型号整机支持" data-en="Multi-model machine support">Multi-model machine support</span></li>
-                            <li><i class="fas fa-check-circle"></i> <span data-zh="快速切换整机型号" data-en="Quick machine model switching">Quick machine model switching</span></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="card-footer">
-                        <a href="machine-directory.html" class="card-btn machine">
-                            <i class="fas fa-arrow-right"></i> 
-                            <span data-zh="进入整机目录系统" data-en="Enter Machine Catalog System">Enter Machine Catalog System</span>
-                        </a>
-                    </div>
+    <!-- ===== Top Bar ===== -->
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <div class="brand">
+                <div class="brand-logo"><img src="Info/Title.png" alt="ULY"></div>
+                <div>
+                    <div class="brand-name">FUJIAN ULY INDUSTRY &amp; TRADE CO., LTD</div>
+                    <div class="brand-sub" data-zh="机械配件智能查询系统" data-en="Mechanical Parts Intelligent Query System">Mechanical Parts Intelligent Query System</div>
                 </div>
             </div>
-            
-            <!-- Features Section -->
-            <div class="section-title animate-fade-in-up delay-2">
-                <h2 data-zh="为什么选择ULY" data-en="Why Choose ULY">Why Choose ULY System</h2>
-                <p data-zh="我们致力于提供最专业、最高效的机械配件查询体验" data-en="We are committed to providing the most professional and efficient mechanical parts query experience">
-                    We are committed to providing the most professional and efficient mechanical parts query experience
-                </p>
-            </div>
-            
-            <div class="features-section animate-fade-in-up delay-2">
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h3 class="feature-title" data-zh="极速查询" data-en="Fast Query">Fast Query</h3>
-                        <p class="feature-description" data-zh="毫秒级响应速度，快速定位您需要的配件信息，提高工作效率" data-en="Millisecond response speed, quickly locate the parts information you need, improve work efficiency">
-                            Millisecond response speed, quickly locate the parts information you need, improve work efficiency
-                        </p>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-images"></i>
-                        </div>
-                        <h3 class="feature-title" data-zh="高清展示" data-en="HD Display">HD Display</h3>
-                        <p class="feature-description" data-zh="所有配件均提供高清图片，支持放大查看细节，确保准确识别" data-en="All parts come with HD images, support zooming to view details, ensuring accurate identification">
-                            All parts come with HD images, support zooming to view details, ensuring accurate identification
-                        </p>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h3 class="feature-title" data-zh="智能搜索" data-en="Intelligent Search">Intelligent Search</h3>
-                        <p class="feature-description" data-zh="支持编码、名称、规格多维度搜索，智能匹配最相关结果" data-en="Support multi-dimensional search by code, name, specification, intelligently match the most relevant results">
-                            Support multi-dimensional search by code, name, specification, intelligently match the most relevant results
-                        </p>
-                    </div>
-                    
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3 class="feature-title" data-zh="专业服务" data-en="Professional Service">Professional Service</h3>
-                        <p class="feature-description" data-zh="专业的团队提供技术支持，确保您获得最佳的使用体验" data-en="Professional team provides technical support to ensure you get the best user experience">
-                            Professional team provides technical support to ensure you get the best user experience
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <form class="topbar-search" id="searchForm" action="basic-directory.html" method="get">
+                <input type="text" id="searchInput" placeholder="Please enter keyword" data-zh-ph="请输入关键词" data-en-ph="Please enter keyword">
+                <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+            </form>
         </div>
-    </div>
-    
-    <!-- Footer - Foreign Trade Company -->
-    <div class="footer">
+    </header>
+
+    <!-- ===== Nav Bar ===== -->
+    <nav class="navbar">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <img src="Info/Title.jpg" alt="ULY Logo">
-                        ULY <span style="font-size: 14px; color: var(--uly-orange);">International Trade</span>
-                    </div>
-                    <p class="trade-description" data-zh="ULY国际贸易有限公司是专业的机械配件出口商，致力于为全球客户提供高质量机械配件和卓越的售后服务。我们与多家国际知名制造商合作，确保产品质量和供应稳定性。" data-en="ULY International Trade Co., Ltd. is a professional mechanical parts exporter, dedicated to providing global customers with high-quality mechanical parts and excellent after-sales service. We cooperate with multiple internationally renowned manufacturers to ensure product quality and supply stability.">
-                        ULY International Trade Co., Ltd. is a professional mechanical parts exporter, dedicated to providing global customers with high-quality mechanical parts and excellent after-sales service. We cooperate with multiple internationally renowned manufacturers to ensure product quality and supply stability.
-                    </p>
-                    
-                    <div class="trade-services">
-                        <span class="service-tag" data-zh="机械配件出口" data-en="Mechanical Parts Export">Mechanical Parts Export</span>
-                        <span class="service-tag" data-zh="国际贸易" data-en="International Trade">International Trade</span>
-                        <span class="service-tag" data-zh="OEM制造" data-en="OEM Manufacturing">OEM Manufacturing</span>
-                        <span class="service-tag" data-zh="供应链管理" data-en="Supply Chain Management">Supply Chain Management</span>
-                        <span class="service-tag" data-zh="质量认证" data-en="Quality Certification">Quality Certification</span>
-                        <span class="service-tag" data-zh="全球物流" data-en="Global Logistics">Global Logistics</span>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4 data-zh="出口业务" data-en="Export Business">Export Business</h4>
-                    <ul class="footer-links">
-                        <li><a href="#"><i class="fas fa-globe-americas"></i> <span data-zh="产品目录" data-en="Product Catalog">Product Catalog</span></a></li>
-                        <li><a href="#"><i class="fas fa-ship"></i> <span data-zh="物流跟踪" data-en="Logistics Tracking">Logistics Tracking</span></a></li>
-                        <li><a href="#"><i class="fas fa-file-contract"></i> <span data-zh="贸易条款" data-en="Trade Terms">Trade Terms</span></a></li>
-                        <li><a href="#"><i class="fas fa-certificate"></i> <span data-zh="质量认证" data-en="Quality Certification">Quality Certification</span></a></li>
-                        <li><a href="#"><i class="fas fa-handshake"></i> <span data-zh="合作伙伴" data-en="Partners">Partners</span></a></li>
-                    </ul>
-                    
-                    <div class="business-hours">
-                        <h5 data-zh="业务时间" data-en="Business Hours">Business Hours</h5>
-                        <p data-zh="周一至周五: 8:30 AM - 5:45 PM (GMT+8)" data-en="Mon-Fri: 8:30 AM - 5:45 PM (GMT+8)">
-                            Mon-Fri: 8:30 AM - 5:45 PM (GMT+8)
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <h4 data-zh="联系我们" data-en="Contact Us">Contact Us</h4>
-                    <div class="footer-info">
-                        <div>
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span data-zh="福建省福鼎市锦云路85号" data-en="No. 85 Jinyun Road, Fuding City, Fujian Province">No. 85 Jinyun Road, Fuding City, Fujian Province, ULY International Trade Building</span>
-                        </div>
-                        <div>
-                            <i class="fas fa-phone"></i>
-                            <div>
-                                <div data-zh="国际热线: +86-400-888-ULY1" data-en="International Hotline: +86-400-888-ULY1">International Hotline: +86-400-888-ULY1</div>
-                                <div style="font-size: 13px; margin-top: 2px;" data-zh="海外电话: +86-591-8888 6666" data-en="Overseas: +86-591-8888 6666">Overseas: +86-591-8888 6666</div>
-                            </div>
-                        </div>
-                        <div>
-                            <i class="fas fa-envelope"></i>
-                            <div>
-                                <div>export@uly-trade.com</div>
-                                <div style="font-size: 13px; margin-top: 2px;">inquiry@uly-trade.com</div>
-                            </div>
-                        </div>
-                        <div>
-                            <i class="fas fa-globe"></i>
-                            <span>www.uly-international.com</span>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <h5 style="font-size: 15px; margin-bottom: 10px;" data-zh="主要出口市场" data-en="Main Export Markets">Main Export Markets</h5>
-                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 13px; line-height: 1.6;">
-                            <span data-zh="欧洲 · 北美 · 东南亚 · 中东 · 非洲 · 南美" data-en="Europe · North America · Southeast Asia · Middle East · Africa · South America">Europe · North America · Southeast Asia · Middle East · Africa · South America</span>
-                        </div>
-                    </div>
+            <ul class="nav-menu">
+                <li><a href="https://www.ulyparts.com/wzsy" data-zh="首页" data-en="Home">Home</a></li>
+                <li><a href="https://www.ulyparts.com/gywm" data-zh="关于我们" data-en="About Us">About Us</a></li>
+                <li><a href="javascript:void(0)" data-zh="产品中心" data-en="Products">Products</a></li>
+                <li><a href="https://www.ulyparts.com/lxwm" data-zh="联系我们" data-en="Contact Us">Contact Us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+        <div class="container hero-inner">
+            <div>
+                <h1 class="hero-title" data-zh="查找您需要的机械配件" data-en="Find Your Mechanical Parts">Find Your Mechanical Parts</h1>
+                <p class="hero-subtitle" data-zh="ULY 提供专业的机械配件查询服务，快速定位所需配件的规格、图片与技术参数。" data-en="ULY provides professional mechanical parts query service to quickly locate specifications, images and technical parameters.">ULY provides professional mechanical parts query service to quickly locate specifications, images and technical parameters.</p>
+                <div class="hero-icons">
+                    <div class="hero-icon"><i class="fas fa-cog"></i></div>
+                    <div class="hero-icon"><i class="fas fa-wrench"></i></div>
+                    <div class="hero-icon"><i class="fas fa-cogs"></i></div>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>© 2026 ULY International Trade Co., Ltd. <span data-zh="版权所有" data-en="All Rights Reserved">All Rights Reserved</span> | 
-                   <span data-zh="闽ICP备2023012345号" data-en="Min ICP No. 2023012345">Min ICP No. 2023012345</span> | 
-                   <span data-zh="进出口许可证: FD-TR-2026001" data-en="Import-Export License: FD-TR-2026001">Import-Export License: FD-TR-2026001</span></p>
+            <div class="hero-stat">
+                <div class="stat-num">5000<sup>+</sup></div>
+                <div class="stat-label" data-zh="常备库存" data-en="Standing Stock">Standing Stock</div>
             </div>
         </div>
-    </div>
-    
+    </section>
+
+    <!-- ===== Products ===== -->
+    <section class="section products" id="products">
+        <div class="container">
+            <div class="section-head">
+                <h2 data-zh="产品目录" data-en="Product Catalog">Product Catalog</h2>
+                <p data-zh="根据需求选择查询方式，快速定位您需要的配件信息。" data-en="Choose the query method that fits your needs to locate parts quickly.">Choose the query method that fits your needs to locate parts quickly.</p>
+            </div>
+            <div class="products-grid">
+                <!-- Basic Catalog -->
+                <div class="product-card">
+                    <div class="product-banner">
+                        <div class="banner-icon"><i class="fas fa-book-open"></i></div>
+                        <h3 data-zh="基础配件目录" data-en="Basic Parts Catalog">Basic Parts Catalog</h3>
+                        <p data-zh="全面覆盖所有基础配件" data-en="Comprehensive coverage of all basic parts">Comprehensive coverage of all basic parts</p>
+                    </div>
+                    <div class="product-body">
+                        <ul class="product-features">
+                            <li><i class="fas fa-check-circle"></i><span data-zh="按系统分类管理配件" data-en="Manage parts by system classification">Manage parts by system classification</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="专业配件分类" data-en="Professional parts categories">Professional parts categories</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="详细规格参数查询" data-en="Detailed specification query">Detailed specification query</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="高清配件图片展示" data-en="HD parts image display">HD parts image display</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="快速智能搜索功能" data-en="Fast intelligent search">Fast intelligent search</span></li>
+                        </ul>
+                        <a href="basic-directory.html" class="btn-outline">
+                            <span data-zh="进入基础目录" data-en="Enter Basic Catalog">Enter Basic Catalog</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Machine Catalog -->
+                <div class="product-card">
+                    <div class="product-banner">
+                        <div class="banner-icon"><i class="fas fa-tractor"></i></div>
+                        <h3 data-zh="整机配件目录" data-en="Machine Parts Catalog">Machine Parts Catalog</h3>
+                        <p data-zh="按整机型号快速定位" data-en="Quickly locate by machine model">Quickly locate by machine model</p>
+                    </div>
+                    <div class="product-body">
+                        <ul class="product-features">
+                            <li><i class="fas fa-check-circle"></i><span data-zh="按整机型号管理配件" data-en="Manage parts by machine model">Manage parts by machine model</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="树形目录清晰展示" data-en="Clear tree directory display">Clear tree directory display</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="配件与整机关联" data-en="Parts-machine association">Parts-machine association</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="多型号整机支持" data-en="Multi-model machine support">Multi-model machine support</span></li>
+                            <li><i class="fas fa-check-circle"></i><span data-zh="快速切换整机型号" data-en="Quick model switching">Quick model switching</span></li>
+                        </ul>
+                        <a href="machine-directory.html" class="btn-outline">
+                            <span data-zh="进入整机目录" data-en="Enter Machine Catalog">Enter Machine Catalog</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Why Us ===== -->
+    <section class="section why-us" id="about">
+        <div class="container">
+            <div class="section-head">
+                <h2 data-zh="为什么选择 ULY" data-en="Why Choose ULY">Why Choose ULY</h2>
+                <p data-zh="我们致力于提供最专业、最高效的机械配件查询体验。" data-en="We are committed to the most professional and efficient parts query experience.">We are committed to the most professional and efficient parts query experience.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <h3 data-zh="极速查询" data-en="Fast Query">Fast Query</h3>
+                    <p data-zh="毫秒级响应，快速定位配件信息，提高工作效率。" data-en="Millisecond response to locate parts and improve efficiency.">Millisecond response to locate parts and improve efficiency.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-images"></i></div>
+                    <h3 data-zh="高清展示" data-en="HD Display">HD Display</h3>
+                    <p data-zh="所有配件提供高清图片，支持放大查看细节。" data-en="HD images for every part, with zoom-in detail view.">HD images for every part, with zoom-in detail view.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-search"></i></div>
+                    <h3 data-zh="智能搜索" data-en="Intelligent Search">Intelligent Search</h3>
+                    <p data-zh="支持编码、名称、规格多维度搜索与智能匹配。" data-en="Multi-dimensional search by code, name and specification.">Multi-dimensional search by code, name and specification.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+                    <h3 data-zh="专业服务" data-en="Professional Service">Professional Service</h3>
+                    <p data-zh="专业团队提供技术支持，确保最佳使用体验。" data-en="Expert team provides technical support for the best experience.">Expert team provides technical support for the best experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Footer ===== -->
+    <footer class="footer" id="contact">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <div class="brand-logo"><img src="Info/Title.png" alt="ULY"></div>
+                <p data-zh="ULY 国际贸易有限公司是专业的机械配件出口商，致力于为全球客户提供高质量机械配件与卓越售后服务。" data-en="ULY International Trade Co., Ltd. is a professional mechanical parts exporter dedicated to high-quality parts and service for global customers.">ULY International Trade Co., Ltd. is a professional mechanical parts exporter dedicated to high-quality parts and service for global customers.</p>
+            </div>
+            <div>
+                <h4 data-zh="快速链接" data-en="Quick Links">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="basic-directory.html"><i class="fas fa-book-open"></i><span data-zh="基础配件目录" data-en="Basic Parts Catalog">Basic Parts Catalog</span></a></li>
+                    <li><a href="machine-directory.html"><i class="fas fa-tractor"></i><span data-zh="整机配件目录" data-en="Machine Parts Catalog">Machine Parts Catalog</span></a></li>
+                    <li><a href="#about"><i class="fas fa-info-circle"></i><span data-zh="关于我们" data-en="About Us">About Us</span></a></li>
+                    <li><a href="#contact"><i class="fas fa-envelope"></i><span data-zh="联系我们" data-en="Contact Us">Contact Us</span></a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 data-zh="联系我们" data-en="Contact Us">Contact Us</h4>
+                <div class="footer-info">
+                    <div><i class="fas fa-map-marker-alt"></i><span data-zh="福建省福鼎市锦云路 85 号" data-en="No. 85 Jinyun Road, Fuding, Fujian, China">No. 85 Jinyun Road, Fuding, Fujian, China</span></div>
+                    <div><i class="fas fa-phone"></i><span>+86-400-888-ULY1</span></div>
+                    <div><i class="fas fa-envelope"></i><span>export@uly-trade.com</span></div>
+                    <div><i class="fas fa-globe"></i><span>www.uly-trade.com</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 ULY International Trade Co., Ltd. <span data-zh="版权所有" data-en="All Rights Reserved">All Rights Reserved</span>
+        </div>
+    </footer>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Language switching functionality
-            let isEnglish = true; // Default to English
+        document.addEventListener('DOMContentLoaded', function () {
+            let isEnglish = true;
             const langToggle = document.getElementById('langToggle');
             const langText = document.getElementById('langText');
-            
-            // Initialize with English
+            const searchInput = document.getElementById('searchInput');
+
             updateLanguage(isEnglish);
-            
-            langToggle.addEventListener('click', function() {
+
+            langToggle.addEventListener('click', function () {
                 isEnglish = !isEnglish;
                 updateLanguage(isEnglish);
             });
-            
+
             function updateLanguage(isEnglish) {
                 const lang = isEnglish ? 'en' : 'zh';
-                
-                // Update language button text
                 langText.textContent = isEnglish ? '中文' : 'EN';
-                
-                // Update all elements with data-zh and data-en attributes
-                const elements = document.querySelectorAll('[data-zh]');
-                elements.forEach(element => {
-                    const text = element.getAttribute(`data-${lang}`);
-                    if (text) {
-                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                            element.placeholder = text;
-                        } else if (element.tagName === 'IMG') {
-                            element.alt = text;
-                        } else {
-                            element.innerHTML = text.replace(/<br>/g, '<br>');
-                        }
-                    }
+
+                document.querySelectorAll('[data-zh]').forEach(function (el) {
+                    const text = el.getAttribute('data-' + lang);
+                    if (text) el.innerHTML = text;
                 });
-                
-                // Update title
-                document.title = isEnglish ? 'ULY - Mechanical Parts Intelligent Query System' : 'ULY - 机械配件智能查询系统';
-                
-                // Update html lang attribute
+
+                if (searchInput) {
+                    searchInput.placeholder = searchInput.getAttribute('data-' + lang + '-ph') || searchInput.placeholder;
+                }
+
+                document.title = isEnglish
+                    ? 'ULY - Mechanical Parts Intelligent Query System'
+                    : 'ULY - 机械配件智能查询系统';
                 document.documentElement.lang = isEnglish ? 'en' : 'zh-CN';
             }
-            
-            // Card hover effects
-            const cards = document.querySelectorAll('.system-card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-10px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-            
-            // Animation effects
-            const animatedElements = document.querySelectorAll('.animate-fade-in-up');
-            animatedElements.forEach(el => {
-                el.style.opacity = 0;
-                el.style.transform = 'translateY(30px)';
-                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            });
-            
-            // Show animations on load
-            setTimeout(() => {
-                animatedElements.forEach((el, index) => {
-                    setTimeout(() => {
-                        el.style.opacity = 1;
-                        el.style.transform = 'translateY(0)';
-                    }, index * 100);
-                });
-            }, 300);
-            
-            // Logo hover effect
-            const logo = document.querySelector('.logo-icon');
-            if (logo) {
-                logo.addEventListener('mouseenter', function() {
-                    this.style.transform = 'rotate(5deg) scale(1.05)';
-                    this.style.transition = 'transform 0.3s ease';
-                });
-                
-                logo.addEventListener('mouseleave', function() {
-                    this.style.transform = 'rotate(0) scale(1)';
+
+            // 搜索提交：跳转基础目录并带上关键词
+            const searchForm = document.getElementById('searchForm');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function (e) {
+                    const kw = searchInput.value.trim();
+                    if (kw) {
+                        searchForm.action = 'basic-directory.html?q=' + encodeURIComponent(kw);
+                    }
                 });
             }
-            
-            // Service tags hover effect
-            const serviceTags = document.querySelectorAll('.service-tag');
-            serviceTags.forEach(tag => {
-                tag.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-3px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-                });
-                
-                tag.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                });
-            });
         });
     </script>
 </body>

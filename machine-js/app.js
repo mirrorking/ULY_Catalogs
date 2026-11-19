@@ -2227,7 +2227,7 @@ function createPartCard(part) {
                 ${categoryTag}
             </div>
             <div class="part-specs">
-                ${part.specs ? `${part.category} - ${part.specs}` : part.category}
+                ${part.specs ? part.specs : (part.name || part.category)}
             </div>
             <div class="part-footer">
                 <div class="part-old-code">${part.oldCode ? `${state.currentLanguage === 'zh' ? '旧编码' : 'Old Code'}: ${part.oldCode}` : ''}</div>
