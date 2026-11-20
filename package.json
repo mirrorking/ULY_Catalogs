@@ -1,0 +1,13 @@
+{
+  "name": "uly-catalogs",
+  "version": "1.0.0",
+  "description": "ULY Mechanical Parts Intelligent Query System",
+  "main": "api/verify.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
