@@ -410,11 +410,6 @@
 
     <script src="auth.js"></script>
     <script>
-        // GitHub Gist配置 - 只使用Gist ID，不需要Token
-        const GIST_CONFIG = {
-            gistId: '52102f8d0c8808a733ce44513a4cedd9'
-        };
-
         // 全局变量声明
         let authCodeInput, submitButton, authMessage, attemptsInfo;
         let lockInfo, lockTimer, authForm, lastSync;
@@ -494,95 +489,22 @@
             }
         }
 
-        // 从GitHub Gist获取验证码
-        async function fetchCodeFromGist() {
+        // 向服务器端验证接口提交验证码（验证码本身由服务器端从 Gist 比对，前端不可见）
+        async function verifyCodeWithServer(code) {
             try {
-                // 显示同步状态
-                syncStatus.style.display = 'flex';
-                syncStatus.className = 'sync-status syncing';
-                syncMessage.innerHTML = '<span class="loading"></span> Syncing verification code from GitHub Gist...';
-                
-                // 构建Gist URL - 使用公开的raw URL（不需要token）
-                const gistUrl = `https://gist.githubusercontent.com/raw/${GIST_CONFIG.gistId}/uly_config.json`;
-                
-                console.log('从Gist获取验证码:', gistUrl);
-                
-                // 添加随机参数防止缓存
-                const timestamp = new Date().getTime();
-                const response = await fetch(`${gistUrl}?t=${timestamp}`, {
-                    method: 'GET',
-                    cache: 'no-cache',
+                const response = await fetch('/api/verify', {
+                    method: 'POST',
                     headers: {
-                        'Accept': 'application/json'
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch Gist: HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (!data || !data.code) {
-                    throw new Error('No verification code found in Gist');
-                }
-                
-                // 更新本地验证码（仅更新authManager的配置，不自动验证）
-                if (window.authManager && window.authManager.updateCode) {
-                    const result = window.authManager.updateCode(data.code);
-                    
-                    if (result.success) {
-                        // 保存同步时间
-                        localStorage.setItem('uly_last_sync_time', Date.now().toString());
-                        localStorage.setItem('uly_gist_cache', data.code);
-                        localStorage.setItem('uly_gist_cache_time', Date.now().toString());
-                        
-                        // 更新显示
-                        syncStatus.className = 'sync-status success';
-                        syncMessage.innerHTML = '<i class="fas fa-check-circle"></i> Verification code synced successfully';
-                        lastSync.textContent = 'Just now';
-                        
-                        // 延迟隐藏同步状态
-                        setTimeout(() => {
-                            syncStatus.style.display = 'none';
-                        }, 3000);
-                        
-                        return {
-                            success: true,
-                            code: data.code,
-                            updated_at: data.updated_at || new Date().toISOString()
-                        };
-                    } else {
-                        throw new Error(result.message);
-                    }
-                } else {
-                    throw new Error('authManager not initialized');
-                }
+                const result = await response.json();
+                return result;
             } catch (error) {
-                console.error('Failed to sync from Gist:', error);
-                
-                // 显示错误状态
-                syncStatus.className = 'sync-status error';
-                syncMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Sync failed: ${error.message}`;
-                
-                // 使用缓存的验证码时间戳
-                const lastSyncTime = localStorage.getItem('uly_last_sync_time');
-                if (lastSyncTime) {
-                    const time = new Date(parseInt(lastSyncTime));
-                    lastSync.textContent = time.toLocaleString();
-                } else {
-                    lastSync.textContent = 'Never';
-                }
-                
-                // 延迟隐藏同步状态
-                setTimeout(() => {
-                    syncStatus.style.display = 'none';
-                }, 5000);
-                
-                return {
-                    success: false,
-                    error: error.message
-                };
+                console.error('Server verification failed:', error);
+                return { ok: false, message: '验证服务暂时不可用，请稍后再试' };
             }
         }
 
@@ -661,16 +583,22 @@
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
             
-            // 验证
-            const result = window.authManager.validate(code);
+            // 向服务器端验证（验证码由服务器端从 Gist 比对，前端不可见）
+            const result = await verifyCodeWithServer(code);
             
             // 显示结果
-            if (result.success) {
-                showMessage(result.message, 'success');
+            if (result.ok) {
+                showMessage(result.message || '验证成功！正在跳转...', 'success');
                 
-                // 获取重定向URL
-                const redirectUrl = getReturnUrl();
-                console.log('验证成功，跳转到:', redirectUrl);
+                // 记录认证状态（供其他页面检查）
+                const tokenData = {
+                    authenticated: true,
+                    expires: Date.now() + (24 * 60 * 60 * 1000),
+                    timestamp: Date.now()
+                };
+                try {
+                    localStorage.setItem('uly_access_token', btoa(JSON.stringify(tokenData)));
+                } catch {}
                 
                 // 清除存储的页面信息，避免下次错误使用
                 sessionStorage.removeItem('uly_return_page');
@@ -678,7 +606,7 @@
                 
                 // 延迟跳转到目标页面
                 setTimeout(() => {
-                    // 确保URL是有效的
+                    const redirectUrl = getReturnUrl();
                     if (redirectUrl && redirectUrl !== 'auth.html') {
                         window.location.href = redirectUrl;
                     } else {
@@ -686,25 +614,26 @@
                     }
                 }, 1500);
             } else {
-                showMessage(result.message, result.locked ? 'warning' : 'error');
+                showMessage(result.message || '验证码错误，请重新输入', 'error');
                 authCodeInput.classList.add('error');
                 
-                if (result.locked) {
+                // 记录失败次数（本地限制，防止暴力破解）
+                const result2 = window.authManager.recordFailedAttempt();
+                if (result2.locked) {
                     checkLockStatus();
                 } else {
-                    // 更新尝试次数信息
                     attemptsInfo.innerHTML = `
                         <i class="fas fa-exclamation-triangle"></i> 
-                        Verification failed, <strong>${result.remainingAttempts}</strong> attempts remaining
+                        Verification failed, <strong>${result2.remainingAttempts}</strong> attempts remaining
                     `;
                     attemptsInfo.style.color = '#ff4444';
-                    
-                    // 清空输入框并聚焦
-                    authCodeInput.value = '';
-                    setTimeout(() => {
-                        authCodeInput.focus();
-                    }, 100);
                 }
+                
+                // 清空输入框并聚焦
+                authCodeInput.value = '';
+                setTimeout(() => {
+                    authCodeInput.focus();
+                }, 100);
                 
                 // 重新启用提交按钮
                 submitButton.disabled = false;
@@ -769,24 +698,19 @@
             // 初始化DOM元素
             initDOMElements();
             
-            // 显示最后同步时间
-            if (lastSync) {
-                const lastSyncTime = localStorage.getItem('uly_last_sync_time');
-                if (lastSyncTime) {
-                    const time = new Date(parseInt(lastSyncTime));
-                    lastSync.textContent = time.toLocaleString();
-                } else {
-                    lastSync.textContent = 'Not synced';
-                }
-            }
-            
-            // 检查是否已通过验证
-            if (window.authManager && window.authManager.isAuthenticated()) {
-                // 已认证，跳转到目标页面
-                const redirectUrl = getReturnUrl();
-                console.log('已认证，跳转到:', redirectUrl);
-                window.location.href = redirectUrl;
-                return;
+            // 检查是否已通过服务器端验证（cookie 或 token）
+            const hasToken = localStorage.getItem('uly_access_token');
+            if (hasToken) {
+                try {
+                    const data = JSON.parse(atob(hasToken));
+                    if (Date.now() < data.expires) {
+                        // 已认证，跳转到目标页面
+                        const redirectUrl = getReturnUrl();
+                        console.log('已认证，跳转到:', redirectUrl);
+                        window.location.href = redirectUrl;
+                        return;
+                    }
+                } catch {}
             }
             
             // 显示重定向信息
@@ -795,12 +719,6 @@
             // 检查是否被锁定
             if (window.authManager) {
                 checkLockStatus();
-            }
-            
-            // 如果未锁定，自动从Gist获取验证码
-            if (window.authManager && !window.authManager.isLocked()) {
-                // 从Gist获取最新验证码
-                await fetchCodeFromGist();
             }
             
             // 设置事件监听器
