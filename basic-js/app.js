@@ -3,6 +3,21 @@
 let searchDebounceTimer = null;
 let scrollTimer = null;
 
+// 背景滚动锁定（计数，避免多个抽屉叠加时提前解锁）
+let bodyScrollLockCount = 0;
+function lockBodyScroll() {
+    bodyScrollLockCount++;
+    document.body.style.overflow = 'hidden';
+}
+function unlockBodyScroll() {
+    bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+    if (bodyScrollLockCount === 0) {
+        document.body.style.overflow = '';
+    }
+}
+window.lockBodyScroll = lockBodyScroll;
+window.unlockBodyScroll = unlockBodyScroll;
+
 // ========== 数据加载和显示函数 ==========
 async function loadJSONData() {
     try {
@@ -101,7 +116,7 @@ function updateDataStatus(success, message) {
 function initializeTreeView() {
     const treeList = document.getElementById('category-tree');
     treeList.innerHTML = '';
-    
+
     window.utils.state.sheetNames.forEach(sheetName => {
         const productCount = window.utils.state.productsBySheet[sheetName] ? 
             window.utils.state.productsBySheet[sheetName].length : 0;
@@ -146,6 +161,10 @@ function initializeTreeView() {
             window.utils.state.selectedSheet = sheetName;
             resetPagination();
             showProductsBySheet(sheetName);
+
+            const mobileLabel = document.getElementById('mobile-filter-label');
+            if (mobileLabel) mobileLabel.textContent = sheetName;
+            if (window.closeSidebarDrawer) window.closeSidebarDrawer();
         });
         
         treeList.appendChild(treeItem);
@@ -282,9 +301,9 @@ function showProductsBySheet(sheetName) {
         showSearchResults();
         return;
     }
-    
+
     window.imageLoader.cleanupImageLoadingStates();
-    
+
     const products = window.utils.state.productsBySheet[sheetName] || [];
     updatePaginationInfo(products.length);
     
@@ -811,6 +830,58 @@ function activateSheetInTree(sheetName) {
 
 // ========== 事件监听器 ==========
 function setupEventListeners() {
+
+    // 分类抽屉（手机端）—— 最先绑定，避免前置异常影响；空值兜底
+    const sidebarEl = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const openSidebarBtn = document.getElementById('open-sidebar');
+
+    function openSidebarDrawer() {
+        if (!sidebarEl || !sidebarOverlay) return;
+        sidebarEl.classList.add('open');
+        sidebarOverlay.classList.add('open');
+        lockBodyScroll();
+    }
+
+    function closeSidebarDrawer() {
+        if (!sidebarEl || !sidebarOverlay) return;
+        sidebarEl.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+        unlockBodyScroll();
+    }
+
+    openSidebarBtn?.addEventListener('click', openSidebarDrawer);
+    sidebarOverlay?.addEventListener('click', closeSidebarDrawer);
+    window.closeSidebarDrawer = closeSidebarDrawer;
+
+    // 顶部导航抽屉（手机端）
+    const navDrawerEl = document.getElementById('nav-tabs-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const openNavBtn = document.getElementById('open-nav-drawer');
+
+    function openNavDrawer() {
+        if (!navDrawerEl || !navOverlay) return;
+        navDrawerEl.classList.add('open');
+        navOverlay.classList.add('open');
+        lockBodyScroll();
+    }
+
+    function closeNavDrawer() {
+        if (!navDrawerEl || !navOverlay) return;
+        navDrawerEl.classList.remove('open');
+        navOverlay.classList.remove('open');
+        unlockBodyScroll();
+    }
+
+    openNavBtn?.addEventListener('click', openNavDrawer);
+    navOverlay?.addEventListener('click', closeNavDrawer);
+    window.closeNavDrawer = closeNavDrawer;
+
+    // 点击导航抽屉内的链接/按钮后自动收起
+    navDrawerEl?.querySelectorAll('a.nav-tab, button.nav-tab').forEach(item => {
+        item.addEventListener('click', closeNavDrawer);
+    });
+
     // 语言切换
     const languageBtn = document.getElementById('language-btn');
     const languageDropdown = document.getElementById('language-dropdown');
@@ -885,6 +956,15 @@ function setupEventListeners() {
         e.stopPropagation();
         window.cart.toggleCartSidebar();
     });
+
+    // 手机端导航栏购物车按钮（仅在窄屏显示）
+    const openCartMobileBtn = document.getElementById('open-cart-mobile');
+    if (openCartMobileBtn) {
+        openCartMobileBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            window.cart.toggleCartSidebar();
+        });
+    }
     
     document.getElementById('cart-close').addEventListener('click', function() {
         window.cart.closeCartSidebar();
@@ -961,6 +1041,7 @@ function setupEventListeners() {
             window.imageLoader.closeImageModal();
             document.getElementById('quantity-modal').classList.remove('active');
             window.cart.closeCartSidebar();
+            if (window.closeSidebarDrawer) window.closeSidebarDrawer();
             
             if (window.utils.state.currentView === 'detail') {
                 if (window.utils.state.isSearchMode) {

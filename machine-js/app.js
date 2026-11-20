@@ -87,6 +87,7 @@ const translations = {
         
         // Excel导出列名
         "excel_serial_number": "序号",
+        "excel_product_image": "商品图片",
         "excel_product_code": "商品编码",
         "excel_original_code": "原始编码",
         "excel_product_name": "商品名称",
@@ -187,6 +188,7 @@ const translations = {
         
         // Excel导出列名
         "excel_serial_number": "Serial Number",
+        "excel_product_image": "Product Image",
         "excel_product_code": "Product Code",
         "excel_original_code": "Original Code",
         "excel_product_name": "Product Name",
@@ -658,7 +660,11 @@ const state = {
             return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
         },
         updateUI() {
-            document.getElementById('cart-count').textContent = this.getTotalItems();
+            const totalItems = this.getTotalItems();
+            document.getElementById('cart-count').textContent = totalItems;
+            // 手机端导航栏购物车按钮的角标（桌面端该按钮不渲染）
+            const mobileCount = document.getElementById('cart-count-mobile');
+            if (mobileCount) mobileCount.textContent = totalItems;
             this.renderCart();
             updateCartButtonStates();
         },
@@ -736,15 +742,6 @@ const state = {
                 setTimeout(() => notification.remove(), 300);
             }, 1000);
         },
-        checkImageUrlExists(url) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
-                img.src = url;
-            });
-        },
-        
         async loadImageToBuffer(productCode) {
             // Excel 导出使用原图
             const candidates = [originalImageUrl(productCode)];
@@ -903,12 +900,30 @@ const state = {
                         const cellWidthPx = worksheet.getColumn(2).width * 7;
                         const cellHeightPx = row.height * 1.33;
 
-                        const blob = new Blob([imageBuffer], { type: `image/${extension}` });
-                        const bitmap = await createImageBitmap(blob);
+                        // createImageBitmap 在部分浏览器/版本不可用，降级为固定尺寸
+                        let bitmap = null;
+                        try {
+                            const blob = new Blob([imageBuffer], { type: `image/${extension}` });
+                            bitmap = await createImageBitmap(blob);
+                        } catch (e) {
+                            console.warn('createImageBitmap 不可用，降级处理:', e);
+                            bitmap = null;
+                        }
 
-                        const scale = Math.min(cellWidthPx / bitmap.width, cellHeightPx / bitmap.height);
-                        const width = bitmap.width * scale;
-                        const height = bitmap.height * scale;
+                        let imgWidth, imgHeight;
+                        if (bitmap && bitmap.width > 0 && bitmap.height > 0) {
+                            imgWidth = bitmap.width;
+                            imgHeight = bitmap.height;
+                            if (typeof bitmap.close === 'function') bitmap.close();
+                        } else {
+                            // 无法解码时按图片列宽等比占满（假定接近方图）
+                            imgWidth = cellWidthPx;
+                            imgHeight = cellHeightPx;
+                        }
+
+                        const scale = Math.min(cellWidthPx / imgWidth, cellHeightPx / imgHeight);
+                        const width = imgWidth * scale;
+                        const height = imgHeight * scale;
 
                         worksheet.addImage(imageId, {
                             tl: {
@@ -1011,28 +1026,32 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
+// 切换语言（统一入口，供按钮与快捷键复用）
+function switchLanguage(lang) {
+    if (!translations[lang] || state.currentLanguage === lang) return;
+
+    state.currentLanguage = lang;
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+
+    translatePage();
+    updateCurrentMachineDisplay();
+
+    if (state.currentMachine) {
+        renderTree();
+        applyFilters();
+        updateCartButtonStates();
+    }
+}
+window.switchLanguage = switchLanguage;
+
 // 设置语言切换器
 function setupLanguageSwitcher() {
-    const langBtns = document.querySelectorAll('.lang-btn');
-    
-    langBtns.forEach(btn => {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const lang = this.dataset.lang;
-            if (state.currentLanguage !== lang) {
-                langBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                state.currentLanguage = lang;
-                
-                translatePage();
-                
-                updateCurrentMachineDisplay();
-                
-                if (state.currentMachine) {
-                    renderTree();
-                    applyFilters();
-                }
-            }
+            switchLanguage(this.dataset.lang);
         });
     });
 }
@@ -1170,24 +1189,6 @@ function loadLazyImage(imageContainer, productCode) {
     showLazyImage(imageContainer, imageUrl, productCode);
 }
 
-async function asyncPool(limit, tasks) {
-    const results = [];
-    const executing = [];
-
-    for (const task of tasks) {
-        const p = Promise.resolve().then(() => task());
-        results.push(p);
-
-        if (limit <= tasks.length) {
-            const e = p.then(() => executing.splice(executing.indexOf(e), 1));
-            executing.push(e);
-            if (executing.length >= limit) {
-                await Promise.race(executing);
-            }
-        }
-    }
-    return Promise.all(results);
-}
 // 显示懒加载图片
 function showLazyImage(imageContainer, imageUrl, productCode) {
     // 如果已经显示过了，跳过
@@ -1261,19 +1262,6 @@ function showNoImage(imageContainer, productCode) {
         </div>
     `;
     translatePage();
-}
-
-// 检查图片是否存在
-async function checkImage(code) {
-    // 直接使用.png格式
-    const url = `images/${code}.png`;
-    const exists = await checkImageExists(url);
-    
-    if (exists) {
-        return url;
-    }
-    
-    return false;
 }
 
 // 检查图片是否存在
@@ -1686,8 +1674,15 @@ function updateCurrentMachineDisplay() {
     partDetailSubtitle.textContent = `${state.currentLanguage === 'zh' ? '整机型号' : 'Machine Model'}: ${state.currentMachine.name} (${typeName})`;
 }
 
+// 手机端分类抽屉触发条：只在选中整机、分类树有内容时显示
+function setTreeBarVisible(visible) {
+    const bar = document.getElementById('mobile-filter-bar');
+    if (bar) bar.style.display = visible ? '' : 'none';
+}
+
 // 显示整机内容
 function showMachineContent() {
+    setTreeBarVisible(true);
     document.getElementById('machine-selector').style.display = 'none';
     document.getElementById('machine-parts-container').classList.add('active');
     document.getElementById('part-detail-container').classList.remove('active');
@@ -1695,6 +1690,7 @@ function showMachineContent() {
 
 // 返回类型选择器
 function backToTypeSelector() {
+    setTreeBarVisible(false);
     state.currentMachineType = null;
     state.currentMachine = null;
     state.selectedPart = null;
@@ -1709,6 +1705,7 @@ function backToTypeSelector() {
 
 // 返回选择器
 function backToSelector() {
+    setTreeBarVisible(false);
     if (state.currentMachineType) {
         document.getElementById('machine-selector').style.display = 'block';
         document.getElementById('machine-parts-container').classList.remove('active');
@@ -1846,6 +1843,9 @@ function createTreeNode(category, count, isExpanded, isActive, hasParts) {
 
 // 选择分类
 function selectCategory(category) {
+    // 手机端：选完分类自动收起抽屉
+    if (window.closeTreeDrawer) window.closeTreeDrawer();
+
     if (category === '全部') {
         state.currentCategory = '全部';
         state.selectedPart = null;
@@ -2287,6 +2287,7 @@ function selectPart(part) {
 
 // 显示配件详情
 function showPartDetail(part) {
+    setTreeBarVisible(false);
     document.getElementById('machine-parts-container').classList.remove('active');
     document.getElementById('part-detail-container').classList.add('active');
     
@@ -2552,9 +2553,15 @@ async function loadMoreImages(productCode) {
 
     /* ========= 更多图片：边检测，边显示 ========= */
     const extensions = ['webp', 'png', 'jpg', 'jpeg'];
+    const MAX_MORE_IMAGES = 20;
     let imageIndex = 1;
 
-    while (true) {
+    while (imageIndex <= MAX_MORE_IMAGES) {
+        // 用户已切换到别的配件时停止探测，避免无效请求
+        if (!thumbsContainer.isConnected || (state.selectedPart && state.selectedPart.code !== productCode)) {
+            break;
+        }
+
         let found = false;
 
         for (const ext of extensions) {
@@ -2604,46 +2611,6 @@ async function loadMoreImages(productCode) {
 }
 
 
-// 获取更多图片
-async function getMoreImages(productCode) {
-    const baseCode = productCode;
-    const moreImages = [];
-    
-    // 定义扩展名顺序：jpg, png, jpeg
-    const extensions = ['webp', 'png', 'jpg', 'jpeg'];
-    let imageIndex = 1;
-    
-    // 尝试读取带括号的图片文件
-    while (true) {
-        let foundImage = false;
-        
-        for (const ext of extensions) {
-            const imageUrl = `Moreimages/${baseCode}(${imageIndex}).${ext}`;
-            const exists = await checkImageExists(imageUrl);
-            
-            if (exists) {
-                moreImages.push({
-                    url: imageUrl,
-                    index: imageIndex,
-                    extension: ext
-                });
-                foundImage = true;
-                // 找到一种格式后就不尝试其他格式了
-                break;
-            }
-        }
-        
-        if (!foundImage) {
-            // 如果所有格式都没找到，停止搜索
-            break;
-        }
-        
-        imageIndex++;
-    }
-    
-    return moreImages;
-}
-
 // 显示上一个配件
 function showPreviousPart() {
     if (!state.currentMachine || !state.selectedPart) return;
@@ -2680,6 +2647,7 @@ function updateNavigationButtons() {
 
 // 返回配件列表
 function backToPartsList() {
+    setTreeBarVisible(true);
     document.getElementById('machine-parts-container').classList.add('active');
     document.getElementById('part-detail-container').classList.remove('active');
 }
@@ -2860,7 +2828,59 @@ function setupEventListeners() {
     
     // 切换整机树形目录
     document.getElementById('toggle-machine-tree').addEventListener('click', toggleMachineTree);
-    
+
+    // 手机端：顶部导航栏新增按钮
+    const openNavBtn = document.getElementById('open-nav-drawer');
+    const navTabsDrawer = document.getElementById('nav-tabs-drawer');
+    const navOverlay = document.getElementById('nav-overlay');
+    const openCartBtnMobile = document.getElementById('open-cart-mobile');
+
+    function openNavDrawer() {
+        if (!navTabsDrawer || !navOverlay) return;
+        navTabsDrawer.classList.add('open');
+        navOverlay.classList.add('open');
+    }
+    function closeNavDrawer() {
+        if (!navTabsDrawer || !navOverlay) return;
+        navTabsDrawer.classList.remove('open');
+        navOverlay.classList.remove('open');
+    }
+
+    if (openNavBtn) openNavBtn.addEventListener('click', openNavDrawer);
+    if (navOverlay) navOverlay.addEventListener('click', closeNavDrawer);
+    navTabsDrawer?.querySelectorAll('a.nav-tab, button.nav-tab').forEach(item => {
+        item.addEventListener('click', closeNavDrawer);
+    });
+
+    // 手机端：导航栏购物车按钮（点击后不再被全局点击监听立刻关闭）
+    if (openCartBtnMobile) {
+        openCartBtnMobile.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeNavDrawer();
+            openCart();
+        });
+    }
+
+    // 手机端：分类树抽屉
+    const machineTreeContainer = document.getElementById('machine-tree-container');
+    const machineTreeOverlay = document.getElementById('machine-tree-overlay');
+    const openTreeDrawerBtn = document.getElementById('open-tree-drawer');
+
+    function openTreeDrawer() {
+        if (!machineTreeContainer || !machineTreeOverlay) return;
+        machineTreeContainer.classList.add('open');
+        machineTreeOverlay.classList.add('open');
+    }
+    function closeTreeDrawer() {
+        if (!machineTreeContainer || !machineTreeOverlay) return;
+        machineTreeContainer.classList.remove('open');
+        machineTreeOverlay.classList.remove('open');
+    }
+    window.closeTreeDrawer = closeTreeDrawer;
+
+    if (openTreeDrawerBtn) openTreeDrawerBtn.addEventListener('click', openTreeDrawer);
+    if (machineTreeOverlay) machineTreeOverlay.addEventListener('click', closeTreeDrawer);
+
     // 购物车相关事件
     document.getElementById('view-cart').addEventListener('click', openCart);
     document.getElementById('cart-close').addEventListener('click', closeCart);
@@ -2907,10 +2927,12 @@ function setupEventListeners() {
     document.addEventListener('click', function(e) {
         const cartSidebar = document.getElementById('cart-sidebar');
         const viewCartBtn = document.getElementById('view-cart');
+        if (e.target && e.target.closest && e.target.closest('#open-cart-mobile')) return;
         
         if (cartSidebar.classList.contains('active') &&
             !cartSidebar.contains(e.target) &&
             !viewCartBtn.contains(e.target) &&
+            !e.target.closest('#open-cart-mobile') &&
             !e.target.closest('.quantity-modal') &&
             !e.target.closest('.quantity-modal-content')) {
             closeCart();
@@ -2965,54 +2987,47 @@ function setupEventListeners() {
     
     // 键盘快捷键
     document.addEventListener('keydown', function(e) {
+        const imageModal = document.getElementById('image-modal');
+        const quantityModal = document.getElementById('quantity-modal');
+        const detailContainer = document.getElementById('part-detail-container');
+        const imageModalActive = imageModal.classList.contains('active');
+        const quantityModalActive = quantityModal.classList.contains('active');
+        const detailActive = detailContainer.classList.contains('active');
+
         if (e.key === 'Escape') {
-            closeImageModal();
-            closeQuantityModal();
-            closeCart();
-            
-            if (document.getElementById('part-detail-container').classList.contains('active')) {
-                backToPartsList();
+            // 关闭优先级：图片弹窗 > 数量弹窗 > 购物车/详情页
+            if (imageModalActive) {
+                closeImageModal();
+            } else if (quantityModalActive) {
+                closeQuantityModal();
+            } else {
+                closeCart();
+                if (detailActive) {
+                    backToPartsList();
+                }
             }
+            return;
         }
-        
-        if (state.selectedPart && state.currentMachine && 
-            document.getElementById('part-detail-container').classList.contains('active')) {
+
+        // 仅在详情页激活且无弹窗时，才允许左右切换配件
+        if (state.selectedPart && state.currentMachine && detailActive &&
+            !imageModalActive && !quantityModalActive) {
             if (e.key === 'ArrowLeft') {
                 showPreviousPart();
             } else if (e.key === 'ArrowRight') {
                 showNextPart();
             }
         }
-        
-        if (e.ctrlKey && e.key === 'b') {
+
+        if (e.ctrlKey && (e.key === 'b' || e.key === 'B')) {
             e.preventDefault();
             openCart();
         }
-        
-        if (e.ctrlKey && e.key === 'l') {
+
+        // 切换语言：原 Ctrl+L 与浏览器地址栏快捷键冲突，改为 Ctrl+Shift+L
+        if (e.ctrlKey && e.shiftKey && (e.key === 'l' || e.key === 'L')) {
             e.preventDefault();
-            const currentLang = state.currentLanguage;
-            const newLang = currentLang === 'zh' ? 'en' : 'zh';
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.lang === newLang) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            state.currentLanguage = newLang;
-            
-            translatePage();
-            
-            updateCurrentMachineDisplay();
-            
-            updateMachineTypeStats();
-            
-            if (state.currentMachine) {
-                renderTree();
-                applyFilters();
-            }
+            switchLanguage(state.currentLanguage === 'zh' ? 'en' : 'zh');
         }
     });
     
@@ -3024,22 +3039,8 @@ function setupEventListeners() {
             zoomImage(-0.1);
         }
     });
-    
-    // 为配件卡片添加点击事件
-    document.getElementById('parts-grid').addEventListener('click', function(e) {
-        const partCard = e.target.closest('.part-card');
-        if (partCard) {
-            const partCode = partCard.dataset.code;
-            let part = null;
-            
-            part = state.filteredParts.find(p => p.code === partCode);
-            
-            if (part) {
-                selectPart(part);
-                closeCart();
-            }
-        }
-    });
+
+    // 配件卡片的点击已在 createPartCard 内逐卡绑定，此处不再重复委托，避免重复打开详情
 }
 
 // 注入占位卡片样式
@@ -3080,6 +3081,12 @@ function setupEventListeners() {
             flex-direction: column;
             align-items: center;
             justify-content: center;
+        }
+        @media (max-width: 768px) {
+            .placeholder-card .placeholder-image,
+            .placeholder-card .placeholder-image .image-placeholder {
+                min-height: 120px;
+            }
         }
     `;
     document.head.appendChild(style);

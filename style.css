@@ -108,6 +108,26 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+/* 顶部导航汉堡按钮（仅手机端显示） */
+.nav-menu-btn {
+    display: none;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 顶部导航抽屉遮罩（桌面默认隐藏） */
+.nav-overlay {
+    display: none;
+}
+
 /* 主内容区域 */
 .main-area {
     flex: 1;
@@ -123,6 +143,15 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+
+/* 手机端分类抽屉：桌面默认隐藏触发条与遮罩 */
+.mobile-filter-bar {
+    display: none;
+}
+
+.sidebar-overlay {
+    display: none;
 }
 
 .sidebar-header {
@@ -720,21 +749,152 @@ footer {
 }
 
 @media (max-width: 768px) {
+    body {
+        height: auto;
+        overflow: auto;
+    }
+
+    .container {
+        height: auto;
+        min-height: calc(100vh - 20px);
+        overflow: visible;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
     .main-area {
         flex-direction: column;
+        overflow: visible;
     }
-    
-    .sidebar {
+
+    /* 顶部导航抽屉：右侧滑出 */
+    .nav-menu-btn {
+        display: flex;
+    }
+
+    .top-nav {
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .nav-tabs {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 280px;
+        max-width: 80vw;
+        height: 100vh;
+        flex-direction: column;
+        gap: 10px;
+        padding: 20px 16px;
+        background: linear-gradient(to bottom, #2c3e50, #34495e);
+        z-index: 1001;
+        overflow-y: auto;
+        transition: right 0.3s ease;
+        box-shadow: -2px 0 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .nav-tabs.open {
+        right: 0;
+    }
+
+    .nav-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+    }
+
+    .nav-overlay.open {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .nav-tabs .language-switcher {
         width: 100%;
-        max-height: 250px;
-        border-right: none;
+        margin-right: 0;
+    }
+
+    .nav-tabs .nav-tab {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    /* 手机端分类抽屉触发条 */
+    .mobile-filter-bar {
+        display: block;
+        padding: 10px 15px;
+        background-color: #fff;
         border-bottom: 1px solid #dee2e6;
     }
-    
-    .tree-container {
-        max-height: 200px;
+
+    .mobile-filter-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #2c3e50;
+        cursor: pointer;
     }
-    
+
+    .mobile-filter-btn i {
+        color: #3498db;
+    }
+
+    /* 分类抽屉：左侧滑出 */
+    .sidebar {
+        position: fixed;
+        left: -320px;
+        top: 0;
+        width: 300px;
+        max-width: 85vw;
+        height: 100vh;
+        max-height: none;
+        z-index: 1000;
+        border-right: none;
+        border-bottom: none;
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25);
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.open {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .tree-container {
+        max-height: none;
+        overflow-y: auto;
+    }
+
+    .main-content {
+        overflow: visible;
+    }
+
     .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         padding: 15px;
@@ -742,26 +902,76 @@ footer {
 }
 
 @media (max-width: 576px) {
+    .top-nav {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
+    .logo {
+        gap: 6px;
+        align-self: flex-start;
+    }
+
+    .logo-icon {
+        font-size: 16px;
+    }
+
+    .logo-text h1 {
+        font-size: 14px;
+        line-height: 1.3;
+    }
+
+    .logo-text .subtitle {
+        display: none;
+    }
+
     .nav-tabs {
         flex-direction: column;
-        width: 100%;
+        gap: 5px;
     }
-    
-    .top-nav {
+
+    .language-switcher {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .language-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .nav-tab {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 5px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .sidebar-header {
+        padding: 12px 15px;
+    }
+
+    .content-header {
         flex-direction: column;
         gap: 10px;
+        align-items: flex-start;
+        padding: 12px 15px;
     }
-    
+
     .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 10px;
         padding: 10px;
     }
-    
-    .content-header {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
+
+    footer {
+        padding: 12px 15px;
     }
 }
 
@@ -1738,20 +1948,22 @@ footer {
 @media (max-width: 992px) {
     .machine-main-content {
         flex-direction: column;
+        overflow: visible;
     }
-    
+
     .machine-tree-container {
         width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        max-height: 300px;
+        max-height: 240px;
+        overflow-y: auto;
     }
-    
+
     .machine-controls {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .current-machine, .machine-search-box {
         min-width: auto;
         width: 100%;

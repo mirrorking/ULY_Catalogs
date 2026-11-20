@@ -89,7 +89,11 @@ const cartState = {
         return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
     },
     updateUI() {
-        document.getElementById('cart-count').textContent = this.getTotalItems();
+        const totalItems = this.getTotalItems();
+        document.getElementById('cart-count').textContent = totalItems;
+        // 手机端导航栏购物车按钮的角标（桌面端该按钮不渲染）
+        const mobileCount = document.getElementById('cart-count-mobile');
+        if (mobileCount) mobileCount.textContent = totalItems;
         this.renderCart();
         if (window.app) window.app.updateCartButtonStates();
     },
@@ -411,19 +415,26 @@ const cartState = {
 function toggleCartSidebar() {
     const cartSidebar = document.getElementById('cart-sidebar');
     const cartOverlay = document.getElementById('cart-overlay');
-    
+
     if (cartSidebar.classList.contains('active')) {
         cartSidebar.classList.remove('active');
         cartOverlay.classList.remove('active');
+        if (window.unlockBodyScroll) window.unlockBodyScroll();
     } else {
         cartSidebar.classList.add('active');
         cartOverlay.classList.add('active');
+        if (window.lockBodyScroll) window.lockBodyScroll();
     }
 }
 
 function closeCartSidebar() {
-    document.getElementById('cart-sidebar').classList.remove('active');
-    document.getElementById('cart-overlay').classList.remove('active');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const cartOverlay = document.getElementById('cart-overlay');
+    if (cartSidebar && cartSidebar.classList.contains('active')) {
+        cartSidebar.classList.remove('active');
+        cartOverlay.classList.remove('active');
+        if (window.unlockBodyScroll) window.unlockBodyScroll();
+    }
 }
 
 // 添加商品到购物车

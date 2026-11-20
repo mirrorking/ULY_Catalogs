@@ -7,14 +7,14 @@
     <link rel="icon" href="Info/Title.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="Info/Title.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20261120a">
     
     <!-- 预连接优化 -->
     <link rel="preconnect" href=".">
     <link rel="dns-prefetch" href=".">
     
     <!-- 开发者工具检测和防护脚本 -->
-    <script src="devtools-detection.js"></script>
+    <script src="devtools-detection.js?v=20261120a"></script>
     <style>
         /* 样式部分保持不变，已移除调试代码 */
         /* ========== 新增：防止文本选择和右键菜单的样式 ========== */
@@ -811,6 +811,29 @@
             padding: 0 4px;
         }
 
+        /* 手机端导航购物车按钮：复用汉堡按钮外观，仅在手机端显示 */
+        .top-nav .nav-cart-btn {
+            position: relative;
+            margin-left: auto;
+        }
+
+        .top-nav .nav-cart-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
         /* ========== 修改：商品网格布局样式 ========== */
         /* 商品网格布局 - 一行4个 */
         .products-grid {
@@ -1235,6 +1258,149 @@
                 height: 70px;
             }
         }
+
+        /* 顶部导航栏样式 */
+        .top-nav {
+            background: linear-gradient(to right, #2c3e50, #34495e);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 10px;
+        }
+
+        .top-nav .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .top-nav .logo-icon {
+            font-size: 24px;
+            color: white;
+        }
+
+        .top-nav .logo-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .top-nav .logo-text .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .top-nav .nav-tabs {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .top-nav .nav-tab {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .top-nav .nav-tab:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .top-nav .nav-menu-btn {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 手机端响应式 */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 10px 12px;
+            }
+
+            /* 手机端：logo 可收缩，给右侧购物车 + 抽屉按钮让出空间 */
+            .top-nav .logo {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            .top-nav .logo-text {
+                min-width: 0;
+            }
+
+            .top-nav .logo-text h1 {
+                font-size: 16px;
+                line-height: 1.25;
+                word-break: break-word;
+            }
+
+            .top-nav .nav-cart-btn {
+                flex: 0 0 auto;
+            }
+
+            .top-nav .logo-text .subtitle {
+                display: none;
+            }
+
+            .top-nav .nav-tabs {
+                position: fixed;
+                top: 0;
+                right: -300px;
+                width: 280px;
+                max-width: 80vw;
+                height: 100vh;
+                flex-direction: column;
+                gap: 10px;
+                padding: 60px 16px 20px;
+                background: linear-gradient(to bottom, #2c3e50, #34495e);
+                z-index: 1001;
+                overflow-y: auto;
+                transition: right 0.3s ease;
+                box-shadow: -2px 0 12px rgba(0, 0, 0, 0.25);
+            }
+
+            .top-nav .nav-tabs.open {
+                right: 0;
+            }
+
+            .top-nav .nav-tabs .nav-tab {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .top-nav .nav-tabs .language-switcher {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .top-nav .nav-menu-btn {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1265,6 +1431,12 @@
     
     <!-- 购物车遮罩层 -->
     <div class="cart-overlay" id="cart-overlay"></div>
+
+    <!-- 分类抽屉遮罩层 -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- 顶部导航抽屉遮罩层 -->
+    <div class="nav-overlay" id="nav-overlay"></div>
     
     <!-- 购物车侧边栏 -->
     <div class="cart-sidebar" id="cart-sidebar">
@@ -1338,7 +1510,14 @@
                     <div class="subtitle" id="page-subtitle">选择商品并添加到购物车，生成采购清单</div>
                 </div>
             </div>
-            <div class="nav-tabs">
+            <button class="nav-menu-btn nav-cart-btn" id="open-cart-mobile" aria-label="购物车">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="nav-cart-count" id="cart-count-mobile">0</span>
+            </button>
+            <button class="nav-menu-btn" id="open-nav-drawer" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-tabs" id="nav-tabs-drawer">
                 <!-- 语言切换器 -->
                 <div class="language-switcher">
                     <button class="language-btn" id="language-btn">
@@ -1374,6 +1553,14 @@
             </div>
         </div>
         
+        <!-- 手机端分类抽屉触发条 -->
+        <div class="mobile-filter-bar" id="mobile-filter-bar">
+            <button class="mobile-filter-btn" id="open-sidebar">
+                <i class="fas fa-list-ul"></i>
+                <span id="mobile-filter-label">Categories</span>
+            </button>
+        </div>
+
         <!-- 主内容区域 -->
         <div class="main-area">
             <!-- 侧边栏 - 商品类别树 -->
@@ -1414,10 +1601,10 @@
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     
     <!-- 引入模块化JavaScript文件 -->
-    <script src="basic-js/utils.js"></script>
-    <script src="basic-js/translations.js"></script>
-    <script src="basic-js/image-loader.js"></script>
-    <script src="basic-js/cart.js"></script>
-    <script src="basic-js/app.js"></script>
+    <script src="basic-js/utils.js?v=20261120a"></script>
+    <script src="basic-js/translations.js?v=20261120a"></script>
+    <script src="basic-js/image-loader.js?v=20261120a"></script>
+    <script src="basic-js/cart.js?v=20261120b"></script>
+    <script src="basic-js/app.js?v=20261120b"></script>
 </body>
 </html>
