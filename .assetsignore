@@ -1,0 +1,18 @@
+# 不要上传git仓库文件
+.git/**
+.gitignore
+
+# npm依赖，千万不要上传
+node_modules/**
+package*.json
+
+# wrangler缓存
+.wrangler/**
+
+# 系统垃圾文件
+**/.DS_Store
+**/Thumbs.db
+**/Desktop.ini
+
+# 开发临时文件
+*.log
