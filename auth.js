@@ -79,9 +79,11 @@ class AuthManager {
             }
         }
         
-        // 从Gist获取最新
+        // 从Gist获取最新（Gist ID 分段存储，避免明文暴露完整链接）
         try {
-            const gistUrl = `https://gist.githubusercontent.com/raw/${this.config.gistId}/uly_config.json`;
+            const gistIdParts = ['52102f8d', '0c8808a7', '33ce4451', '3a4cedd9'];
+            const gistId = gistIdParts.join('');
+            const gistUrl = `https://gist.githubusercontent.com/raw/${gistId}/uly_config.json`;
             
             const response = await fetch(gistUrl, {
                 cache: 'no-cache',

@@ -489,25 +489,6 @@
             }
         }
 
-        // 向服务器端验证接口提交验证码（验证码本身由服务器端从 Gist 比对，前端不可见）
-        async function verifyCodeWithServer(code) {
-            try {
-                const response = await fetch('/api/verify', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ code })
-                });
-                
-                const result = await response.json();
-                return result;
-            } catch (error) {
-                console.error('Server verification failed:', error);
-                return { ok: false, message: '验证服务暂时不可用，请稍后再试' };
-            }
-        }
-
         // 检查是否已被锁定
         function checkLockStatus() {
             if (window.authManager && window.authManager.isLocked()) {
@@ -583,22 +564,16 @@
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
             
-            // 向服务器端验证（验证码由服务器端从 Gist 比对，前端不可见）
-            const result = await verifyCodeWithServer(code);
+            // 纯前端验证（调用 authManager 验证）
+            const result = window.authManager.validate(code);
             
             // 显示结果
-            if (result.ok) {
-                showMessage(result.message || '验证成功！正在跳转...', 'success');
+            if (result.success) {
+                showMessage(result.message, 'success');
                 
-                // 记录认证状态（供其他页面检查）
-                const tokenData = {
-                    authenticated: true,
-                    expires: Date.now() + (24 * 60 * 60 * 1000),
-                    timestamp: Date.now()
-                };
-                try {
-                    localStorage.setItem('uly_access_token', btoa(JSON.stringify(tokenData)));
-                } catch {}
+                // 获取重定向URL
+                const redirectUrl = getReturnUrl();
+                console.log('验证成功，跳转到:', redirectUrl);
                 
                 // 清除存储的页面信息，避免下次错误使用
                 sessionStorage.removeItem('uly_return_page');
@@ -606,7 +581,7 @@
                 
                 // 延迟跳转到目标页面
                 setTimeout(() => {
-                    const redirectUrl = getReturnUrl();
+                    // 确保URL是有效的
                     if (redirectUrl && redirectUrl !== 'auth.html') {
                         window.location.href = redirectUrl;
                     } else {
@@ -614,26 +589,25 @@
                     }
                 }, 1500);
             } else {
-                showMessage(result.message || '验证码错误，请重新输入', 'error');
+                showMessage(result.message, result.locked ? 'warning' : 'error');
                 authCodeInput.classList.add('error');
                 
-                // 记录失败次数（本地限制，防止暴力破解）
-                const result2 = window.authManager.recordFailedAttempt();
-                if (result2.locked) {
+                if (result.locked) {
                     checkLockStatus();
                 } else {
+                    // 更新尝试次数信息
                     attemptsInfo.innerHTML = `
                         <i class="fas fa-exclamation-triangle"></i> 
-                        Verification failed, <strong>${result2.remainingAttempts}</strong> attempts remaining
+                        Verification failed, <strong>${result.remainingAttempts}</strong> attempts remaining
                     `;
                     attemptsInfo.style.color = '#ff4444';
+                    
+                    // 清空输入框并聚焦
+                    authCodeInput.value = '';
+                    setTimeout(() => {
+                        authCodeInput.focus();
+                    }, 100);
                 }
-                
-                // 清空输入框并聚焦
-                authCodeInput.value = '';
-                setTimeout(() => {
-                    authCodeInput.focus();
-                }, 100);
                 
                 // 重新启用提交按钮
                 submitButton.disabled = false;
